@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <PackageId>DockerSdk</PackageId>
+        <Description>DockerSdk is a library that allows you to interact with the Docker Remote API programmatically with fully asynchronous, non-blocking, and object-oriented code in your .NET applications.</Description>
+        <AssemblyName>DockerSdk</AssemblyName>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DocumentationFile>DockerSdk.xml</DocumentationFile>
+        <Version>0.1.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="DockerSdk.xml" />
+      <None Remove="Doxyfile" />
+      <None Remove="Home.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Docker.DotNet" Version="3.125.4" />
+        <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>
