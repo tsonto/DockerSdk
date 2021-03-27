@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using Api = Docker.DotNet;
+using Core = Docker.DotNet;
 
 namespace DockerSdk
 {
@@ -44,7 +44,7 @@ namespace DockerSdk
         /// </summary>
         /// <param name="ex">The exception from the core API.</param>
         /// <returns>The wrapper exception.</returns>
-        internal static DockerException Wrap(Api.DockerApiException ex)
+        internal static DockerException Wrap(Core.DockerApiException ex)
             => ex.StatusCode switch
             {
                 HttpStatusCode.BadRequest => new DockerException("The Docker daemon rejected the request because a parameter is invalid.", ex),

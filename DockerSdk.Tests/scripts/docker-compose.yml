@@ -16,3 +16,8 @@ services:
     container_name: ddnt-registry-htpasswd-tls
     ports:
       - "5001:443"
+
+  inspect-me-1:
+    build: inspect-me-1
+    image: ddnt:inspect-me-1
+    container_name: ddnt-inspect-me-1

@@ -166,10 +166,21 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="imageName">The name of image. (Not the ID.)</param>
         /// <returns>The registry hostname, possibly including a port.</returns>
-        public string GetRegistryName(string imageName)
+        public string GetRegistryName(string imageName) => GetRegistryName(imageName, Registries, out _);
+
+        /// <summary>
+        /// Parses an image's name to determine which registry the image is associated with.
+        /// </summary>
+        /// <param name="imageName">The name of image. (Not the ID.)</param>
+        /// <param name="knownRegisties"></param>
+        /// <param name="remainder"></param>
+        /// <returns>The registry hostname, possibly including a port.</returns>
+        internal static string GetRegistryName(string imageName, IEnumerable<string> knownRegisties, out string remainder)
         {
             if (string.IsNullOrEmpty(imageName))
                 throw new ArgumentException("Must not be null or empty.", nameof(imageName));
+
+            remainder = imageName;
 
             // There's always at least one non-host component, so if there's only one component we know there's no host.
             // In that case Dockerhub is the registry.
@@ -179,6 +190,7 @@ namespace DockerSdk.Registries
 
             // If there's a host component, it's always the first component.
             var candidate = components[0];
+            remainder = string.Join("/", components.Skip(1));
 
             // The only components that are allowed a : character are host components and final components. We're
             // looking at a non-final component, so if we find a : we know that we have a registry.
@@ -197,7 +209,7 @@ namespace DockerSdk.Registries
                 return candidate;
 
             // Otherwise, if we have a cached registry with this name, treat it as a registry.
-            if (_entriesByServer.ContainsKey(candidate))
+            if (knownRegisties.Contains(candidate))
                 return candidate;
 
             // Otherwise, if it contains any . characters, assume that it's a hostname.
@@ -205,6 +217,7 @@ namespace DockerSdk.Registries
                 return candidate;
 
             // Otherwise, assume that it isn't a host name, in which case we use Dockerhub.
+            remainder = imageName;
             return "docker.io";
         }
 

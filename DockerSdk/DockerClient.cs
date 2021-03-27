@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Images;
 using DockerSdk.Registries;
 
 using Core = Docker.DotNet;
@@ -18,6 +19,7 @@ namespace DockerSdk
             Core = core;
             Options = options;
             ApiVersion = negotiatedApiVersion;
+            Images = new ImageAccess(this);
             Registries = new RegistryAccess(this);
         }
 
@@ -26,6 +28,11 @@ namespace DockerSdk
         /// </summary>
         /// <remarks>This will always be the highest version that both sides support.</remarks>
         public Version ApiVersion { get; }
+
+        /// <summary>
+        /// Provides access to functionality related to Docker images.
+        /// </summary>
+        public ImageAccess Images { get; }
 
         /// <summary>
         /// Provides access to functionality related to Docker registries.
