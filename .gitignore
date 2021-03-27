@@ -122,3 +122,8 @@ ServiceFabricBackup/
 
 # Local History for Visual Studio
 .localhistory/
+
+# Specific to DockerSdk
+/DockerSdk/html
+/DockerSdk/DockerSdk.xml
+*.orig
