@@ -58,7 +58,7 @@ namespace DockerSdk.Images
         /// <list type="bullet">
         /// <item><c>*</c> matches zero or more characters</item>
         /// <item><c>?</c> matches exactly one character</item>
-        /// <item><c>[</c>... <c>]</c> matches exactly one character in the set</item>
+        /// <item><c>[</c>...<c>]</c> matches exactly one character in the set</item>
         /// </list>
         /// </para>
         /// <para>
