@@ -27,6 +27,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="scripts\inspect-me-2\Dockerfile" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\DockerSdk\DockerSdk.csproj" />
     </ItemGroup>
 

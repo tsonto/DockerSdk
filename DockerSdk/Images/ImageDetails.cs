@@ -19,23 +19,15 @@ namespace DockerSdk.Images
             Comment = raw.Comment ?? "";
             CreationTime = raw.Created;
             Digest = raw.RepoDigests?.FirstOrDefault();
-            Id = raw.ID;
-            IdShort = ImageAccess.ShortenId(raw.ID);
-            Labels = raw.ContainerConfig?.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string,string>.Empty;
-            Os = raw.Os;
+            Id = new ImageFullId(raw.ID);
+            Labels = raw.ContainerConfig?.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty;
+            OsType = Enum.Parse<GuestOsType>(raw.Os, true);
             ParentImage = parent;
             Size = raw.Size;
-            Tags = raw.RepoTags?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
+            Tags = raw.RepoTags?.Select(ImageName.Parse)?.ToImmutableArray() ?? ImmutableArray<ImageName>.Empty;
             VirtualSize = raw.VirtualSize;
-            WorkingDirectory = raw.ContainerConfig?.WorkingDir ?? GetDefaultWorkingDirectory(Os);
+            WorkingDirectory = raw.ContainerConfig?.WorkingDir ?? GetDefaultWorkingDirectory(OsType);
         }
-
-        private static string? GetDefaultWorkingDirectory(string os)
-            => os switch
-            {
-                "windows" => @"C:\",
-                _ => "/"
-            };
 
         /// <summary>
         /// Gets the image's author, or a blank string if no author information is available.
@@ -63,24 +55,27 @@ namespace DockerSdk.Images
         public string? Digest { get; }
 
         /// <summary>
-        /// Gets the image's full ID, including the hash function prefix.
+        /// Gets the image's ID.
         /// </summary>
         /// <remarks>
         /// This is a hash of the image's config file. Even with identical build inputs, this will be different for each
         /// build.
         /// </remarks>
-        public string Id { get; }
-
-        /// <summary>
-        /// Gets the short form of the ID, which is 12 hex digits long and does not include the hash function prefix.
-        /// </summary>
-        public string IdShort { get; }
+        public ImageFullId Id { get; }
 
         /// <summary>
         /// Gets the labels that have been applied to the image.
         /// </summary>
-        public IReadOnlyDictionary<string,string> Labels { get; }
-        public string Os { get; }
+        public IReadOnlyDictionary<string, string> Labels { get; }
+
+        /// <summary>
+        /// Gets the kind of OS that the image runs.
+        /// </summary>
+        /// <remarks>
+        /// The only situation where this can be Windows is when running Docker for Windows (which only runs on Windows
+        /// hosts) in Windows containers mode. In that situation Linux containers will not be visible.
+        /// </remarks>
+        public GuestOsType OsType { get; }
 
         /// <summary>
         /// Gets the image that this image was built from, of any.
@@ -91,17 +86,34 @@ namespace DockerSdk.Images
         /// </remarks>
         public ImageDetails? ParentImage { get; }
 
+        /// <summary>
+        /// Gets the size, in bytes, of the image's writable layer.
+        /// </summary>
+        /// <remarks>
+        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size.
+        /// Each subsequent container will consume memory equal to the size. These sizes do not include space consumed for
+        /// log files, volumes, configuration files, swap space, or checkpoints.
+        /// </remarks>
         public long Size { get; }
 
         /// <summary>
         /// Gets the names that the image is known by.
         /// </summary>
-        public IReadOnlyList<string> Tags { get; }
+        public IReadOnlyList<ImageName> Tags { get; }
 
+        /// <summary>
+        /// Gets the size, in bytes, of the image's read-only layers.
+        /// </summary>
+        /// <remarks>
+        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size.
+        /// Each subsequent container will consume memory equal to the size. These sizes do not include space consumed for
+        /// log files, volumes, configuration files, swap space, or checkpoints.
+        /// </remarks>
         public long VirtualSize { get; }
 
         /// <summary>
-        /// Gets the image's initial working directory. If the image did not specify a working directory, this will be set to the filesystem's root path.
+        /// Gets the image's initial working directory. If the image did not specify a working directory, this will be
+        /// set to the filesystem's root path.
         /// </summary>
         /// <remarks>This directory is guaranteed to exist inside the image.</remarks>
         public string WorkingDirectory { get; }
@@ -117,11 +129,10 @@ namespace DockerSdk.Images
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
-        internal static async Task<ImageDetails> LoadAsync(DockerClient client, string image, CancellationToken ct = default)
+        internal static async Task<ImageDetails> LoadAsync(DockerClient client, ImageReference image, CancellationToken ct = default)
         {
-            // Scrub the input.
-            if (string.IsNullOrEmpty(image))
-                throw new ArgumentException($"'{nameof(image)}' cannot be null or empty", nameof(image));
+            if (image is null)
+                throw new ArgumentNullException(nameof(image));
 
             // Fetch the main portion of the image's details.
             CoreModels.ImageInspectResponse response;
@@ -141,10 +152,17 @@ namespace DockerSdk.Images
             // If the image's parent is known, recursively fetch its details.
             ImageDetails? parent = null;
             if (!string.IsNullOrEmpty(response.Parent))
-                parent = await LoadAsync(client, response.Parent, ct);
+                parent = await LoadAsync(client, new ImageId(response.Parent), ct);
 
             return new ImageDetails(response, parent);
         }
+
+        private static string GetDefaultWorkingDirectory(GuestOsType os)
+                                                                                                                    => os switch
+                                                                                                                    {
+                                                                                                                        GuestOsType.Windows => @"C:\",
+                                                                                                                        _ => "/"
+                                                                                                                    };
 
         // TODO: Container and ContainerConfig -- these represent the temporary container created when building the image
         // TODO: DockerVersion -- the version of Docker that created the image

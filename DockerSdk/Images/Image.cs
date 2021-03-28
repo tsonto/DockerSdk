@@ -14,27 +14,16 @@ namespace DockerSdk.Images
         /// </summary>
         /// <param name="client">The <see cref="Docker"/> instance to use.</param>
         /// <param name="id">The image's full ID. If the hash function is not specified, SHA-256 is assumed.S</param>
-        internal Image(DockerClient client, string id)
+        internal Image(DockerClient client, ImageFullId id)
         {
-            _client = client;
-
-            if (id.Contains(":"))
-                Id = id;
-            else
-                Id = "sha256:" + id;
-
-            IdShort = ImageAccess.ShortenId(Id);
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            Id = id ?? throw new ArgumentNullException(nameof(id));
         }
 
         /// <summary>
-        /// Gets the image's full ID, including the hash function prefix.
+        /// Gets the image's full ID.
         /// </summary>
-        public string Id { get; }
-
-        /// <summary>
-        /// Gets the short form of the ID, which is 12 hex digits long and does not include the hash function prefix.
-        /// </summary>
-        public string IdShort { get; }
+        public ImageFullId Id { get; }
 
         private readonly DockerClient _client;
 
