@@ -12,12 +12,13 @@ namespace DockerSdk.Tests
     [Collection("Common")]
     public class ImageAccessTests
     {
-        private const string SampleImageName = "ddnt:inspect-me-1";
+        private const string SampleImage1Name = "ddnt:inspect-me-1";
+        private const string SampleImage2Name = "ddnt:inspect-me-2";
         private const string NonImageName = "ddnt:no-such-image-exists-with-this-name";
 
-        private static string ReadSampleImageId()
+        private static string GetImageId(string imageName)
         {
-            var output = Cli.Run("docker images ls --no-trunc --quiet --filter reference=" + SampleImageName);
+            var output = Cli.Run("docker images ls --no-trunc --quiet --filter reference=" + imageName);
             return output[0];
         }
 
@@ -26,10 +27,10 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            Image result = await client.Images.GetAsync(SampleImageName);
+            Image result = await client.Images.GetAsync(SampleImage1Name);
 
-            string id = ReadSampleImageId();
-            result.Id.Should().Be(id);
+            string id = GetImageId(SampleImage1Name);
+            result.Id.ToString().Should().Be(id);
         }
 
         [Fact]
@@ -37,10 +38,10 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            string id = ReadSampleImageId();
+            string id = GetImageId(SampleImage1Name);
             Image result = await client.Images.GetAsync(id);
 
-            result.Id.Should().Be(id);
+            result.Id.ToString().Should().Be(id);
         }
 
         [Fact]
@@ -48,8 +49,8 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            string id = ReadSampleImageId();
-            Image result = await client.Images.GetAsync(ImageAccess.ShortenId(id));
+            string id = GetImageId(SampleImage1Name);
+            Image result = await client.Images.GetAsync(ImageId.Shorten(id));
 
             result.Id.Should().Equals(id);
         }
@@ -68,23 +69,121 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            ImageDetails actual = await client.Images.GetDetailsAsync(SampleImageName);
+            ImageDetails actual = await client.Images.GetDetailsAsync(SampleImage1Name);
 
-            var id = ReadSampleImageId();
+            var id = GetImageId(SampleImage1Name);
             actual.Author.Should().Be("3241034+Emdot@users.noreply.github.com");
             actual.Comment.Should().Be("");   // how to set this?
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow);
-            actual.CreationTime.Should().BeAfter(DateTimeOffset.UtcNow.AddDays(-1));
+            actual.CreationTime.Should().BeAfter(DateTimeOffset.UtcNow.AddDays(-3));
             actual.Digest.Should().BeNull();   // because the image has not been synced
-            actual.Id.Should().Be(id);
-            actual.IdShort.Should().Be(ImageAccess.ShortenId(id));
+            actual.Id.ToString().Should().Be(id);
             actual.Labels["sample-label-a"].Should().Be("alpha");
             actual.Labels["sample-label-b"].Should().Be("beta");
             actual.ParentImage.Should().NotBeNull();
             actual.Size.Should().Be(5_613_130);
-            actual.Tags.Should().Contain(SampleImageName);
+            actual.Tags.Select(tag => tag.ToString()).Should().Contain(SampleImage1Name);
             actual.VirtualSize.Should().Be(5_613_130);
             actual.WorkingDirectory.Should().Be("/sample");
+        }
+
+        [Fact]
+        public async Task ListAsync_Default_IncludesSampleImages()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var list = await client.Images.ListAsync();
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            var sample2Id = GetImageId(SampleImage2Name);
+            list.Select(image => image.Id.ToString()).Should().Contain(sample1Id, sample2Id);
+        }
+
+        [Fact]
+        public async Task ListAsync_FilterByReference_Filters()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var options = new ListImagesOptions
+            {
+                ReferencePatternFilters = { "ddnt:inspect-me-?" },
+            };
+            var list = await client.Images.ListAsync(options);
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            var sample2Id = GetImageId(SampleImage2Name);
+            list.Count.Should().Be(2);
+            list.Select(image => image.Id.ToString()).Should().Contain(sample1Id, sample2Id);
+        }
+
+        [Fact]
+        public async Task ListAsync_FilterByLabelExists_Filters()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var options = new ListImagesOptions
+            {
+                HideIntermediateImages = true,
+                DanglingImagesFilter = false,
+                LabelExistsFilters = { "sample-label-b" }
+            };
+            var list = await client.Images.ListAsync(options);
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            list.Count.Should().Be(1);
+            list.Single().Id.ToString().Should().Be(sample1Id);
+        }
+
+        [Fact]
+        public async Task ListAsync_FilterByLabelValues_Filters()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var options = new ListImagesOptions
+            {
+                HideIntermediateImages = true,
+                DanglingImagesFilter = false,
+                LabelValueFilters = { ["sample-label-b"] = "beta" }
+            };
+            var list = await client.Images.ListAsync(options);
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            list.Count.Should().Be(1);
+            list.Single().Id.ToString().Should().Be(sample1Id);
+        }
+
+        [Fact]
+        public async Task ListAsync_FilterByLabelValues_LabelValueHasEqualSign_Filters()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var options = new ListImagesOptions
+            {
+                HideIntermediateImages = true,
+                DanglingImagesFilter = false,
+                LabelValueFilters = { ["label-with-equals"] = "abc=def" }
+            };
+            var list = await client.Images.ListAsync(options);
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            list.Count.Should().Be(1);
+            list.Single().Id.ToString().Should().Be(sample1Id);
+        }
+
+        [Fact]
+        public async Task ListAsync_MultipleLabelFilters_UsesAndLogic()
+        {
+            using var client = await DockerClient.StartAsync();
+
+            var options = new ListImagesOptions
+            {
+                LabelExistsFilters = { "sample-label-b", "sample-label-g" }
+            };
+            var list = await client.Images.ListAsync(options);
+
+            var sample1Id = GetImageId(SampleImage1Name);
+            var sample2Id = GetImageId(SampleImage1Name);
+            list.Count.Should().Be(0);
         }
     }
 }

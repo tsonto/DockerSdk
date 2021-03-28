@@ -12,7 +12,7 @@ namespace DockerSdk.Tests
         [InlineData("678dfa38fcfa", "678dfa38fcfa")]
         public void ShortenId_SuccessfulCases(string input, string expected)
         {
-            var actual = ImageAccess.ShortenId(input);
+            var actual = ImageId.Shorten(input);
             Assert.Equal(expected, actual);
         }
 
@@ -22,8 +22,8 @@ namespace DockerSdk.Tests
         [InlineData("mcr.microsoft.com/dotnet/runtime:5.0-buster-slim")]
         public void ShortenId_ExceptionCases(string input)
         {
-            Assert.Throws<ArgumentException>(
-                () => _ = ImageAccess.ShortenId(input));
+            Assert.Throws<MalformedReferenceException>(
+                () => _ = ImageId.Shorten(input));
         }
     }
 }

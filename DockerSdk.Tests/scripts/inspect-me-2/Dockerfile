@@ -2,8 +2,7 @@
 #LABEL maintainer="3241034+Emdot@users.noreply.github.com"
 MAINTAINER 3241034+Emdot@users.noreply.github.com
 LABEL sample-label-a="alpha"
-LABEL sample-label-b="beta"
-LABEL label-with-equals="abc=def"
-LABEL org.opencontainers.image.title="Sample image for testing image inspection"
+LABEL sample-label-g="gamma"
+LABEL org.opencontainers.image.title="A second sample image for testing image inspection"
 
 WORKDIR sample

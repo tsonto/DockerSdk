@@ -1,4 +1,5 @@
 ﻿# Sets up the docker containers needed by the project's tests.
+
 version: '3.9'
 
 services:
@@ -21,3 +22,8 @@ services:
     build: inspect-me-1
     image: ddnt:inspect-me-1
     container_name: ddnt-inspect-me-1
+
+  inspect-me-2:
+    build: inspect-me-2
+    image: ddnt:inspect-me-2
+    container_name: ddnt-inspect-me-2
