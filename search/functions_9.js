@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['remove_299',['Remove',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#aad6e78d8e3b08c5e2219e72904288cd0',1,'DockerSdk::Registries::RegistryAccess']]],
+  ['resourcenotfoundexception_300',['ResourceNotFoundException',['../classDockerSdk_1_1ResourceNotFoundException.html#a26c500264034dff4923f2761b89ac31d',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException()'],['../classDockerSdk_1_1ResourceNotFoundException.html#a396b0225b0b1534a42b7aeb808e60181',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(string message)'],['../classDockerSdk_1_1ResourceNotFoundException.html#ab9664a14e052be698fb17eea7b0eacc9',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(string message, Exception inner)'],['../classDockerSdk_1_1ResourceNotFoundException.html#a5421c9003b84fb62d0fb31304b441085',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)']]]
+];

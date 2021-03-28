@@ -1,10 +1,13 @@
 var indexSectionsWithContent =
 {
-  0: "acdfgrsu",
-  1: "cdr",
+  0: "abcdefghilmnoprstuvw",
+  1: "abcdfhilmnprst",
   2: "d",
-  3: "acdfgrs",
-  4: "acdru"
+  3: "acdefgilmrstv",
+  4: "i",
+  5: "g",
+  6: "lw",
+  7: "acdhiloprstuvw"
 };
 
 var indexSectionNames =
@@ -13,7 +16,10 @@ var indexSectionNames =
   1: "classes",
   2: "namespaces",
   3: "functions",
-  4: "properties"
+  4: "variables",
+  5: "enums",
+  6: "enumvalues",
+  7: "properties"
 };
 
 var indexSectionLabels =
@@ -22,6 +28,9 @@ var indexSectionLabels =
   1: "Classes",
   2: "Namespaces",
   3: "Functions",
-  4: "Properties"
+  4: "Variables",
+  5: "Enumerations",
+  6: "Enumerator",
+  7: "Properties"
 };
 

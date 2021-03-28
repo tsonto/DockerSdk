@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['registries_20',['Registries',['../classDockerSdk_1_1DockerClient.html#a43c3a35ee344b6d0be720221b2e6bb2d',1,'DockerSdk.DockerClient.Registries()'],['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#ad76ce098a515ec0b869e9876de61bcfd',1,'DockerSdk.Registries.RegistryAccess.Registries()']]],
-  ['registryaccess_21',['RegistryAccess',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html',1,'DockerSdk::Registries']]],
-  ['remove_22',['Remove',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#aad6e78d8e3b08c5e2219e72904288cd0',1,'DockerSdk::Registries::RegistryAccess']]]
+  ['firstcomponentcontext_86',['FirstComponentContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1FirstComponentContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
+  ['fromenvironment_87',['FromEnvironment',['../classDockerSdk_1_1ClientOptions.html#a7122610f09619f574b2b88686e84208e',1,'DockerSdk::ClientOptions']]]
 ];

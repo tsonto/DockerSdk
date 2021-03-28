@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['getregistryname_43',['GetRegistryName',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#a085849c60e1aac2c5b427b4c069ebd3a',1,'DockerSdk::Registries::RegistryAccess']]]
+  ['fromenvironment_292',['FromEnvironment',['../classDockerSdk_1_1ClientOptions.html#a7122610f09619f574b2b88686e84208e',1,'DockerSdk::ClientOptions']]]
 ];
