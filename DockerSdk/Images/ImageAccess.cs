@@ -100,11 +100,36 @@ namespace DockerSdk.Images
         /// </summary>
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns>A <see cref="Task{TResult}"/> that resolves to the list of images.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method does not necessarily return the same results as the `docker image ls` command. To get the same
+        /// results, use the <see cref="ListAsync(ListImagesOptions, CancellationToken)"/> overload and give it the <see
+        /// cref="ListImagesOptions.CommandLineDefaults"/> options.
+        /// </para>
+        /// <para>The sequence of the results is undefined.</para>
+        /// </remarks>
         public Task<IReadOnlyList<Image>> ListAsync(CancellationToken ct = default)
             => ListAsync(new(), ct);
 
+        /// <summary>
+        /// Gets a list of Docker images known to the daemon.
+        /// </summary>
+        /// <param name="options">Filters for the search.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves to the list of images.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method does not necessarily return the same results as the `docker image ls` command by default. To get
+        /// the same results, pass in <see cref="ListImagesOptions.CommandLineDefaults"/>.
+        /// </para>
+        /// <para>The sequence of the results is undefined.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="options"/> is null.</exception>
         public async Task<IReadOnlyList<Image>> ListAsync(ListImagesOptions options, CancellationToken ct = default)
         {
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+
             var request = new CoreModels.ImagesListParameters
             {
                 All = !options.HideIntermediateImages,
@@ -130,11 +155,11 @@ namespace DockerSdk.Images
 
             if (options.DanglingImagesFilter == true)
                 output.Add("dangling", new Dictionary<string, bool> { ["true"] = true });
-            else  if (options.DanglingImagesFilter == false)
+            else if (options.DanglingImagesFilter == false)
                 output.Add("dangling", new Dictionary<string, bool> { ["false"] = true });
 
             var labelsDictionary = new Dictionary<string, bool>();
-            foreach ( var label in options.LabelExistsFilters)
+            foreach (var label in options.LabelExistsFilters)
                 labelsDictionary.Add(label, true);
             foreach (var (label, value) in options.LabelValueFilters)
                 labelsDictionary.Add($"{label}={value}", true);

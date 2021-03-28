@@ -48,7 +48,7 @@ namespace DockerSdk.Images
             // If there are multiple repository components and the first component has a dot but no
             // underscores, treat it as a host component instead. Other signs of a host component
             // (port number, uppercase letters) will already have set it.
-            if (listener.Host is null && listener.NormalComponent.Count() > 1)
+            if (listener.Host is null && listener.NormalComponent.Count > 1)
             {
                 var first = listener.NormalComponent.First();
                 if (first.Contains('.') && !first.Contains('_'))

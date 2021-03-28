@@ -45,7 +45,7 @@ namespace DockerSdk.Images
         /// <summary>
         /// Gets the short form of the ID.
         /// </summary>
-        public ImageId ShortForm => new ImageId(Shorten(_value));
+        public ImageId ShortForm => new(Shorten(_value));
 
         /// <inheritdoc/>
         public override string ToString() => _value;
