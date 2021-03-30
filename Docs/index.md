@@ -104,7 +104,7 @@ Version support:
 
 | SDK versions   | API versions | Docker versions |
 |----------------|--------------|-----------------|
-| 0.1.0 - 0.5.0  | 1.41 - 1.41  | 20.10 - 20.10   |
+| 0.1.0 - 0.5.x  | 1.41 - 1.41  | 20.10 - 20.10   |
 
 ## I need even more control! ##
 If you find that you need more fine-grained control over the functionality, or if you need better performance than the SDK can give you, you can
@@ -112,4 +112,8 @@ skip the SDK layer and instead use [Docker.DotNet](https://github.com/dotnet/Doc
 conventions of the Docker REST API, but it provides a strong foundation for working with the Docker daemon at the lowest-available level.
 
 ## License ##
-DockerSdk is licensed under the [MIT license](https://raw.githubusercontent.com/Emdot/DockerSdk/main/LICENSE).
+DockerSdk is licensed under the [MIT license](articles/LICENSE.md).
+
+## Code of Conduct
+This project subscribes to a [Code of Conduct](articles/CODE-OF-CONDUCT.md).
+

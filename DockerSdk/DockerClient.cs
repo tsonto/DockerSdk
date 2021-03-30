@@ -84,7 +84,7 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DockerException">An internal error occurred within the daemon.</exception> 
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -101,7 +101,7 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DockerException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -120,7 +120,7 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DockerException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -145,6 +145,10 @@ namespace DockerSdk
             catch (TimeoutException ex)
             {
                 throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUri}. This typically means that the daemon is not running.", ex);
+            }
+            catch (Core.DockerApiException ex)
+            {
+                throw DockerException.Wrap(ex);
             }
             var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo, _libraryMaxApiVersion);
 

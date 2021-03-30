@@ -1,0 +1,4 @@
+- name: License
+  href: LICENSE.md
+- name: "Code of Conduct"
+  href: CODE-OF-CONDUCT.md

@@ -1,0 +1,5 @@
+references:
+- uid: Task
+  href: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task
+- uid: System.Net.Http.HttpRequestException
+  href: https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httprequestexception?view=net-5.0

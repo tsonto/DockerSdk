@@ -126,7 +126,10 @@ ServiceFabricBackup/
 # Specific to DockerSdk
 /DockerSdk/html
 /DockerSdk/DockerSdk.xml
-*.orig
+**/*.orig
 *.id
 act/
 /DockerSdk.Tests/TestResults
+Docs/www/
+Docs/obj/
+Docs/api/
