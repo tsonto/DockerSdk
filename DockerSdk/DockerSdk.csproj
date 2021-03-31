@@ -26,11 +26,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
-        <!--<PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />-->
         <PackageReference Include="Docker.DotNet" Version="3.125.4" />
         <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     </ItemGroup>

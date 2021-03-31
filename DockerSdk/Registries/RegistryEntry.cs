@@ -10,7 +10,7 @@ namespace DockerSdk.Registries
     /// </summary>
     internal class RegistryEntry
     {
-        public RegistryEntry(string server)
+        public RegistryEntry(RegistryReference server)
         {
             Server = server;
             encodedAuthData = Encode(new CoreModels.AuthConfig());

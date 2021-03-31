@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DockerSdk.Images
 {
@@ -36,6 +37,7 @@ namespace DockerSdk.Images
         /// <param name="input">The string to parse.</param>
         /// <param name="name">The name, or null if parsing failed.</param>
         /// <returns>True if parsing succeeded; false otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="input"/> is null or empty.</exception>
         public static bool TryParse(string input, [NotNullWhen(returnValue: true)] out ImageName? name)
         {
             if (TryParse(input, out ImageReference? reference) && reference is ImageName x)
@@ -55,6 +57,7 @@ namespace DockerSdk.Images
         /// </summary>
         /// <param name="input">The string to parse.</param>
         /// <returns>The name.</returns>
+        /// <exception cref="ArgumentException"><paramref name="input"/> is null or empty.</exception>
         /// <exception cref="MalformedReferenceException">The input could not be parsed as an image name.</exception>
         public static new ImageName Parse(string input)
             => TryParse(input, out ImageName? name)

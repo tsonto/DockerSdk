@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DockerSdk.Images
 {
@@ -13,6 +14,7 @@ namespace DockerSdk.Images
         /// <param name="input">The text to parse.</param>
         /// <param name="reference">The reference, or null if parsing failed.</param>
         /// <returns>True if parsing succeeded; false otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="input"/> is null or empty.</exception>
         public static bool TryParse(string input, [NotNullWhen(returnValue: true)] out ImageReference? reference)
         {
             if (!ImageReferenceParser.TryParse(input, out DecomposedImageReference? parsed))
