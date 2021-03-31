@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-
+using DockerSdk.Images;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 
@@ -25,21 +25,32 @@ namespace DockerSdk.Registries
         /// <summary>
         /// Gets the Docker registries that have cache entries.
         /// </summary>
-        public IEnumerable<string> Registries => _entriesByServer.Keys;
+        public IEnumerable<RegistryReference> Registries => _entriesByServer.Keys.Select(r => new RegistryReference(r));
 
         private readonly DockerClient _client;
 
-        private readonly Dictionary<string, RegistryEntry> _entriesByServer = new(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, RegistryEntry> _entriesByServer = new();
 
         /// <summary>
         /// Specifies that you want to use anonymous access to the indicated registry.
         /// </summary>
         /// <param name="registry">The name of the registry, as used in image names.</param>
-        /// <exception cref="ArgumentException">The input is null, empty, or malformatted.</exception>
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a well-formed registry access reference.
+        /// </exception>
         public void AddAnonymous(string registry)
+            => AddAnonymous(RegistryReference.Parse(registry));
+
+        /// <summary>
+        /// Specifies that you want to use anonymous access to the indicated registry.
+        /// </summary>
+        /// <param name="registry">The name of the registry, as used in image names.</param>
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        public void AddAnonymous(RegistryReference registry)
         {
-            // Scrub the input.
-            ValidateRegistryName(registry);
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
 
             // Get or add an entry for the registry.
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
@@ -56,13 +67,26 @@ namespace DockerSdk.Registries
         /// <param name="registry">The name of the registry, as used in image names.</param>
         /// <param name="username">The username to use for the registry.</param>
         /// <param name="password">The password to use for the registry.</param>
-        /// <exception cref="ArgumentException">
-        /// The registry input is null, empty, or malformatted; or the username or password are null or empty.
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a well-formed registry access reference.
         /// </exception>
         public void AddBasicAuth(string registry, string username, string password)
+            => AddBasicAuth(RegistryReference.Parse(registry), username, password);
+
+        /// <summary>
+        /// Specifies that you want to use <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">basic
+        /// authentication</a> for access to the indicated registry.
+        /// </summary>
+        /// <param name="registry">The name of the registry, as used in image names.</param>
+        /// <param name="username">The username to use for the registry.</param>
+        /// <param name="password">The password to use for the registry.</param>
+        /// <exception cref="ArgumentException">One or more of the inputs are null or the empty string.</exception>
+        public void AddBasicAuth(RegistryReference registry, string username, string password)
         {
             // Scrub the inputs.
-            ValidateRegistryName(registry);
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentException($"'{nameof(username)}' cannot be null or empty", nameof(username));
             if (string.IsNullOrEmpty(password))
@@ -81,13 +105,24 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="registry">The name of the registry, as used in image names.</param>
         /// <param name="identityToken">An identity token granted by the registry.</param>
-        /// <exception cref="ArgumentException">
-        /// The registry input is null, empty, or malformatted; or the identity token is null or empty.
+        /// <exception cref="ArgumentException">One or more of the inputs are null or the empty string.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a well-formed registry access reference.
         /// </exception>
         public void AddIdentityToken(string registry, string identityToken)
+            => AddIdentityToken(RegistryReference.Parse(registry), identityToken);
+
+        /// <summary>
+        /// Specifies that you want to use an identity token for authenticating with the indicated registry.
+        /// </summary>
+        /// <param name="registry">The name of the registry, as used in image names.</param>
+        /// <param name="identityToken">An identity token granted by the registry.</param>
+        /// <exception cref="ArgumentException">One or more of the inputs are null or the empty string.</exception>
+        public void AddIdentityToken(RegistryReference registry, string identityToken)
         {
             // Scrub the inputs.
-            ValidateRegistryName(registry);
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
             if (string.IsNullOrEmpty(identityToken))
                 throw new ArgumentException($"'{nameof(identityToken)}' cannot be null or empty", nameof(identityToken));
 
@@ -109,15 +144,37 @@ namespace DockerSdk.Registries
         /// Use the various <c>Add</c>* methods to supply authentication instructions. If no such instructions are
         /// provided, this method will try anonymous access.
         /// </remarks>
-        /// <exception cref="ArgumentException">The registry input is null, empty, or malformatted.</exception>
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a well-formed registry access reference.
+        /// </exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public async Task<bool> CheckAuthenticationAsync(string registry, CancellationToken ct = default)
+        public Task<bool> CheckAuthenticationAsync(string registry, CancellationToken ct = default)
+            => CheckAuthenticationAsync(RegistryReference.Parse(registry), ct);
+
+        /// <summary>
+        /// Tests whether the client can authenticate with the indicated registry.
+        /// </summary>
+        /// <param name="registry"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Use the various <c>Add</c>* methods to supply authentication instructions. If no such instructions are
+        /// provided, this method will try anonymous access.
+        /// </remarks>
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        public async Task<bool> CheckAuthenticationAsync(RegistryReference registry, CancellationToken ct = default)
         {
             // Scrub the inputs.
-            ValidateRegistryName(registry);
+            if (registry is null)
+                throw new ArgumentNullException(nameof(registry));
 
             // If we have an entry for that registry, get the auth object. Otherwise create a new auth object, and set a
             // flag indicating that the registry isn't already known.
@@ -132,13 +189,11 @@ namespace DockerSdk.Registries
             }
             catch (Core.DockerApiException ex)
             {
-                if (ex.StatusCode == HttpStatusCode.Unauthorized)
+                // If the exception represents a registry auth failure, return false instead.
+                if (RegistryAuthException.TryWrap(ex, registry, out _))
                     return false;
-                if (ex.StatusCode == HttpStatusCode.InternalServerError && ex.Message.Contains("401 Unauthorized"))
-                    return false;
-                if (ex.StatusCode == HttpStatusCode.InternalServerError && ex.Message.Contains("no basic auth credentials"))
-                    return false; // the registry only accepts basic auth and was given something else
 
+                // For any other kind of error, throw.
                 throw DockerException.Wrap(ex);
             }
 
@@ -165,61 +220,10 @@ namespace DockerSdk.Registries
         /// Parses an image's name to determine which registry the image is associated with.
         /// </summary>
         /// <param name="imageName">The name of image. (Not the ID.)</param>
-        /// <returns>The registry hostname, possibly including a port.</returns>
-        public string GetRegistryName(string imageName) => GetRegistryName(imageName, Registries, out _);
-
-        /// <summary>
-        /// Parses an image's name to determine which registry the image is associated with.
-        /// </summary>
-        /// <param name="imageName">The name of image. (Not the ID.)</param>
-        /// <param name="knownRegisties"></param>
-        /// <param name="remainder"></param>
-        /// <returns>The registry hostname, possibly including a port.</returns>
-        internal static string GetRegistryName(string imageName, IEnumerable<string> knownRegisties, out string remainder)
-        {
-            if (string.IsNullOrEmpty(imageName))
-                throw new ArgumentException("Must not be null or empty.", nameof(imageName));
-
-            remainder = imageName;
-
-            // There's always at least one non-host component, so if there's only one component we know there's no host.
-            // In that case Dockerhub is the registry.
-            var components = imageName.Split('/');
-            if (components.Length == 1)
-                return "docker.io";
-
-            // If there's a host component, it's always the first component.
-            var candidate = components[0];
-            remainder = string.Join("/", components.Skip(1));
-
-            // The only components that are allowed a : character are host components and final components. We're
-            // looking at a non-final component, so if we find a : we know that we have a registry.
-            if (candidate.Contains(':'))
-                return candidate;
-
-            // Only host components are allowed to use uppercase letters, so that's the next most straightforward way to
-            // test.
-            if (candidate.Any(char.IsUpper))
-                return candidate;
-
-            // The remaining criteria are ambiguous, so we're basically making educated guesses. First, check for
-            // well-known references to the current host. Note that we don't need to check the IP v6 loopback address
-            // because it can't be part of a valid image name.
-            if (candidate == "localhost" || candidate == "127.0.0.1")
-                return candidate;
-
-            // Otherwise, if we have a cached registry with this name, treat it as a registry.
-            if (knownRegisties.Contains(candidate))
-                return candidate;
-
-            // Otherwise, if it contains any . characters, assume that it's a hostname.
-            if (candidate.Contains('.'))
-                return candidate;
-
-            // Otherwise, assume that it isn't a host name, in which case we use Dockerhub.
-            remainder = imageName;
-            return "docker.io";
-        }
+        /// <returns>A reference to the registry.</returns>
+        /// <exception cref="ArgumentException"><paramref name="imageName"/> is null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">The input could not be parsed as an image name.</exception>
+        public RegistryReference GetRegistryName(string imageName) => GetRegistryName(ImageName.Parse(imageName));
 
         /// <summary>
         /// Removes an entry from the cache.
@@ -227,7 +231,76 @@ namespace DockerSdk.Registries
         /// <param name="registry">The host name of the registry to remove.</param>
         /// <returns>True if the entry was removed, or false if the entry was not present.</returns>
         /// <remarks>This method is equivalent to <c>docker logout</c>.</remarks>
-        public bool Remove(string registry) => _entriesByServer.Remove(registry);
+        /// <exception cref="ArgumentException">The input is null or empty.</exception>
+        public bool Remove(string registry) 
+            => string.IsNullOrEmpty(registry)
+            ? throw new ArgumentException("The input must not be null or empty.")
+            : _entriesByServer.Remove(registry);
+
+        /// <summary>
+        /// Removes an entry from the cache.
+        /// </summary>
+        /// <param name="registry">The host name of the registry to remove.</param>
+        /// <returns>True if the entry was removed, or false if the entry was not present.</returns>
+        /// <remarks>This method is equivalent to <c>docker logout</c>.</remarks>
+        /// <exception cref="ArgumentException">The input is null.</exception>
+        public bool Remove(RegistryReference registry) => Remove(registry.ToString());
+
+        /// <summary>
+        /// Parses an image's name to determine which registry the image is associated with.
+        /// </summary>
+        /// <param name="imageName">The name of image.</param>
+        /// <returns>The registry hostname, possibly including a port.</returns>
+        internal static RegistryReference GetRegistryName(ImageName imageName)
+        {
+            if (string.IsNullOrEmpty(imageName))
+                throw new ArgumentException("Must not be null or empty.", nameof(imageName));
+
+            // Pull apart the image reference. This will always succeed, because ImageName objects are guaranteed to be well-formed.
+            _ = ImageReferenceParser.TryParse(imageName, out DecomposedImageReference? parsed);
+            
+            // If the registry isn't given explicitly, it's implicitly Dockerhub.
+            if (string.IsNullOrEmpty(parsed!.HostWithPort))
+                return new("docker.io");
+
+            // Create the reference. We use the Parse method so it's normalized properly.
+            return RegistryReference.Parse(parsed.HostWithPort);
+        }
+
+        /// <summary>
+        /// Gets the authorization information for the given registry. If the information is not already available, the
+        /// method attempts anonymous access. If that fails, the method throws <see cref="RegistryAuthException"/>.
+        /// </summary>
+        /// <param name="registry">The Docker registry to get auth information for.</param>
+        /// <param name="ct"></param>
+        /// <returns>The auth object that Core methods need.</returns>
+        /// <exception cref="ArgumentException">The <paramref name="registry"/> input was null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The <paramref name="registry"/> is not in the expected format for a Docker registry name.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// One Task removed the auth object while another was getting it.
+        /// </exception>
+        /// <exception cref="RegistryAuthException">
+        /// The registry requires credentials that the client hasn't been given.
+        /// </exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        internal async Task<CoreModels.AuthConfig> GetAuthObjectAsync(string registry, CancellationToken ct = default)
+        {
+            if (TryGetAuthObject(registry, out CoreModels.AuthConfig? auth))
+                return auth;
+
+            if (!await CheckAuthenticationAsync(registry, ct).ConfigureAwait(false))
+                throw new RegistryAuthException($"Could not authenticate with registry {registry}. If this is a private registry, use one of the client.Registries.Add* methods to set credentials.");
+
+            if (!TryGetAuthObject(registry, out auth))
+                throw new InvalidOperationException($"Registry {registry} was removed from the client's auth information while another Task was trying to read it.");
+
+            return auth;
+        }
 
         /// <summary>
         /// Attempts to get the auth information for the given registry.
@@ -244,16 +317,6 @@ namespace DockerSdk.Registries
 
             authObject = entry.AuthObject;
             return true;
-        }
-
-        private static void ValidateRegistryName(string registry)
-        {
-            if (string.IsNullOrEmpty(registry))
-                throw new ArgumentException($"'{nameof(registry)}' cannot be null or empty", nameof(registry));
-            if (registry.Contains("//"))
-                throw new ArgumentException("The registry name must not include the protocol.", nameof(registry));
-            if (registry.Contains('/'))
-                throw new ArgumentException("The registry name must not include a path.", nameof(registry));
         }
 
         private void AddBuiltInRegistries()

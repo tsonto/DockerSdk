@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using DockerSdk.Images;
 using Core = Docker.DotNet;
 
 namespace DockerSdk
@@ -50,5 +52,26 @@ namespace DockerSdk
         /// <returns>A new <see cref="ImageNotFoundException"/> exception.</returns>
         internal static ImageNotFoundException Wrap(string image, Core.DockerImageNotFoundException ex)
             => new($"Image {image} does not exist.", ex);
+
+        internal static bool TryWrap(Core.DockerApiException ex, ImageReference image, [NotNullWhen(returnValue: true)] out DockerException? wrapped)
+        {
+            if (ex is Core.DockerImageNotFoundException imageNotFoundEx)
+            {
+                // This happens when trying to fetch an image from a Docker daemon that doesn't have it.
+                wrapped = Wrap(imageNotFoundEx);
+                return true;
+            }
+            else if (ex.StatusCode == System.Net.HttpStatusCode.NotFound && ex.Message.Contains("manifest unknown"))
+            {
+                // This happens when trying to fetch a image from a Docker registry that doesn't have it.
+                wrapped = new ImageNotFoundException($"Image {image} does not exist.", ex);
+                return true;
+            }
+            else
+            {
+                wrapped = null;
+                return false;
+            }
+        }
     }
 }

@@ -12,9 +12,12 @@ namespace DockerSdk.Tests
     [Collection("Common")]
     public class ImageAccessTests
     {
-        private const string SampleImage1Name = "ddnt:inspect-me-1";
-        private const string SampleImage2Name = "ddnt:inspect-me-2";
-        private const string NonImageName = "ddnt:no-such-image-exists-with-this-name";
+        private const string LocalImage1Name = "ddnt:inspect-me-1";
+        private const string LocalImage2Name = "ddnt:inspect-me-2";
+        private const string LocalNonImageName = "ddnt:no-such-image-exists-with-this-name";
+        private const string RemoteImage1Name = "emdot/docker-dotnet-test:empty.1";
+        private const string RemoteNonImageName = "emdot/docker-dotnet-test:no-such-image-exists-with-this-name";
+        private const string PrivateImage1Name = "emdot/dockersdk-private:inspect-me-1";
 
         private static string GetImageId(string imageName)
         {
@@ -27,9 +30,9 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            Image result = await client.Images.GetAsync(SampleImage1Name);
+            Image result = await client.Images.GetAsync(LocalImage1Name);
 
-            string id = GetImageId(SampleImage1Name);
+            string id = GetImageId(LocalImage1Name);
             result.Id.ToString().Should().Be(id);
         }
 
@@ -38,7 +41,7 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            string id = GetImageId(SampleImage1Name);
+            string id = GetImageId(LocalImage1Name);
             Image result = await client.Images.GetAsync(id);
 
             result.Id.ToString().Should().Be(id);
@@ -49,7 +52,7 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            string id = GetImageId(SampleImage1Name);
+            string id = GetImageId(LocalImage1Name);
             Image result = await client.Images.GetAsync(ImageId.Shorten(id));
 
             result.Id.Should().Equals(id);
@@ -61,7 +64,7 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
 
             await Assert.ThrowsAsync<ImageNotFoundException>(
-                () => client.Images.GetAsync(NonImageName));
+                () => client.Images.GetAsync(LocalNonImageName));
         }
 
         [Fact]
@@ -69,20 +72,20 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
 
-            ImageDetails actual = await client.Images.GetDetailsAsync(SampleImage1Name);
+            ImageDetails actual = await client.Images.GetDetailsAsync(LocalImage1Name);
 
-            var id = GetImageId(SampleImage1Name);
+            var id = GetImageId(LocalImage1Name);
             actual.Author.Should().Be("3241034+Emdot@users.noreply.github.com");
             actual.Comment.Should().Be("");   // how to set this?
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow);
-            actual.CreationTime.Should().BeAfter(DateTimeOffset.UtcNow.AddDays(-3));
+            actual.CreationTime.Should().BeAfter(DateTimeOffset.Parse("2021-1-1"));
             actual.Digest.Should().BeNull();   // because the image has not been synced
             actual.Id.ToString().Should().Be(id);
             actual.Labels["sample-label-a"].Should().Be("alpha");
             actual.Labels["sample-label-b"].Should().Be("beta");
             actual.ParentImage.Should().NotBeNull();
             actual.Size.Should().Be(5_613_130);
-            actual.Tags.Select(tag => tag.ToString()).Should().Contain(SampleImage1Name);
+            actual.Tags.Select(tag => tag.ToString()).Should().Contain(LocalImage1Name);
             actual.VirtualSize.Should().Be(5_613_130);
             actual.WorkingDirectory.Should().Be("/sample");
         }
@@ -94,8 +97,8 @@ namespace DockerSdk.Tests
 
             var list = await client.Images.ListAsync();
 
-            var sample1Id = GetImageId(SampleImage1Name);
-            var sample2Id = GetImageId(SampleImage2Name);
+            var sample1Id = GetImageId(LocalImage1Name);
+            var sample2Id = GetImageId(LocalImage2Name);
             list.Select(image => image.Id.ToString()).Should().Contain(sample1Id, sample2Id);
         }
 
@@ -110,8 +113,8 @@ namespace DockerSdk.Tests
             };
             var list = await client.Images.ListAsync(options);
 
-            var sample1Id = GetImageId(SampleImage1Name);
-            var sample2Id = GetImageId(SampleImage2Name);
+            var sample1Id = GetImageId(LocalImage1Name);
+            var sample2Id = GetImageId(LocalImage2Name);
             list.Count.Should().Be(2);
             list.Select(image => image.Id.ToString()).Should().Contain(sample1Id, sample2Id);
         }
@@ -129,7 +132,7 @@ namespace DockerSdk.Tests
             };
             var list = await client.Images.ListAsync(options);
 
-            var sample1Id = GetImageId(SampleImage1Name);
+            var sample1Id = GetImageId(LocalImage1Name);
             list.Count.Should().Be(1);
             list.Single().Id.ToString().Should().Be(sample1Id);
         }
@@ -147,7 +150,7 @@ namespace DockerSdk.Tests
             };
             var list = await client.Images.ListAsync(options);
 
-            var sample1Id = GetImageId(SampleImage1Name);
+            var sample1Id = GetImageId(LocalImage1Name);
             list.Count.Should().Be(1);
             list.Single().Id.ToString().Should().Be(sample1Id);
         }
@@ -165,7 +168,7 @@ namespace DockerSdk.Tests
             };
             var list = await client.Images.ListAsync(options);
 
-            var sample1Id = GetImageId(SampleImage1Name);
+            var sample1Id = GetImageId(LocalImage1Name);
             list.Count.Should().Be(1);
             list.Single().Id.ToString().Should().Be(sample1Id);
         }
@@ -181,9 +184,59 @@ namespace DockerSdk.Tests
             };
             var list = await client.Images.ListAsync(options);
 
-            var sample1Id = GetImageId(SampleImage1Name);
-            var sample2Id = GetImageId(SampleImage1Name);
+            var sample1Id = GetImageId(LocalImage1Name);
+            var sample2Id = GetImageId(LocalImage1Name);
             list.Count.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task PullAsync_NotAvailableLocally_RetrievesImage()
+        {
+            _ = Cli.Run($"docker image rm {RemoteImage1Name}", ignoreErrors: true);
+
+            using var client = await DockerClient.StartAsync();
+
+            var image = await client.Images.PullAsync(RemoteImage1Name);
+
+            image.Should().NotBeNull();
+
+            _ = Cli.Run($"docker image rm {RemoteImage1Name}", ignoreErrors: true);
+        }
+
+        [Fact]
+        public async Task PullAsync_IsAvailableLocally_RetrievesImage()
+        {
+            _ = Cli.Run($"docker image pull {RemoteImage1Name}", ignoreErrors: true);
+
+            using var client = await DockerClient.StartAsync();
+
+            var image = await client.Images.PullAsync(RemoteImage1Name);
+
+            image.Should().NotBeNull();
+
+            _ = Cli.Run($"docker image rm {RemoteImage1Name}", ignoreErrors: true);
+        }
+
+        [Fact]
+        public async Task PullAsync_NoSuchImageExists_ThrowsImageNotFoundException()
+        {
+            _ = Cli.Run($"docker image rm {RemoteNonImageName}", ignoreErrors: true);
+
+            using var client = await DockerClient.StartAsync();
+
+            await Assert.ThrowsAsync<ImageNotFoundException>(
+                () => client.Images.PullAsync(RemoteNonImageName));
+        }
+
+        [Fact]
+        public async Task PullAsync_FromPrivateRegistry_WithoutCredentials_ThrowsRegistryAuthException()
+        {
+            _ = Cli.Run($"docker image rm {PrivateImage1Name}", ignoreErrors: true);
+
+            using var client = await DockerClient.StartAsync();
+
+            await Assert.ThrowsAsync<RegistryAuthException>(
+                () => client.Images.PullAsync(PrivateImage1Name));
         }
     }
 }

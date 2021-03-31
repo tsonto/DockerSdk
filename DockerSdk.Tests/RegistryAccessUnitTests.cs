@@ -60,7 +60,7 @@ namespace DockerSdk.Tests
 
             access.Clear();
 
-            access.Registries.Should().Contain("docker.io");
+            access.Registries.Should().Contain(new RegistryReference("docker.io"));
         }
 
         [Theory]
@@ -70,15 +70,16 @@ namespace DockerSdk.Tests
         [InlineData("example/test:123", "docker.io")]
         [InlineData("example.com", "docker.io")]
         [InlineData("example.com:123", "docker.io")]
-        [InlineData("Example/test", "Example")]
-        [InlineData("localhost/test", "localhost")]
+        [InlineData("example.com/test:0123", "example.com")]
+        [InlineData("example.com:0123/test", "example.com:123")]
+        [InlineData("Example/test", "example")]
         public void GetRegistryName_ProducesExpectedOutput(string imageName, string expected)
         {
             var access = new RegistryAccess(null!);
 
             var actual = access.GetRegistryName(imageName);
 
-            actual.Should().Be(expected);
+            actual.ToString().Should().Be(expected);
         }
 
         [Fact]

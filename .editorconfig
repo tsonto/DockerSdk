@@ -148,3 +148,11 @@ csharp_space_between_method_call_empty_parameter_list_parentheses = false
 csharp_preserve_single_line_statements = true
 csharp_preserve_single_line_blocks = true
 
+###############################
+# C# Analyzer Adjustments     #
+###############################
+
+[*.cs]
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = silent

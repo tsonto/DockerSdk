@@ -149,6 +149,81 @@ namespace DockerSdk.Images
             return response.Select(raw => new Image(_docker, new ImageFullId(raw.ID))).ToArray();
         }
 
+        /// <summary>
+        /// Retrieves the indicated image from its remote home.
+        /// </summary>
+        /// <param name="image">A reference to the image to fetch.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves to the downloaded image.</returns>
+        /// <remarks>
+        /// This instructs the Docker daemon to download the image from the image's home registry. The registry is
+        /// determined based on the image's name, defaulting to "docker.io".
+        /// </remarks>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null or empty.</exception>
+        /// <exception cref="MalformedReferenceException">The input could not be parsed as an image name.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// One Task removed the auth object while another was getting it.
+        /// </exception>
+        /// <exception cref="RegistryAuthException">
+        /// The registry requires credentials that the client hasn't been given.
+        /// </exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        public Task<Image> PullAsync(string image, CancellationToken ct = default)
+            => PullAsync(ImageReference.Parse(image), ct);
+
+        /// <summary>
+        /// Retrieves the indicated image from its remote home.
+        /// </summary>
+        /// <param name="image">A reference to the image to fetch.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves to the downloaded image.</returns>
+        /// <remarks>
+        /// This instructs the Docker daemon to download the image from the image's home registry. The registry is
+        /// determined based on the image's name, defaulting to "docker.io".
+        /// </remarks>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null.</exception>
+        /// <exception cref="MalformedReferenceException">The input could not be parsed as an image name.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// One Task removed the auth object while another was getting it.
+        /// </exception>
+        /// <exception cref="RegistryAuthException">
+        /// The registry requires credentials that the client hasn't been given.
+        /// </exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        public async Task<Image> PullAsync(ImageReference image, CancellationToken ct = default)
+        {
+            // Get the authentication information for the image's registry.
+            var registryName = _docker.Registries.GetRegistryName(image);
+            var auth = await _docker.Registries.GetAuthObjectAsync(registryName, ct).ConfigureAwait(false);
+
+            // Perform the pull request.
+            var request = new CoreModels.ImagesCreateParameters
+            {
+                FromImage = image,
+            };
+            try
+            {
+                await _docker.Core.Images.CreateImageAsync(request, auth, new NoOpProgress(), ct).ConfigureAwait(false);
+            }
+            catch (Core.DockerApiException ex)
+            {
+                if (ImageNotFoundException.TryWrap(ex, image, out var nex))
+                    throw nex;
+                if (RegistryAuthException.TryWrap(ex, registryName, out nex))
+                    throw nex;
+                throw DockerException.Wrap(ex);
+            }
+
+            // Return an object representing the new image.
+            return await GetAsync(image, ct).ConfigureAwait(false);
+        }
+
         private static IDictionary<string, IDictionary<string, bool>> MakeListFilters(ListImagesOptions options)
         {
             var output = new Dictionary<string, IDictionary<string, bool>>();
@@ -175,7 +250,12 @@ namespace DockerSdk.Images
             return output;
         }
 
-        // TODO: PullAsync
+        private class NoOpProgress : IProgress<CoreModels.JSONMessage>
+        {
+            public void Report(CoreModels.JSONMessage value)
+            {
+            }
+        }
 
         // TODO: PushAsync
 
