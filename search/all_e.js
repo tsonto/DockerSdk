@@ -1,11 +1,4 @@
 var searchData=
 [
-  ['referencecontext_132',['ReferenceContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1ReferenceContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
-  ['referenceonlycontext_133',['ReferenceOnlyContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1ReferenceOnlyContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
-  ['referencepatternfilters_134',['ReferencePatternFilters',['../classDockerSdk_1_1Images_1_1ListImagesOptions.html#afdb25c20460e9ccf99b5efe9fec22ba3',1,'DockerSdk::Images::ListImagesOptions']]],
-  ['registries_135',['Registries',['../classDockerSdk_1_1DockerClient.html#a43c3a35ee344b6d0be720221b2e6bb2d',1,'DockerSdk.DockerClient.Registries()'],['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#ad76ce098a515ec0b869e9876de61bcfd',1,'DockerSdk.Registries.RegistryAccess.Registries()']]],
-  ['registryaccess_136',['RegistryAccess',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html',1,'DockerSdk::Registries']]],
-  ['remove_137',['Remove',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#aad6e78d8e3b08c5e2219e72904288cd0',1,'DockerSdk::Registries::RegistryAccess']]],
-  ['repositorycontext_138',['RepositoryContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1RepositoryContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
-  ['resourcenotfoundexception_139',['ResourceNotFoundException',['../classDockerSdk_1_1ResourceNotFoundException.html',1,'DockerSdk.ResourceNotFoundException'],['../classDockerSdk_1_1ResourceNotFoundException.html#a26c500264034dff4923f2761b89ac31d',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException()'],['../classDockerSdk_1_1ResourceNotFoundException.html#a396b0225b0b1534a42b7aeb808e60181',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(string message)'],['../classDockerSdk_1_1ResourceNotFoundException.html#ab9664a14e052be698fb17eea7b0eacc9',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(string message, Exception inner)'],['../classDockerSdk_1_1ResourceNotFoundException.html#a5421c9003b84fb62d0fb31304b441085',1,'DockerSdk.ResourceNotFoundException.ResourceNotFoundException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)']]]
+  ['usetls_64',['UseTls',['../classDockerSdk_1_1ClientOptions.html#a7b793640689a2485bd3753614edf5948',1,'DockerSdk::ClientOptions']]]
 ];

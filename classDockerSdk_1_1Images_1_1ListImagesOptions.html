@@ -251,7 +251,7 @@ Properties</h2></td></tr>
 <li>
 <code>?</code> matches exactly one character </li>
 <li>
-<code>[</code>... <code>]</code> matches exactly one character in the set </li>
+<code>[</code>...<code>]</code> matches exactly one character in the set </li>
 </ul>
 <p>The patterns can match the repository (in which case all tags for that repository are returned) or the repository:tag or the repository@digest. Patterns do not match against the ID. </p>
 <p>Caution: If you use <code>*</code> without <code>:</code> or <code>&lt;/c&gt; you might accidentally match more than you expect. For example, glob "a*b" will match "axb:1.0", "a:xb", and "ax@sha256:bf756fb1ae65adf866bd8c456593cd24beb6a0a061dedf42b26a993176745f6b". Even with <code>:</code> it's possible to accidentally match a digest, such as "a*:*b" matching "ax@sha256:bf756fb1ae65adf866bd8c456593cd24beb6a0a061dedf42b26a993176745f6b". </code></p>

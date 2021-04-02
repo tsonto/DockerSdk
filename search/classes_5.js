@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['hexcharcontext_192',['HexCharContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1HexCharContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
-  ['hostcomponentcontext_193',['HostComponentContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1HostComponentContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]],
-  ['hostnamecontext_194',['HostnameContext',['../classDockerSdk_1_1Images_1_1Parser_1_1ImageReferencesParser_1_1HostnameContext.html',1,'DockerSdk::Images::Parser::ImageReferencesParser']]]
+  ['registryaccess_79',['RegistryAccess',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html',1,'DockerSdk::Registries']]],
+  ['registryauthexception_80',['RegistryAuthException',['../classDockerSdk_1_1RegistryAuthException.html',1,'DockerSdk']]],
+  ['resourcenotfoundexception_81',['ResourceNotFoundException',['../classDockerSdk_1_1ResourceNotFoundException.html',1,'DockerSdk']]]
 ];

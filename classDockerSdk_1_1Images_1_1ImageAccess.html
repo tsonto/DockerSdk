@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classDockerSdk_1_1Images_1_1ImageAccess-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -97,6 +98,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac802d3a4152cbc420a9f32096e5e71eb"><td class="memItemLeft" align="right" valign="top">async Task&lt; IReadOnlyList&lt; <a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1ImageAccess.html#ac802d3a4152cbc420a9f32096e5e71eb">ListAsync</a> (<a class="el" href="classDockerSdk_1_1Images_1_1ListImagesOptions.html">ListImagesOptions</a> options, CancellationToken ct=default)</td></tr>
 <tr class="memdesc:ac802d3a4152cbc420a9f32096e5e71eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a list of Docker images known to the daemon.  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#ac802d3a4152cbc420a9f32096e5e71eb">More...</a><br /></td></tr>
 <tr class="separator:ac802d3a4152cbc420a9f32096e5e71eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8928195ff855f48d5261048d498f9921"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1ImageAccess.html#a8928195ff855f48d5261048d498f9921">PullAsync</a> (string image, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a8928195ff855f48d5261048d498f9921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the indicated image from its remote home.  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#a8928195ff855f48d5261048d498f9921">More...</a><br /></td></tr>
+<tr class="separator:a8928195ff855f48d5261048d498f9921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7259abcf2efa5155dce100eb130dc1d4"><td class="memItemLeft" align="right" valign="top">async Task&lt; <a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1ImageAccess.html#a7259abcf2efa5155dce100eb130dc1d4">PullAsync</a> (<a class="el" href="namespaceDockerSdk_1_1Images.html#acf63d34bd9d26a759a70005ab3a96944">ImageReference</a> image, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a7259abcf2efa5155dce100eb130dc1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the indicated image from its remote home.  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#a7259abcf2efa5155dce100eb130dc1d4">More...</a><br /></td></tr>
+<tr class="separator:a7259abcf2efa5155dce100eb130dc1d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides methods for interacting with Docker images. </p>
@@ -368,6 +375,112 @@ Public Member Functions</h2></td></tr>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentNullException</td><td><em>options</em>  is null.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7259abcf2efa5155dce100eb130dc1d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7259abcf2efa5155dce100eb130dc1d4">&#9670;&nbsp;</a></span>PullAsync() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">async Task&lt;<a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a>&gt; DockerSdk.Images.ImageAccess.PullAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceDockerSdk_1_1Images.html#acf63d34bd9d26a759a70005ab3a96944">ImageReference</a>&#160;</td>
+          <td class="paramname"><em>image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the indicated image from its remote home. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">image</td><td>A reference to the image to fetch.</td></tr>
+    <tr><td class="paramname">ct</td><td>A token used to cancel the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the downloaded image.</dd></dl>
+<p>This instructs the Docker daemon to download the image from the image's home registry. The registry is determined based on the image's name, defaulting to "docker.io". </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The input could not be parsed as an image name.</td></tr>
+    <tr><td class="paramname">InvalidOperationException</td><td>One Task removed the auth object while another was getting it. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. </td></tr>
+    <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8928195ff855f48d5261048d498f9921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8928195ff855f48d5261048d498f9921">&#9670;&nbsp;</a></span>PullAsync() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a>&gt; DockerSdk.Images.ImageAccess.PullAsync </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves the indicated image from its remote home. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">image</td><td>A reference to the image to fetch.</td></tr>
+    <tr><td class="paramname">ct</td><td>A token used to cancel the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the downloaded image.</dd></dl>
+<p>This instructs the Docker daemon to download the image from the image's home registry. The registry is determined based on the image's name, defaulting to "docker.io". </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The input could not be parsed as an image name.</td></tr>
+    <tr><td class="paramname">InvalidOperationException</td><td>One Task removed the auth object while another was getting it. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. </td></tr>
+    <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
 </dl>
