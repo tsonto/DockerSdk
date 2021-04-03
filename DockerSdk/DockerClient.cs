@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Containers;
 using DockerSdk.Images;
 using DockerSdk.Registries;
 
@@ -21,6 +22,7 @@ namespace DockerSdk
             ApiVersion = negotiatedApiVersion;
             Images = new ImageAccess(this);
             Registries = new RegistryAccess(this);
+            Containers = new ContainerAccess(this);
         }
 
         /// <summary>
@@ -38,6 +40,11 @@ namespace DockerSdk
         /// Provides access to functionality related to Docker registries.
         /// </summary>
         public RegistryAccess Registries { get; }
+
+        /// <summary>
+        /// Provides access to functionality related to Docker containers.
+        /// </summary>
+        public ContainerAccess Containers { get; }
 
         /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.

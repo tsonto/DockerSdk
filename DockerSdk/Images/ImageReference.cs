@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace DockerSdk.Images
 {
     /// <summary>
-    /// Represents an image name or full ID.
+    /// Represents an image name or ID.
     /// </summary>
     public abstract record ImageReference
     {
