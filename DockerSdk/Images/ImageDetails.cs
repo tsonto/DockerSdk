@@ -158,11 +158,11 @@ namespace DockerSdk.Images
         }
 
         private static string GetDefaultWorkingDirectory(GuestOsType os)
-                                                                                                                    => os switch
-                                                                                                                    {
-                                                                                                                        GuestOsType.Windows => @"C:\",
-                                                                                                                        _ => "/"
-                                                                                                                    };
+            => os switch
+            {
+                GuestOsType.Windows => @"C:\",
+                _ => "/"
+            };
 
         // TODO: Container and ContainerConfig -- these represent the temporary container created when building the image
         // TODO: DockerVersion -- the version of Docker that created the image

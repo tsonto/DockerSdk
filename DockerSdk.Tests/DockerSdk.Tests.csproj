@@ -27,6 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="scripts\error-out\Dockerfile" />
+      <None Remove="scripts\error-out\script.sh" />
       <None Remove="scripts\infinite-loop\Dockerfile" />
       <None Remove="scripts\inspect-me-2\Dockerfile" />
     </ItemGroup>

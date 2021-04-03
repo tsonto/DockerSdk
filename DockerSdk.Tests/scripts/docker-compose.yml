@@ -32,3 +32,8 @@ services:
     build: infinite-loop
     image: ddnt:infinite-loop
     container_name: ddnt-infinite-loop
+  
+  error-out:
+    build: error-out
+    image: ddnt:error-out
+    container_name: ddnt-error-out

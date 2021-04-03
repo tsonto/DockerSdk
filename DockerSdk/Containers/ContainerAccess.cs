@@ -59,9 +59,51 @@ namespace DockerSdk.Containers
         /// Caution: Container names and short IDs are not guaranteed to be unique. If there is more than one match for
         /// the reference, the result is undefined.
         /// </remarks>
-        public Task<Container> GetAsync(ContainerReference container, CancellationToken ct = default)
+        public async Task<Container> GetAsync(ContainerReference container, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            if (container is null)
+                throw new ArgumentNullException(nameof(container));
+
+            CoreModels.ContainerInspectResponse response;
+            try
+            {
+                response = await _docker.Core.Containers.InspectContainerAsync(container, ct).ConfigureAwait(false);
+            }
+            catch (Core.DockerContainerNotFoundException ex)
+            {
+                throw new ContainerNotFoundException($"No such container \"{container}\".", ex);
+            }
+            catch (Core.DockerApiException ex)
+            {
+                throw DockerException.Wrap(ex);
+            }
+
+            return new Container(_docker, new ContainerFullId(response.ID));
+        }
+
+        public Task<ContainerDetails> GetDetailsAsync(string container, CancellationToken ct = default)
+                    => GetDetailsAsync(ContainerReference.Parse(container), ct);
+
+        public async Task<ContainerDetails> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
+        {
+            if (container is null)
+                throw new ArgumentNullException(nameof(container));
+
+            CoreModels.ContainerInspectResponse response;
+            try
+            {
+                response = await _docker.Core.Containers.InspectContainerAsync(container, ct).ConfigureAwait(false);
+            }
+            catch (Core.DockerContainerNotFoundException ex)
+            {
+                throw new ContainerNotFoundException($"No such container \"{container}\".", ex);
+            }
+            catch (Core.DockerApiException ex)
+            {
+                throw DockerException.Wrap(ex);
+            }
+
+            return new ContainerDetails(response);
         }
 
         /// <summary>
@@ -174,7 +216,6 @@ namespace DockerSdk.Containers
         }
 
         // TODO: CreateAsync
-        // TODO: GetDetailsAsync
         // TODO: StartAsync
         // TODO: StopAsync, optionally combine with wait
         // TODO: RestartAsync

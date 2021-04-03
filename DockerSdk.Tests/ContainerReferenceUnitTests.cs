@@ -45,6 +45,22 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
+        public void TryParse_Name_WithLeadingSlash_Success()
+        {
+            string value = "/clever_wozniak";
+            Assert.True(ContainerReference.TryParse(value, out var reference));
+            Assert.IsType<ContainerName>(reference);
+            Assert.Equal("clever_wozniak", reference!.ToString());
+        }
+
+        [Fact]
+        public void NewContainerName_WithLeadingSlash_Success()
+        {
+            var actual = new ContainerName("/clever_wozniak");
+            Assert.Equal("clever_wozniak", actual.ToString());
+        }
+
+        [Fact]
         public void TryParse_ShortId_Success()
         {
             string value = "366ad733152b";

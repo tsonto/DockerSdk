@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DockerSdk.Containers
@@ -23,6 +24,9 @@ namespace DockerSdk.Containers
             _client = client;
             Id = id;
         }
+
+        public Task<ContainerDetails> GetDetailsAsync(CancellationToken ct = default)
+            => _client.Containers.GetDetailsAsync(Id, ct);
 
         // TODO: GetDetailsAsync
         // TODO: ListProcessesAsync
