@@ -27,3 +27,8 @@ services:
     build: inspect-me-2
     image: ddnt:inspect-me-2
     container_name: ddnt-inspect-me-2
+
+  infinite-loop:
+    build: infinite-loop
+    image: ddnt:infinite-loop
+    container_name: ddnt-infinite-loop

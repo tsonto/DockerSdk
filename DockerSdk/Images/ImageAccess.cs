@@ -224,7 +224,7 @@ namespace DockerSdk.Images
             return await GetAsync(image, ct).ConfigureAwait(false);
         }
 
-        private static IDictionary<string, IDictionary<string, bool>> MakeListFilters(ListImagesOptions options)
+        private static IDictionary<string, IDictionary<string, bool>>? MakeListFilters(ListImagesOptions options)
         {
             var output = new Dictionary<string, IDictionary<string, bool>>();
 
@@ -247,6 +247,8 @@ namespace DockerSdk.Images
             if (globsDictionary.Any())
                 output.Add("reference", globsDictionary);
 
+            if (!output.Any())
+                return null;
             return output;
         }
 

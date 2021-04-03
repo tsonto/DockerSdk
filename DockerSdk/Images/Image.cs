@@ -7,6 +7,7 @@ namespace DockerSdk.Images
     /// <summary>
     /// Represents a Docker image, which is a read-only template for creating containers.
     /// </summary>
+    /// <seealso cref="ImageDetails"/>
     public class Image
     {
         /// <summary>
