@@ -1,4 +1,6 @@
-﻿# Creates an image that hosts a Docker registry. The registry uses basic 
+﻿# syntax=docker/dockerfile:1.2
+
+# Creates an image that hosts a Docker registry. The registry uses basic 
 # authentication with TLS. The username is "testuser" and the password is
 # "testpassword".
 

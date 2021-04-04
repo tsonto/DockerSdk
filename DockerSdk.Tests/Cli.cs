@@ -1,56 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
 {
+    public delegate void CliWriter(string s);
+
     /// <summary>
     /// Runs commands on in a PowerShell command line. This is meant for setting up tests via the docker CLI.
     /// </summary>
     internal static class Cli
     {
-        internal static Action<string>? writer = null;
+        internal static CliWriter? staticWriter = null;
 
-        private static void Write(string message) => writer?.Invoke(message);
+        private static void Write(CliWriter? writer, string message) => writer?.Invoke(message);
 
-        /// <summary>
-        /// Runs a series of commands in a Powershell prompt.
-        /// </summary>
-        /// <param name="commands">An array where each line is a command to run.</param>
-        /// <returns>An array of lines written to stdout across all commands.</returns>
-        /// <remarks>
-        /// If any command returns a non-zero exit code or writes to stderr, the subsequent commands do not run. <br/>
-        /// Use of stdin is not supported.
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        /// One of the commands either wrote to stdout or returned a non-zero exit code.
-        /// </exception>
-        public static string[] Run(params string[] commands)
-            => Run(false, commands);
+        ///// <summary>
+        ///// Runs a series of commands in a Powershell prompt.
+        ///// </summary>
+        ///// <param name="commands">An array where each line is a command to run.</param>
+        ///// <returns>An array of lines written to stdout across all commands.</returns>
+        ///// <remarks>
+        ///// If any command returns a non-zero exit code or writes to stderr, the subsequent commands do not run. <br/>
+        ///// Use of stdin is not supported.
+        ///// </remarks>
+        ///// <exception cref="InvalidOperationException">
+        ///// One of the commands either wrote to stdout or returned a non-zero exit code.
+        ///// </exception>
+        //public static string[] Run(params string[] commands)
+        //    => Run(false, commands);
 
-        /// <summary>
-        /// Runs a series of commands in a Powershell prompt.
-        /// </summary>
-        /// <param name="ignoreErrors">True to ignore any errors that the commands may raise.</param>
-        /// <param name="commands">An array where each line is a command to run.</param>
-        /// <returns>An array of lines written to stdout across all commands.</returns>
-        /// <remarks>
-        /// If any command returns a non-zero exit code or writes to stderr, the subsequent commands do not run, unless
-        /// <paramref name="ignoreErrors"/> is true. <br/> Use of stdin is not supported.
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        /// One of the commands either wrote to stdout or returned a non-zero exit code, and <paramref
-        /// name="ignoreErrors"/> was false.
-        /// </exception>
-        public static string[] Run(bool ignoreErrors, params string[] commands)
-        {
-            var output = new List<string>();
-            foreach (var command in commands)
-                output.AddRange(Run(command, ignoreErrors));
-            return output.ToArray();
-        }
+        ///// <summary>
+        ///// Runs a series of commands in a Powershell prompt.
+        ///// </summary>
+        ///// <param name="ignoreErrors">True to ignore any errors that the commands may raise.</param>
+        ///// <param name="commands">An array where each line is a command to run.</param>
+        ///// <returns>An array of lines written to stdout across all commands.</returns>
+        ///// <remarks>
+        ///// If any command returns a non-zero exit code or writes to stderr, the subsequent commands do not run, unless
+        ///// <paramref name="ignoreErrors"/> is true. <br/> Use of stdin is not supported.
+        ///// </remarks>
+        ///// <exception cref="InvalidOperationException">
+        ///// One of the commands either wrote to stdout or returned a non-zero exit code, and <paramref
+        ///// name="ignoreErrors"/> was false.
+        ///// </exception>
+        //public static string[] Run(bool ignoreErrors, params string[] commands)
+        //{
+        //    var output = new List<string>();
+        //    foreach (var command in commands)
+        //        output.AddRange(Run(command, ignoreErrors));
+        //    return output.ToArray();
+        //}
 
         /// <summary>
         /// Runs a command in a Powershell prompt.
@@ -61,7 +64,18 @@ namespace DockerSdk.Tests
         /// The command either wrote to stdout or returned a non-zero exit code.
         /// </exception>
         public static string[] Run(string command)
-            => Run(command, false);
+            => Run(staticWriter, command, false);
+
+        /// <summary>
+        /// Runs a command in a Powershell prompt.
+        /// </summary>
+        /// <param name="command">The command to run.</param>
+        /// <returns>An array of lines written to stdout.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// The command either wrote to stdout or returned a non-zero exit code.
+        /// </exception>
+        public static string[] Run(CliWriter? writer, string command)
+            => Run(writer, command, false);
 
         /// <summary>
         /// Runs a command in a Powershell prompt.
@@ -74,6 +88,19 @@ namespace DockerSdk.Tests
         /// false.
         /// </exception>
         public static string[] Run(string command, bool ignoreErrors)
+            => Run(staticWriter, command, ignoreErrors);
+
+        /// <summary>
+        /// Runs a command in a Powershell prompt.
+        /// </summary>
+        /// <param name="command">The command to run.</param>
+        /// <param name="ignoreErrors">True to ignore any errors that the command may raise.</param>
+        /// <returns>An array of lines written to stdout.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// The command either wrote to stdout or returned a non-zero exit code, and <paramref name="ignoreErrors"/> is
+        /// false.
+        /// </exception>
+        public static string[] Run(CliWriter? writer, string command, bool ignoreErrors)
         {
             // Get the name of the PowerShell executable, which depends on the platform.
             string powershellCommand
@@ -109,7 +136,7 @@ namespace DockerSdk.Tests
             using (process)
             {
                 // Feed the command to PowerShell via stdin.
-                Write("testcli << " + command);
+                Write(writer, "testcli << " + command);
                 process.StandardInput.WriteLine(command);
 
                 // Shut down the process.
@@ -135,9 +162,9 @@ namespace DockerSdk.Tests
 
                 // Write the input and outputs to the console so it will appear in the CI/CD pipeline.
                 foreach (var line in output)
-                    Write($"testcli >> {line}");
+                    Write(writer, $"testcli >> {line}");
                 if (process.ExitCode != 0)
-                    Write($"testcli exited {process.ExitCode}");
+                    Write(writer, $"testcli exited {process.ExitCode}");
 
                 return output;
             }

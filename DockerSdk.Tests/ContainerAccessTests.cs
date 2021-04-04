@@ -11,9 +11,11 @@ namespace DockerSdk.Tests
     [Collection("Common")]
     public class ContainerAccessTests
     {
+        private readonly ITestOutputHelper toh;
+
         public ContainerAccessTests(ITestOutputHelper toh)
         {
-            Cli.writer = s => toh.WriteLine(s);
+            this.toh = toh;
         }
 
         [Fact]
@@ -29,7 +31,8 @@ namespace DockerSdk.Tests
         public async Task GetAsync_StoppedContainer_ReturnsObject()
         {
             // Get the ID of a stopped container.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:inspect-me-1 --quiet --no-trunc --latest --all").First();
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-exited");
 
             using var client = await DockerClient.StartAsync();
 
@@ -42,9 +45,10 @@ namespace DockerSdk.Tests
         [Fact]
         public async Task GetDetailsAsync_RunningContainer_RetrievesCorrectDetails()
         {
-            // Get the ID of a running container and the image.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
-            var imageId = Cli.Run("docker images ls --no-trunc --quiet --filter reference=ddnt:infinite-loop").First();
+            // Get the ID of a running container and its image.
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-running");
+            var imageId = cli.GetImageId("ddnt:infinite-loop");
 
             using var client = await DockerClient.StartAsync();
 
@@ -61,7 +65,7 @@ namespace DockerSdk.Tests
             actual.IsPaused.Should().BeFalse();
             actual.IsRunning.Should().BeTrue();
             actual.IsRunningOrPaused.Should().BeTrue();
-            actual.Labels["com.docker.compose.service"].Should().Be("infinite-loop");
+            actual.Labels["override-1"].Should().NotBeNullOrEmpty();
             actual.MainProcessId.Should().NotBeNull().And.NotBe(0);
             actual.Name.ToString().Should().NotBeNullOrEmpty();
             actual.RanOutOfMemory.Should().BeNull();
@@ -73,10 +77,10 @@ namespace DockerSdk.Tests
         [Fact]
         public async Task GetDetailsAsync_StoppedContainer_NoError_RetrievesCorrectDetails()
         {
-            // Get the ID of a stopped container and the image.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:inspect-me-1 --quiet --no-trunc --latest --all").First();
-            var imageId = Cli.Run("docker images ls --no-trunc --quiet --filter reference=ddnt:inspect-me-1").First();
-
+            // Get the ID of a stopped container and its image.
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-exited");
+            var imageId = cli.GetImageId("ddnt:inspect-me-1");
             using var client = await DockerClient.StartAsync();
 
             var actual = await client.Containers.GetDetailsAsync(containerId);
@@ -103,19 +107,32 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
+        public async Task GetDetailsAsync_RunLabelsOverrideImageLabels()
+        {
+            // Get the ID of a stopped container and its image.
+            using var cli = new DockerCli(toh);
+            var containerId = cli.Run("ddnt:inspect-me-1", args: "--label override-2=\"from-run\"");
+            using var client = await DockerClient.StartAsync();
+
+            var actual = await client.Containers.GetDetailsAsync(containerId);
+
+            actual.Labels["override-2"].Should().Be("from-run");
+        }
+
+        [Fact]
         public async Task GetDetailsAsync_StoppedContainer_WithError_RetrievesCorrectDetails()
         {
-            // Get the ID of a running container and the image.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:error-out --quiet --no-trunc --latest --all").First();
-            var imageId = Cli.Run("docker images ls --no-trunc --quiet --filter reference=ddnt:error-out").First();
-
+            // Get the ID of a failed container and its image.
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-failed");
+            var imageId = cli.GetImageId("ddnt:error-out");
             using var client = await DockerClient.StartAsync();
 
             var actual = await client.Containers.GetDetailsAsync(containerId);
 
             actual.Should().NotBeNull();
             actual.Executable.Should().Be("/bin/sh");
-            actual.ExecutableArgs.Should().BeEquivalentTo("-c", "./script.sh");
+            actual.ExecutableArgs.Should().BeEquivalentTo("-c", "/script.sh");
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
             //actual.ErrorMessage.Should().Be("This is the error message.");    // how to set this?
             actual.ExitCode.Should().Be(1);
@@ -124,7 +141,7 @@ namespace DockerSdk.Tests
             actual.IsPaused.Should().BeFalse();
             actual.IsRunning.Should().BeFalse();
             actual.IsRunningOrPaused.Should().BeFalse();
-            actual.Labels["com.docker.compose.service"].Should().Be("error-out");
+            actual.Labels["override-1"].Should().NotBeNullOrEmpty();
             actual.MainProcessId.Should().BeNull();
             actual.Name.ToString().Should().NotBeNullOrEmpty();
             actual.RanOutOfMemory.Should().BeNull();
@@ -136,9 +153,8 @@ namespace DockerSdk.Tests
         [Fact]
         public async Task ListAsync_Defaults_ReturnsStoppedContainer()
         {
-            // Get the ID of a stopped container.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:inspect-me-1 --quiet --no-trunc --latest --all").First();
-
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-exited");
             using var client = await DockerClient.StartAsync();
 
             var containers = await client.Containers.ListAsync();
@@ -149,9 +165,8 @@ namespace DockerSdk.Tests
         [Fact]
         public async Task ListAsync_ReturnsRunningContainer()
         {
-            // Get the ID of a running container.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
-
+            using var cli = new DockerCli(toh);
+            var containerId = cli.GetContainerId("ddnt-running");
             using var client = await DockerClient.StartAsync();
 
             var containers = await client.Containers.ListAsync();

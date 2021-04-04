@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text.RegularExpressions;
 using DockerSdk.Images;
 using Core = Docker.DotNet;
 
@@ -61,7 +63,7 @@ namespace DockerSdk
                 wrapped = Wrap(imageNotFoundEx);
                 return true;
             }
-            else if (ex.StatusCode == System.Net.HttpStatusCode.NotFound && ex.Message.Contains("manifest unknown"))
+            else if (ex.StatusCode == HttpStatusCode.NotFound && ex.Message.Contains("manifest unknown"))
             {
                 // This happens when trying to fetch a image from a Docker registry that doesn't have it.
                 wrapped = new ImageNotFoundException($"Image {image} does not exist.", ex);
@@ -72,6 +74,11 @@ namespace DockerSdk
                 wrapped = null;
                 return false;
             }
+
+            // I've seen pulls intermittently fail with these server errors. They do not necessarily mean that the image doesn't exist. Based on other evidence, I think these were due to actual errors in the daemon process rather than anything done by the client.
+            //      Get https://registry-1.docker.io/v2/emdot/dockersdk-private/manifests/inspect-me-1: EOF
+            //      Get https://registry-1.docker.io/v2/: EOF
+            //      Head https://registry-1.docker.io/v2/emdot/dockersdk/manifests/empty: Get https://auth.docker.io/token?scope=repository%3Aemdot%2Fdockersdk%3Apull&service=registry.docker.io: EOF
         }
     }
 }

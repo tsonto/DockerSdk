@@ -8,8 +8,6 @@ namespace DockerSdk.Tests
     {
         public Fixture()
         {
-            Cli.writer = s => { Console.WriteLine(s); Console.Out.Flush(); };
-
             // Check that the Docker CLI is installed.
             string[] output;
             try
@@ -29,18 +27,18 @@ namespace DockerSdk.Tests
             if (!string.Equals(osMode, "linux", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Cannot run the tests because the Docker daemon is in Windows mode. To proceed, you must switch it to use Linux containers.");
 
-            // Start up the test environment.
-            Cli.Run("cd scripts && docker-compose up --build --detach --no-color", ignoreErrors: true);
+            // Set up the test environment, if it hasn't been set up already.
+            Cli.Run("./scripts/up.ps1");
         }
 
         public void Dispose()
         {
             // Shut down the test environment.
-            Cli.Run("cd scripts && docker-compose down", ignoreErrors: true);
+            Cli.Run("./scripts/clean.ps1");
         }
 
         private static string GetServerMode(string[] output)
-                    => output
+            => output
                 // There are two OS/Arch lines. We want the one that's after the Server line.
                 .SkipWhile(line => !line.StartsWith("Server", StringComparison.InvariantCultureIgnoreCase))
                 // Get the OS/Arch line.
