@@ -109,7 +109,7 @@ namespace DockerSdk.Tests
             using (process)
             {
                 // Feed the command to PowerShell via stdin.
-                Write("testcli > " + command);
+                Write("testcli << " + command);
                 process.StandardInput.WriteLine(command);
 
                 // Shut down the process.
@@ -135,7 +135,7 @@ namespace DockerSdk.Tests
 
                 // Write the input and outputs to the console so it will appear in the CI/CD pipeline.
                 foreach (var line in output)
-                    Write($"testcli < {line}");
+                    Write($"testcli >> {line}");
                 if (process.ExitCode != 0)
                     Write($"testcli exited {process.ExitCode}");
 

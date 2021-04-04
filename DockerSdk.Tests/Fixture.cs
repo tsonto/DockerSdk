@@ -8,7 +8,7 @@ namespace DockerSdk.Tests
     {
         public Fixture()
         {
-            Cli.writer = s => Console.WriteLine(s);
+            Cli.writer = s => { Console.WriteLine(s); Console.Out.Flush(); };
 
             // Check that the Docker CLI is installed.
             string[] output;

@@ -1,12 +1,18 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
 {
     [Collection("Common")]
     public class RegistryAccessTests
     {
+        public RegistryAccessTests(ITestOutputHelper toh)
+        {
+            Cli.writer = s => toh.WriteLine(s);
+        }
+
         private const string BasicAuthRegistry = "localhost:5001";
         private const string OpenRegistry = "localhost:4000";
 

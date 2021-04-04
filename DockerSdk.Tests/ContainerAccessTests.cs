@@ -4,36 +4,25 @@ using System.Threading.Tasks;
 using DockerSdk.Containers;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
 {
     [Collection("Common")]
     public class ContainerAccessTests
     {
-        [Fact]
-        public async Task ListAsync_Defaults_ReturnsStoppedContainer()
+        public ContainerAccessTests(ITestOutputHelper toh)
         {
-            // Get the ID of a stopped container.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:inspect-me-1 --quiet --no-trunc --latest --all").First();
-
-            using var client = await DockerClient.StartAsync();
-
-            var containers = await client.Containers.ListAsync();
-
-            containers.Should().Contain(container => container.Id == containerId);
+            Cli.writer = s => toh.WriteLine(s);
         }
 
         [Fact]
-        public async Task ListAsync_ReturnsRunningContainer()
+        public async Task GetAsync_NoSuchContainer_ThrowsContainerNotFoundException()
         {
-            // Get the ID of a running container.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
-
             using var client = await DockerClient.StartAsync();
 
-            var containers = await client.Containers.ListAsync();
-
-            containers.Should().Contain(container => container.Id == containerId);
+            await Assert.ThrowsAnyAsync<ContainerNotFoundException>(
+                () => client.Containers.GetAsync("366ad733152b70e53ddd7fd59defe9fa2e055ed2090f5f3a8839b2797388d0b4"));
         }
 
         [Fact]
@@ -51,12 +40,34 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
-        public async Task GetAsync_NoSuchContainer_ThrowsContainerNotFoundException()
+        public async Task GetDetailsAsync_RunningContainer_RetrievesCorrectDetails()
         {
+            // Get the ID of a running container and the image.
+            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
+            var imageId = Cli.Run("docker images ls --no-trunc --quiet --filter reference=ddnt:infinite-loop").First();
+
             using var client = await DockerClient.StartAsync();
 
-            await Assert.ThrowsAnyAsync<ContainerNotFoundException>(
-                () => client.Containers.GetAsync("366ad733152b70e53ddd7fd59defe9fa2e055ed2090f5f3a8839b2797388d0b4"));
+            var actual = await client.Containers.GetDetailsAsync(containerId);
+
+            actual.Should().NotBeNull();
+            actual.Executable.Should().Be("sleep");
+            actual.ExecutableArgs.Should().BeEquivalentTo("infinity");
+            actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
+            actual.ErrorMessage.Should().BeNull();
+            actual.ExitCode.Should().BeNull();
+            actual.Id.ToString().Should().Be(containerId);
+            actual.Image.ToString().Should().Be(imageId);
+            actual.IsPaused.Should().BeFalse();
+            actual.IsRunning.Should().BeTrue();
+            actual.IsRunningOrPaused.Should().BeTrue();
+            actual.Labels["com.docker.compose.service"].Should().Be("infinite-loop");
+            actual.MainProcessId.Should().NotBeNull().And.NotBe(0);
+            actual.Name.ToString().Should().NotBeNullOrEmpty();
+            actual.RanOutOfMemory.Should().BeNull();
+            actual.StartTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime);
+            actual.State.Should().Be(ContainerStatus.Running);
+            actual.StopTime.Should().BeNull();
         }
 
         [Fact]
@@ -92,37 +103,6 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
-        public async Task GetDetailsAsync_RunningContainer_RetrievesCorrectDetails()
-        {
-            // Get the ID of a running container and the image.
-            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
-            var imageId = Cli.Run("docker images ls --no-trunc --quiet --filter reference=ddnt:infinite-loop").First();
-
-            using var client = await DockerClient.StartAsync();
-
-            var actual = await client.Containers.GetDetailsAsync(containerId);
-
-            actual.Should().NotBeNull();
-            actual.Executable.Should().Be("sleep");
-            actual.ExecutableArgs.Should().BeEquivalentTo("infinity");
-            actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
-            actual.ErrorMessage.Should().BeNull();
-            actual.ExitCode.Should().BeNull();
-            actual.Id.ToString().Should().Be(containerId);
-            actual.Image.ToString().Should().Be(imageId);
-            actual.IsPaused.Should().BeFalse();
-            actual.IsRunning.Should().BeTrue();
-            actual.IsRunningOrPaused.Should().BeTrue();
-            actual.Labels["com.docker.compose.service"].Should().Be("infinite-loop");
-            actual.MainProcessId.Should().NotBeNull().And.NotBe(0);
-            actual.Name.ToString().Should().NotBeNullOrEmpty();
-            actual.RanOutOfMemory.Should().BeNull();
-            actual.StartTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime);
-            actual.State.Should().Be(ContainerStatus.Running);
-            actual.StopTime.Should().BeNull();
-        }
-
-        [Fact]
         public async Task GetDetailsAsync_StoppedContainer_WithError_RetrievesCorrectDetails()
         {
             // Get the ID of a running container and the image.
@@ -151,6 +131,32 @@ namespace DockerSdk.Tests
             actual.StartTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime);
             actual.State.Should().Be(ContainerStatus.Exited);
             actual.StopTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.StartTime!.Value);
+        }
+
+        [Fact]
+        public async Task ListAsync_Defaults_ReturnsStoppedContainer()
+        {
+            // Get the ID of a stopped container.
+            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:inspect-me-1 --quiet --no-trunc --latest --all").First();
+
+            using var client = await DockerClient.StartAsync();
+
+            var containers = await client.Containers.ListAsync();
+
+            containers.Should().Contain(container => container.Id == containerId);
+        }
+
+        [Fact]
+        public async Task ListAsync_ReturnsRunningContainer()
+        {
+            // Get the ID of a running container.
+            var containerId = Cli.Run("docker container ls --filter=ancestor=ddnt:infinite-loop --quiet --no-trunc --latest").First();
+
+            using var client = await DockerClient.StartAsync();
+
+            var containers = await client.Containers.ListAsync();
+
+            containers.Should().Contain(container => container.Id == containerId);
         }
     }
 }
