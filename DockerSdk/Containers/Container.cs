@@ -25,6 +25,15 @@ namespace DockerSdk.Containers
             Id = id;
         }
 
+        /// <summary>
+        /// Gets detailed information about the container.
+        /// </summary>
+        /// <param name="ct">A <see cref="CancellationToken"/> used to cancel the operation.</param>
+        /// <returns>A <see cref="Task"/> that completes when the result is available.</returns>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
         public Task<ContainerDetails> GetDetailsAsync(CancellationToken ct = default)
             => _client.Containers.GetDetailsAsync(Id, ct);
 

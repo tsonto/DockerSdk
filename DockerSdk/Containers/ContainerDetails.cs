@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Docker.DotNet.Models;
 using DockerSdk.Images;
+using CodeModels = Docker.DotNet.Models;
 
 namespace DockerSdk.Containers
 {
+    /// <summary>
+    /// Holds detailed information about a Docker container.
+    /// </summary>
+    /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
     public class ContainerDetails
     {
-        public ContainerDetails(ContainerInspectResponse response)
+        internal ContainerDetails(CodeModels.ContainerInspectResponse response)
         {
             Id = new ContainerFullId(response.ID);
             Name = new ContainerName(response.Name);
@@ -17,8 +21,8 @@ namespace DockerSdk.Containers
             IsRunning = State == ContainerStatus.Running;
             IsRunningOrPaused = State == ContainerStatus.Running || State == ContainerStatus.Paused;
             IsPaused = State == ContainerStatus.Paused;
-            Command = response.Path;
-            CommandArgs = response.Args.ToImmutableArray();
+            Executable = response.Path;
+            ExecutableArgs = response.Args.ToImmutableArray();
             CreationTime = response.Created;
             Labels = response.Config.Labels.ToImmutableDictionary();
             RanOutOfMemory = State == ContainerStatus.Dead ? response.State.OOMKilled : null;
@@ -29,23 +33,38 @@ namespace DockerSdk.Containers
             StopTime = ConvertDate(response.State.FinishedAt);
         }
 
-        private static DateTimeOffset? ConvertDate(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return null;
-            var parsed = DateTimeOffset.Parse(input);
-            if (parsed == default)
-                return null;
-            return parsed;
-        }
-
-        public string Command { get; }
-
-        public IReadOnlyList<string> CommandArgs { get; }
-
+        /// <summary>
+        /// Gets the timestamp for when the container was created.
+        /// </summary>
         public DateTimeOffset CreationTime { get; }
 
+        /// <summary>
+        /// Gets an error message for why the container exited. Not all exited containers will have this set.
+        /// </summary>
         public string? ErrorMessage { get; }
+
+        /// <summary>
+        /// Gets the main executable that the container runs. This is what <see cref="MainProcessId"/> points to.
+        /// </summary>
+        /// <remarks>
+        /// This gives the actual executable run by the main process. Note that ENTRYPOINT/CMD directives in
+        /// <em>shell</em> format are shorthands for running a shell, so the actual executable in that case will be
+        /// whatever you specified for the SHELL directive (which defaults to <c>/bin/sh</c> for Linux or <c>cmd</c> for
+        /// Windows).
+        /// </remarks>
+        /// <seealso cref="ExecutableArgs"/>
+        public string Executable { get; }
+
+        /// <summary>
+        /// Gets the arguments to the main executable that the container runs.
+        /// </summary>
+        /// <remarks>
+        /// This gives the arguments to the actual executable run by the main process. Note that ENTRYPOINT/CMD directives in
+        /// <em>shell</em> format are shorthands for running a shell, so the text provided to those directives will really be
+        /// part of the arguments.
+        /// </remarks>
+        /// <seealso cref="Executable"/>
+        public IReadOnlyList<string> ExecutableArgs { get; }
 
         /// <summary>
         /// Gets the exit code of the main process. This property is non-null for containers in the Exited state, and
@@ -149,6 +168,16 @@ namespace DockerSdk.Containers
         /// exited since the most recent restart.
         /// </remarks>
         public DateTimeOffset? StopTime { get; }
+
+        private static DateTimeOffset? ConvertDate(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return null;
+            var parsed = DateTimeOffset.Parse(input);
+            if (parsed == default)
+                return null;
+            return parsed;
+        }
 
         /*
          * TODO:

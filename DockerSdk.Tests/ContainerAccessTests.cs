@@ -71,8 +71,8 @@ namespace DockerSdk.Tests
             var actual = await client.Containers.GetDetailsAsync(containerId);
 
             actual.Should().NotBeNull();
-            actual.Command.Should().Be("/bin/sh");
-            actual.CommandArgs.Should().BeEmpty();
+            actual.Executable.Should().Be("/bin/sh");
+            actual.ExecutableArgs.Should().BeEmpty();
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
             actual.ErrorMessage.Should().BeNull();
             actual.ExitCode.Should().Be(0);
@@ -103,8 +103,8 @@ namespace DockerSdk.Tests
             var actual = await client.Containers.GetDetailsAsync(containerId);
 
             actual.Should().NotBeNull();
-            actual.Command.Should().Be("sleep");
-            actual.CommandArgs.Should().BeEquivalentTo("infinity");
+            actual.Executable.Should().Be("sleep");
+            actual.ExecutableArgs.Should().BeEquivalentTo("infinity");
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
             actual.ErrorMessage.Should().BeNull();
             actual.ExitCode.Should().BeNull();
@@ -134,8 +134,8 @@ namespace DockerSdk.Tests
             var actual = await client.Containers.GetDetailsAsync(containerId);
 
             actual.Should().NotBeNull();
-            actual.Command.Should().Be("/bin/sh");
-            actual.CommandArgs.Should().BeEquivalentTo("-c", "./script.sh");
+            actual.Executable.Should().Be("/bin/sh");
+            actual.ExecutableArgs.Should().BeEquivalentTo("-c", "./script.sh");
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
             //actual.ErrorMessage.Should().Be("This is the error message.");    // how to set this?
             actual.ExitCode.Should().Be(1);

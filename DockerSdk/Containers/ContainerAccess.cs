@@ -81,9 +81,32 @@ namespace DockerSdk.Containers
             return new Container(_docker, new ContainerFullId(response.ID));
         }
 
+        /// <summary>
+        /// Gets detailed information about a container.
+        /// </summary>
+        /// <param name="container">The name or ID of a container.</param>
+        /// <param name="ct">A <see cref="CancellationToken"/> used to cancel the operation.</param>
+        /// <returns>A <see cref="Task"/> that completes when the result is available.</returns>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        /// <exception cref="ContainerNotFoundException">The daemon doesn't know of a container matching the given ID or name.</exception>
+        /// <exception cref="MalformedReferenceException">The given reference isn't in a valid format for a container ID or name.</exception>
         public Task<ContainerDetails> GetDetailsAsync(string container, CancellationToken ct = default)
-                    => GetDetailsAsync(ContainerReference.Parse(container), ct);
+            => GetDetailsAsync(ContainerReference.Parse(container), ct);
 
+        /// <summary>
+        /// Gets detailed information about a container.
+        /// </summary>
+        /// <param name="container">The name or ID of a container.</param>
+        /// <param name="ct">A <see cref="CancellationToken"/> used to cancel the operation.</param>
+        /// <returns>A <see cref="Task"/> that completes when the result is available.</returns>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        /// <exception cref="ContainerNotFoundException">The daemon doesn't know of a container matching the given ID or name.</exception>
         public async Task<ContainerDetails> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
         {
             if (container is null)

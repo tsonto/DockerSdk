@@ -20,7 +20,7 @@ namespace DockerSdk.Containers
 
         private static string RemoveLeadingSlash(string input)
             => input.StartsWith('/')
-            ? input.Substring(1)
+            ? input[1..]
             : input;
 
         /// <inheritdoc/>
