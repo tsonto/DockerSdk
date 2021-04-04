@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
 {
@@ -11,12 +11,9 @@ namespace DockerSdk.Tests
     /// </summary>
     internal static class Cli
     {
-        public static string ReadAndDeleteSingleLineFile(string path)
-        {
-            var line = File.ReadAllLines(path)[0].Trim();
-            File.Delete(path);
-            return line;
-        }
+        internal static Action<string>? writer = null;
+
+        private static void Write(string message) => writer?.Invoke(message);
 
         /// <summary>
         /// Runs a series of commands in a Powershell prompt.
@@ -112,6 +109,7 @@ namespace DockerSdk.Tests
             using (process)
             {
                 // Feed the command to PowerShell via stdin.
+                Write("testcli > " + command);
                 process.StandardInput.WriteLine(command);
 
                 // Shut down the process.
@@ -129,11 +127,19 @@ namespace DockerSdk.Tests
                         throw new InvalidOperationException($"The process exited with code {process.ExitCode}.");
                 }
 
-                // Return the text that the process wrote to stdout.
-                return process.StandardOutput.ReadToEnd()
+                // Get the text that the process wrote to stdout.
+                var output = process.StandardOutput.ReadToEnd()
                     .Split('\n')
                     .Select(line => line.Trim())
                     .ToArray();
+
+                // Write the input and outputs to the console so it will appear in the CI/CD pipeline.
+                foreach (var line in output)
+                    Write($"testcli < {line}");
+                if (process.ExitCode != 0)
+                    Write($"testcli exited {process.ExitCode}");
+
+                return output;
             }
         }
     }
