@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -22,12 +23,27 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
+    - name: Install Powershell
+      if: ${{ env.ACT }}
+      run: |
+        # Update the list of packages
+        sudo apt-get update
+        # Install pre-requisite packages.
+        sudo apt-get install -y wget apt-transport-https software-properties-common
+        # Download the Microsoft repository GPG keys
+        wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+        # Register the Microsoft repository GPG keys
+        sudo dpkg -i packages-microsoft-prod.deb
+        # Update the list of products
+        sudo apt-get update
+        # Enable the "universe" repositories
+        sudo add-apt-repository universe
+        # Install PowerShell
+        sudo apt-get install -y powershell
     - name: Set up test environment
-      shell: pwsh
-      run: ./DockerSdk.Tests/bin/Release/net5.0/scripts/up.ps1
-    - name: Show images
-      run: docker image ls
-    - name: Show containers
-      run: docker container ls --all
+      run: |
+        pwsh -f ./DockerSdk.Tests/bin/Release/net5.0/scripts/up.ps1
+        docker image ls
+        docker container ls --all
     - name: Run the tests
       run: dotnet test --configuration Release --no-build --verbosity normal
