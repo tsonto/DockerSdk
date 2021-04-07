@@ -73,7 +73,7 @@ namespace DockerSdk.Tests
             ImageDetails actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
 
             actual.Author.Should().Be("3241034+Emdot@users.noreply.github.com");
-            actual.Comment.Should().Be("buildkit.dockerfile.v0");
+            actual.Comment.Should().Contain("buildkit");  // BuildKit sets this
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow);
             actual.CreationTime.Should().BeAfter(DateTimeOffset.Parse("2021-1-1"));
             actual.Digest.Should().BeNull();   // because the image has not been synced
@@ -81,9 +81,9 @@ namespace DockerSdk.Tests
             actual.Labels["sample-label-a"].Should().Be("alpha");
             actual.Labels["sample-label-b"].Should().Be("beta");
             actual.ParentImage.Should().BeNull();   // because the image is built by Buildkit
-            actual.Size.Should().Be(5_613_130);
+            actual.Size.Should().BeGreaterThan(1_000_000);
             actual.Tags.Select(tag => tag.ToString()).Should().Contain("ddnt:inspect-me-1");
-            actual.VirtualSize.Should().Be(5_613_130);
+            actual.VirtualSize.Should().BeGreaterThan(1_000_000);
             actual.WorkingDirectory.Should().Be("/sample");
         }
 
