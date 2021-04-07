@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['workingdirectory_138',['WorkingDirectory',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a45bef97dc8c3d5d0be2383f90c782b46',1,'DockerSdk::Images::ImageDetails']]]
+  ['tags_212',['Tags',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a6b5e949d04eb18360a0c8e357f778b64',1,'DockerSdk::Images::ImageDetails']]]
 ];

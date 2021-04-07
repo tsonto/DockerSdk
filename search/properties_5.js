@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['labelexistsfilters_127',['LabelExistsFilters',['../classDockerSdk_1_1Images_1_1ListImagesOptions.html#aaae834749376a7d36480f21cc8e99951',1,'DockerSdk::Images::ListImagesOptions']]],
-  ['labels_128',['Labels',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a70a7575ecf2e21654d6a1f0e4fb6ac51',1,'DockerSdk::Images::ImageDetails']]],
-  ['labelvaluefilters_129',['LabelValueFilters',['../classDockerSdk_1_1Images_1_1ListImagesOptions.html#ad2e76c18ad4cc9a641fdf8492f3d7c4c',1,'DockerSdk::Images::ListImagesOptions']]]
+  ['id_188',['Id',['../classDockerSdk_1_1Containers_1_1Container.html#a6e6d4f1610f5a3cc4ff4257461759fda',1,'DockerSdk.Containers.Container.Id()'],['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a88b88fa6b512b6ca99a6a1525d388e89',1,'DockerSdk.Containers.ContainerDetails.Id()'],['../classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1',1,'DockerSdk.Images.Image.Id()'],['../classDockerSdk_1_1Images_1_1ImageDetails.html#a82da28c36ae22b21755010e90717a319',1,'DockerSdk.Images.ImageDetails.Id()']]],
+  ['image_189',['Image',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae330005b9386877c467032897bb4e91d',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['images_190',['Images',['../classDockerSdk_1_1DockerClient.html#ab047cc6cccdfe8304900946e77756c18',1,'DockerSdk::DockerClient']]],
+  ['ispaused_191',['IsPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a6fc9e4fa13679f99678c2ce82ca42c5d',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['isrunning_192',['IsRunning',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae3f0a71ec107d13ee89c723b71dbae89',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['isrunningorpaused_193',['IsRunningOrPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#aa433e24739c6d80639dd1d2361828d5f',1,'DockerSdk::Containers::ContainerDetails']]]
 ];

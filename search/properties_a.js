@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tags_135',['Tags',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a6b5e949d04eb18360a0c8e357f778b64',1,'DockerSdk::Images::ImageDetails']]]
+  ['parentimage_203',['ParentImage',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a9eac15962d2728550b7deb1fc641f6b4',1,'DockerSdk::Images::ImageDetails']]]
 ];
