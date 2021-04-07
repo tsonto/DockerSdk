@@ -14,7 +14,14 @@ namespace DockerSdk.Containers
     /// </remarks>
     public record ContainerName : ContainerReference
     {
-        internal ContainerName(string name) : base(name) { }
+        internal ContainerName(string name)
+            : base(RemoveLeadingSlash(name))
+        { }
+
+        private static string RemoveLeadingSlash(string input)
+            => input.StartsWith('/')
+            ? input[1..]
+            : input;
 
         /// <inheritdoc/>
         public override string ToString() => _value;
@@ -28,6 +35,8 @@ namespace DockerSdk.Containers
         /// <exception cref="ArgumentException"><paramref name="input"/> is null or empty.</exception>
         public static bool TryParse(string input, [NotNullWhen(returnValue: true)] out ContainerName? name)
         {
+            input = RemoveLeadingSlash(input);
+
             if (_nameRegex.IsMatch(input))
             {
                 name = new(input);

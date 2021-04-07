@@ -127,3 +127,5 @@ ServiceFabricBackup/
 /DockerSdk/html
 /DockerSdk/DockerSdk.xml
 *.orig
+*.id
+act/

@@ -18,21 +18,21 @@ namespace DockerSdk.Tests
         public void TryParse_InvalidFullId_Fails()
         {
             string value = "X66ad733152b70d53ddd7ec59deee9fa2ef55ed2095f5f3a8899b2797388d0b4";
-            Assert.False(ContainerFullId.TryParse(value, out var reference));
+            Assert.False(ContainerFullId.TryParse(value, out _));
         }
 
         [Fact]
         public void TryParse_InvalidName_Fail()
         {
             string value = "clever+wozniak";
-            Assert.False(ContainerReference.TryParse(value, out var reference));
+            Assert.False(ContainerReference.TryParse(value, out _));
         }
 
         [Fact]
         public void TryParse_InvalidShortId_Fail()
         {
             string value = "366ad733152b0";
-            Assert.False(ContainerId.TryParse(value, out var reference));
+            Assert.False(ContainerId.TryParse(value, out _));
         }
 
         [Fact]
@@ -42,6 +42,22 @@ namespace DockerSdk.Tests
             Assert.True(ContainerReference.TryParse(value, out var reference));
             Assert.IsType<ContainerName>(reference);
             Assert.Equal(value, reference!.ToString());
+        }
+
+        [Fact]
+        public void TryParse_Name_WithLeadingSlash_Success()
+        {
+            string value = "/clever_wozniak";
+            Assert.True(ContainerReference.TryParse(value, out var reference));
+            Assert.IsType<ContainerName>(reference);
+            Assert.Equal("clever_wozniak", reference!.ToString());
+        }
+
+        [Fact]
+        public void NewContainerName_WithLeadingSlash_Success()
+        {
+            var actual = new ContainerName("/clever_wozniak");
+            Assert.Equal("clever_wozniak", actual.ToString());
         }
 
         [Fact]

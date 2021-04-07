@@ -20,13 +20,16 @@ namespace DockerSdk.Images
             CreationTime = raw.Created;
             Digest = raw.RepoDigests?.FirstOrDefault();
             Id = new ImageFullId(raw.ID);
-            Labels = raw.ContainerConfig?.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty;
+            Labels = raw.Config?.Labels?.ToImmutableDictionary() ?? ImmutableDictionary.Create<string, string>();
             OsType = Enum.Parse<GuestOsType>(raw.Os, true);
             ParentImage = parent;
             Size = raw.Size;
             Tags = raw.RepoTags?.Select(ImageName.Parse)?.ToImmutableArray() ?? ImmutableArray<ImageName>.Empty;
             VirtualSize = raw.VirtualSize;
-            WorkingDirectory = raw.ContainerConfig?.WorkingDir ?? GetDefaultWorkingDirectory(OsType);
+            WorkingDirectory = raw.Config?.WorkingDir ?? GetDefaultWorkingDirectory(OsType);
+
+            // Note: Config is the image's configuration; ContainerConfig is the configuration of the container from
+            //       which the image was built, which we generally don't care about.
         }
 
         /// <summary>
@@ -81,8 +84,12 @@ namespace DockerSdk.Images
         /// Gets the image that this image was built from, of any.
         /// </summary>
         /// <remarks>
-        /// Due to the way Docker works, this will always be <see langword="null"/> for images pulled from a registry
-        /// (as opposed to images built locally).
+        /// Due to the way that Docker works, this will usually be null:
+        /// <list type="bullet">
+        /// <item>Images using image manifest v2 (the default since Docker 1.3.0) that are pulled from a registry will never have a parent image set.</item>
+        /// <item>Images built with Buildkit (the default since Docker 20.10) seem to never set the parent.</item>
+        /// </list>
+        /// When the parent image is null, the history will not have any image/layer identifiers either, except the current image's.
         /// </remarks>
         public ImageDetails? ParentImage { get; }
 
@@ -90,8 +97,8 @@ namespace DockerSdk.Images
         /// Gets the size, in bytes, of the image's writable layer.
         /// </summary>
         /// <remarks>
-        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size.
-        /// Each subsequent container will consume memory equal to the size. These sizes do not include space consumed for
+        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size. Each
+        /// subsequent container will consume memory equal to the size. These sizes do not include space consumed for
         /// log files, volumes, configuration files, swap space, or checkpoints.
         /// </remarks>
         public long Size { get; }
@@ -105,8 +112,8 @@ namespace DockerSdk.Images
         /// Gets the size, in bytes, of the image's read-only layers.
         /// </summary>
         /// <remarks>
-        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size.
-        /// Each subsequent container will consume memory equal to the size. These sizes do not include space consumed for
+        /// Mounting the first container for the image will consume memory equal to the virtual size plus the size. Each
+        /// subsequent container will consume memory equal to the size. These sizes do not include space consumed for
         /// log files, volumes, configuration files, swap space, or checkpoints.
         /// </remarks>
         public long VirtualSize { get; }
@@ -158,11 +165,11 @@ namespace DockerSdk.Images
         }
 
         private static string GetDefaultWorkingDirectory(GuestOsType os)
-                                                                                                                    => os switch
-                                                                                                                    {
-                                                                                                                        GuestOsType.Windows => @"C:\",
-                                                                                                                        _ => "/"
-                                                                                                                    };
+            => os switch
+            {
+                GuestOsType.Windows => @"C:\",
+                _ => "/"
+            };
 
         // TODO: Container and ContainerConfig -- these represent the temporary container created when building the image
         // TODO: DockerVersion -- the version of Docker that created the image
