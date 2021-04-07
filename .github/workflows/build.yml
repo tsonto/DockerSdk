@@ -23,7 +23,9 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
     - name: Set up test environment
-      run: ./DockerSdk.Tests/bin/Release/net5.0/scripts/up.ps1
+      uses: Amadevus/pwsh-script@v2.0.1
+      with:
+        script: ./DockerSdk.Tests/bin/Release/net5.0/scripts/up.ps1
     - name: Show images
       run: docker image ls
     - name: Show containers
