@@ -56,7 +56,7 @@ namespace DockerSdk.Tests
 
             actual.Should().NotBeNull();
             actual.Executable.Should().Be("sleep");
-            actual.ExecutableArgs.Should().BeEquivalentTo("infinity");
+            actual.ExecutableArgs.Should().BeEquivalentTo("1000d");
             actual.CreationTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(DateTimeOffset.Parse("2021-01-01"));
             actual.ErrorMessage.Should().BeNull();
             toh.WriteLine("**ExitCode " + actual.ExitCode);
