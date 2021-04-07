@@ -7,10 +7,11 @@ on:
     branches: [ main ]
 
 jobs:
+  
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      DOCKER_BUILDKIT: 1
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -21,5 +22,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
-    - name: Test
+    - name: Set up test environment
+      run: ./DockerSdk.Tests/bin/Release/bin/build.ps1
+    - name: Show images
+      run: docker image ls
+    - name: Show containers
+      run: docker container ls --all
+    - name: Run the tests
       run: dotnet test --configuration Release --no-build --verbosity normal
