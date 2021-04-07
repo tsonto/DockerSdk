@@ -23,7 +23,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
     - name: Set up test environment
-      run: ./DockerSdk.Tests/bin/Release/bin/build.ps1
+      run: ./DockerSdk.Tests/bin/Release/net5.0/build.ps1
     - name: Show images
       run: docker image ls
     - name: Show containers
