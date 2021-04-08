@@ -34,7 +34,7 @@ namespace DockerSdk.Tests
         public void Dispose()
         {
             // Shut down the test environment.
-            Cli.Run("./scripts/clean.ps1");
+            //Cli.Run("./scripts/clean.ps1");
         }
 
         private static string GetServerMode(string[] output)

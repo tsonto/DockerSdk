@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 
@@ -29,7 +28,7 @@ namespace DockerSdk.Images
         /// <param name="image">An image name or ID.</param>
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns>A <see cref="Task{TResult}"/> that resolves to the image object.</returns>
-        /// <exception cref="ImageNotFoundException">No such image exists.</exception>
+        /// <exception cref="ImageNotFoundLocallyException">No such image exists.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
@@ -43,7 +42,7 @@ namespace DockerSdk.Images
         /// <param name="image">An image name or ID.</param>
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns>A <see cref="Task{TResult}"/> that resolves to the image object.</returns>
-        /// <exception cref="ImageNotFoundException">No such image exists.</exception>
+        /// <exception cref="ImageNotFoundLocallyException">No such image exists.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
@@ -54,12 +53,10 @@ namespace DockerSdk.Images
                 CoreModels.ImageInspectResponse response = await _docker.Core.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
                 return new Image(_docker, new ImageFullId(response.ID));
             }
-            catch (Core.DockerImageNotFoundException ex)
-            {
-                throw ImageNotFoundException.Wrap(image, ex);
-            }
             catch (Core.DockerApiException ex)
             {
+                if (ImageNotFoundLocallyException.TryWrap(ex, image, out var wrapped))
+                    throw wrapped;
                 throw DockerException.Wrap(ex);
             }
         }
@@ -171,6 +168,7 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
+        /// <exception cref="ImageNotFoundRemotelyException">The image does not exist at the Registry indicated by its name.</exception>
         public Task<Image> PullAsync(string image, CancellationToken ct = default)
             => PullAsync(ImageReference.Parse(image), ct);
 
@@ -185,7 +183,6 @@ namespace DockerSdk.Images
         /// determined based on the image's name, defaulting to "docker.io".
         /// </remarks>
         /// <exception cref="ArgumentException"><paramref name="image"/> is null.</exception>
-        /// <exception cref="MalformedReferenceException">The input could not be parsed as an image name.</exception>
         /// <exception cref="InvalidOperationException">
         /// One Task removed the auth object while another was getting it.
         /// </exception>
@@ -196,6 +193,7 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
+        /// <exception cref="ImageNotFoundRemotelyException">The image does not exist at the Registry indicated by its name.</exception>
         public async Task<Image> PullAsync(ImageReference image, CancellationToken ct = default)
         {
             // Get the authentication information for the image's registry.

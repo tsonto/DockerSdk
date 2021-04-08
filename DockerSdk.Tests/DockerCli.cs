@@ -38,8 +38,10 @@ namespace DockerSdk.Tests
 
         public string Run(string image, string? containerName = null, string args = "")
         {
+            if (!string.IsNullOrEmpty(containerName))
+                args += "--name " + containerName;
             var command = $"container run --detach {args} {image}";
-            var id = RunDocker(command)[0];
+            var id = Invoke(command)[0];
             containersToRemove.Add(id);
             return id;
         }
@@ -53,7 +55,7 @@ namespace DockerSdk.Tests
                 dockerfile = Path.Join(scriptsRoot, dockerfile);
 
             var command = $"image build \"{dockerfile}\" --tag \"{name}\" {args} --quiet";
-            var id = RunDocker(command)[0];
+            var id = Invoke(command)[0];
 
             imagesToRemove.Add(id);
             return id;
@@ -63,41 +65,41 @@ namespace DockerSdk.Tests
         {
             image ??= name.Replace("ddnt-", "ddnt:");
             var command = $"container create {image} --name {name} {args}";
-            var id = RunDocker(command)[0];
+            var id = Invoke(command)[0];
             containersToRemove.Add(id);
             return id;
         }
 
         public string Pull(string name)
         {
-            _ = RunDocker($"image pull --quiet \"{name}\"")[0];
-            string id = RunDocker($"image ls \"{name}\" --quiet --no-trunc")[0];
+            _ = Invoke($"image pull --quiet \"{name}\"")[0];
+            string id = Invoke($"image ls \"{name}\" --quiet --no-trunc")[0];
             imagesToRemove.Add(id);
             return id;
         }
 
         public void RemoveImageIfPresent(string name) 
-            => RunDocker($"image rm --force \"{name}\"", ignoreErrors: true);
+            => Invoke($"image rm --force \"{name}\"", ignoreErrors: true);
 
         public void Dispose()
         {
             foreach(string id in containersToRemove)
             {
                 var command = $"container rm --force {id} --volumes";
-                RunDocker(command);
+                Invoke(command);
             }
 
             foreach (string id in imagesToRemove)
             {
                 var command = $"image rm --force {id}";
-                RunDocker(command);
+                Invoke(command);
             }
         }
 
         private static string? FindDockerCommand()
             => Cli.Run("(get-command docker -CommandType Application).Path | Select-Object -First 1").FirstOrDefault();
 
-        private string[] RunDocker(string subcommand, bool ignoreErrors = false)
+        public string[] Invoke(string subcommand, bool ignoreErrors = false)
         {
             if (string.IsNullOrEmpty(dockerPath.Value))
                 throw new InvalidOperationException($"Could not find the `docker` executable. Make sure that it's installed and in your PATH.");

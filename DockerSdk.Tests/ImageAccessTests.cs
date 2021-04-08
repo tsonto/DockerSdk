@@ -59,7 +59,7 @@ namespace DockerSdk.Tests
         {
             using var client = await DockerClient.StartAsync();
             
-            await Assert.ThrowsAsync<ImageNotFoundException>(
+            await Assert.ThrowsAsync<ImageNotFoundLocallyException>(
                 () => client.Images.GetAsync("ddnt:no-such-image-exists-with-this-name"));
         }
 
@@ -243,7 +243,7 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             using var cli = new DockerCli(toh);
 
-            await Assert.ThrowsAsync<ImageNotFoundException>(
+            await Assert.ThrowsAsync<ImageNotFoundRemotelyException>(
                 () => client.Images.PullAsync("emdot/dockersdk:no-such-image-exists-with-this-name"));
         }
 
