@@ -83,6 +83,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aecd707ea73085a0ab838d9468b8f1678"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html">ImageDetails</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#aecd707ea73085a0ab838d9468b8f1678">GetDetailsAsync</a> (CancellationToken ct=default)</td></tr>
 <tr class="memdesc:aecd707ea73085a0ab838d9468b8f1678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets detailed information about the image.  <a href="classDockerSdk_1_1Images_1_1Image.html#aecd707ea73085a0ab838d9468b8f1678">More...</a><br /></td></tr>
 <tr class="separator:aecd707ea73085a0ab838d9468b8f1678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa9be2661d0cadab08b8aeae28741eb7"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#afa9be2661d0cadab08b8aeae28741eb7">RunAsync</a> (CancellationToken ct=default)</td></tr>
+<tr class="memdesc:afa9be2661d0cadab08b8aeae28741eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="classDockerSdk_1_1Images_1_1Image.html#afa9be2661d0cadab08b8aeae28741eb7">More...</a><br /></td></tr>
+<tr class="separator:afa9be2661d0cadab08b8aeae28741eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a639f10c7e18b53deecfa0dba3e745d41"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#a639f10c7e18b53deecfa0dba3e745d41">RunAsync</a> (<a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a> options, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a639f10c7e18b53deecfa0dba3e745d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="classDockerSdk_1_1Images_1_1Image.html#a639f10c7e18b53deecfa0dba3e745d41">More...</a><br /></td></tr>
+<tr class="separator:a639f10c7e18b53deecfa0dba3e745d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
@@ -125,6 +131,73 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="afa9be2661d0cadab08b8aeae28741eb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa9be2661d0cadab08b8aeae28741eb7">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a>&gt; DockerSdk.Images.Image.RunAsync </td>
+          <td>(</td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new container from this image and starts it. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ct</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container.</dd></dl>
+<p>This method does <em>not</em> wait for the container to finish.</p>
+
+</div>
+</div>
+<a id="a639f10c7e18b53deecfa0dba3e745d41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a639f10c7e18b53deecfa0dba3e745d41">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a>&gt; DockerSdk.Images.Image.RunAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a>&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new container from this image and starts it. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">options</td><td>Settings for the new container.</td></tr>
+    <tr><td class="paramname">ct</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container.</dd></dl>
+<p>This method does <em>not</em> wait for the container to finish.</p>
 
 </div>
 </div>

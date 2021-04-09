@@ -83,6 +83,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6a4205a3a507d7c3feaf08ed85b2c923"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html">ContainerDetails</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1Container.html#a6a4205a3a507d7c3feaf08ed85b2c923">GetDetailsAsync</a> (CancellationToken ct=default)</td></tr>
 <tr class="memdesc:a6a4205a3a507d7c3feaf08ed85b2c923"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets detailed information about the container.  <a href="classDockerSdk_1_1Containers_1_1Container.html#a6a4205a3a507d7c3feaf08ed85b2c923">More...</a><br /></td></tr>
 <tr class="separator:a6a4205a3a507d7c3feaf08ed85b2c923"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3cbcbaf23b9a26fe342e1f79f6fa4ae"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1Container.html#af3cbcbaf23b9a26fe342e1f79f6fa4ae">StartAsync</a> (CancellationToken ct=default)</td></tr>
+<tr class="memdesc:af3cbcbaf23b9a26fe342e1f79f6fa4ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the container, if it is not already running.  <a href="classDockerSdk_1_1Containers_1_1Container.html#af3cbcbaf23b9a26fe342e1f79f6fa4ae">More...</a><br /></td></tr>
+<tr class="separator:af3cbcbaf23b9a26fe342e1f79f6fa4ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
@@ -119,6 +122,43 @@ Properties</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task that completes when the result is available.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af3cbcbaf23b9a26fe342e1f79f6fa4ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3cbcbaf23b9a26fe342e1f79f6fa4ae">&#9670;&nbsp;</a></span>StartAsync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task DockerSdk.Containers.Container.StartAsync </td>
+          <td>(</td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Starts the container, if it is not already running. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ct</td><td>A token used to cancel the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container's main process has started.</dd></dl>
+<p>From the perspective of Docker, there's no concept of whether the container's main process has "finished
+starting"&ndash;just that the process has been started at all. Thus, for example, if the process is a web server, this method's <code>Task</code> may resolve before the web server is ready for connections. If the application using this library needs to synchronize with events happening inside the container, it should monitor the container's logs or use other real-time mechanisms to do so. </p>
+<p>It's also possible that a short-lived process might exit before the method's <code>Task</code> resolves. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container no longer exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>

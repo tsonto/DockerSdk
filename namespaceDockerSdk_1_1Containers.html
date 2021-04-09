@@ -87,12 +87,26 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html">ContainerDetails</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds detailed information about a Docker container.  <a href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Settings for how to create a container and how it should behave.  <a href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html">ListContainersOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filters for container listings.  <a href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:ab47666a9c31e17121b12dc31b4063b25"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25">ContainerExitAction</a> { <br />
+&#160;&#160;<a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25a6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0
+, <a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25a1063e38cb53d94d386f21227fcd84717">Remove</a>
+, <a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25a51cfbcff36da74a9fc47f3a5140f99f2">Restart</a>
+, <a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25a2054b136f113934c795ed73e4a7f8bb2">RestartUnlessStopped</a>
+, <br />
+&#160;&#160;<a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25a12608a00157560459554a4ec1f87284a">RestartOnFailure</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ab47666a9c31e17121b12dc31b4063b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lists actions that Docker can do automatically when a container exits.  <a href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25">More...</a><br /></td></tr>
+<tr class="separator:ab47666a9c31e17121b12dc31b4063b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad44b752c0ce1b6edb3044525d1419efe"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceDockerSdk_1_1Containers.html#ad44b752c0ce1b6edb3044525d1419efe">ContainerStatus</a> { <br />
 &#160;&#160;<a class="el" href="namespaceDockerSdk_1_1Containers.html#ad44b752c0ce1b6edb3044525d1419efea0eceeb45861f9585dd7a97a3e36f85c6">Created</a>
 , <a class="el" href="namespaceDockerSdk_1_1Containers.html#ad44b752c0ce1b6edb3044525d1419efea431dc808fe209d3c3e812991b46d40ef">Restarting</a>
@@ -106,6 +120,12 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ad44b752c0ce1b6edb3044525d1419efe"><td class="mdescLeft">&#160;</td><td class="mdescRight">One of the discrete states that a Docker image can be in.  <a href="namespaceDockerSdk_1_1Containers.html#ad44b752c0ce1b6edb3044525d1419efe">More...</a><br /></td></tr>
 <tr class="separator:ad44b752c0ce1b6edb3044525d1419efe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebfa530429025cc82d07ebae04e3e01d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01d">PullImageCondition</a> { <a class="el" href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01da6e7b34fa59e1bd229b207892956dc41c">Never</a> = 0
+, <a class="el" href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01dae3d9c22c0b3e60deb1b334e71c8d87f0">IfMissing</a>
+, <a class="el" href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01da68eec46437c384d8dad18d5464ebc35c">Always</a>
+ }</td></tr>
+<tr class="memdesc:aebfa530429025cc82d07ebae04e3e01d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conditions under which an operation should automatically pull the required image from the appropriate Docker registry.  <a href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01d">More...</a><br /></td></tr>
+<tr class="separator:aebfa530429025cc82d07ebae04e3e01d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -126,6 +146,43 @@ Variables</h2></td></tr>
 <tr class="separator:a45ad1a5653ddaa44ff172e9f2574b1e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="ab47666a9c31e17121b12dc31b4063b25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab47666a9c31e17121b12dc31b4063b25">&#9670;&nbsp;</a></span>ContainerExitAction</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespaceDockerSdk_1_1Containers.html#ab47666a9c31e17121b12dc31b4063b25">DockerSdk.Containers.ContainerExitAction</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Lists actions that Docker can do automatically when a container exits. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab47666a9c31e17121b12dc31b4063b25a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>Take no special action when the container exits. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab47666a9c31e17121b12dc31b4063b25a1063e38cb53d94d386f21227fcd84717"></a>Remove&#160;</td><td class="fielddoc"><p>Automatically remove the container when it exits. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab47666a9c31e17121b12dc31b4063b25a51cfbcff36da74a9fc47f3a5140f99f2"></a>Restart&#160;</td><td class="fielddoc"><p>Automatically restart the container whenever it exits. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab47666a9c31e17121b12dc31b4063b25a2054b136f113934c795ed73e4a7f8bb2"></a>RestartUnlessStopped&#160;</td><td class="fielddoc"><p>Automatically restart the container when it exits, unless it was specifically stopped. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab47666a9c31e17121b12dc31b4063b25a12608a00157560459554a4ec1f87284a"></a>RestartOnFailure&#160;</td><td class="fielddoc"><p>Automatically restart the container when it exits, but only if the exit code is non-zero. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a8799fa52282cb66e8f979bd58dc352fc" title="Gets or sets the upper limit on how many times Docker should attempt to restart. This property only a...">CreateContainerOptions.MaximumRetriesCount</a></dd></dl>
+</td></tr>
+</table>
+
+</div>
+</div>
 <a id="ad44b752c0ce1b6edb3044525d1419efe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad44b752c0ce1b6edb3044525d1419efe">&#9670;&nbsp;</a></span>ContainerStatus</h2>
 
@@ -161,6 +218,38 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad44b752c0ce1b6edb3044525d1419efea268ce394e277db759f5d6ee76c59f0e7"></a>Exited&#160;</td><td class="fielddoc"><p>The container stopped gracefully and is being removed. This status can apply regardless of exit code. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ad44b752c0ce1b6edb3044525d1419efea183b62c7f067711f9c5a54913c054617"></a>Dead&#160;</td><td class="fielddoc"><p>The daemon shut down the container non-gracefully. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aebfa530429025cc82d07ebae04e3e01d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebfa530429025cc82d07ebae04e3e01d">&#9670;&nbsp;</a></span>PullImageCondition</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01d">DockerSdk.Containers.PullImageCondition</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Conditions under which an operation should automatically pull the required image from the appropriate Docker registry. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aebfa530429025cc82d07ebae04e3e01da6e7b34fa59e1bd229b207892956dc41c"></a>Never&#160;</td><td class="fielddoc"><p>Do not pull the image. If the image does not exist, the operation fails. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aebfa530429025cc82d07ebae04e3e01dae3d9c22c0b3e60deb1b334e71c8d87f0"></a>IfMissing&#160;</td><td class="fielddoc"><p>Pull the image if it is not already present. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aebfa530429025cc82d07ebae04e3e01da68eec46437c384d8dad18d5464ebc35c"></a>Always&#160;</td><td class="fielddoc"><p>Pull the image, even if it's already present. This is useful to get the newest image for a given tag, for example. </p>
 </td></tr>
 </table>
 

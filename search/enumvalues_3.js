@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['linux_163',['Linux',['../namespaceDockerSdk_1_1Images.html#a89133e6b5d458e3b48037a1269070aecaedc9f0a5a5d57797bf68e37364743831',1,'DockerSdk::Images']]]
+  ['exited_201',['Exited',['../namespaceDockerSdk_1_1Containers.html#ad44b752c0ce1b6edb3044525d1419efea268ce394e277db759f5d6ee76c59f0e7',1,'DockerSdk::Containers']]]
 ];
