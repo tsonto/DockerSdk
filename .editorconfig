@@ -159,3 +159,6 @@ csharp_preserve_single_line_blocks = true
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = silent
+
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = silent

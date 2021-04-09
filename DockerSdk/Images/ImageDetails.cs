@@ -147,12 +147,10 @@ namespace DockerSdk.Images
             {
                 response = await client.Core.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
             }
-            catch (Core.DockerImageNotFoundException ex)
-            {
-                throw ImageNotFoundException.Wrap(image, ex);
-            }
             catch (Core.DockerApiException ex)
             {
+                if (ImageNotFoundLocallyException.TryWrap(ex, image, out var wrapped))
+                    throw wrapped;
                 throw DockerException.Wrap(ex);
             }
 

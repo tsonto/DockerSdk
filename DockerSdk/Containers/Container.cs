@@ -37,6 +37,31 @@ namespace DockerSdk.Containers
         public Task<ContainerDetails> GetDetailsAsync(CancellationToken ct = default)
             => _client.Containers.GetDetailsAsync(Id, ct);
 
+        /// <summary>
+        /// Starts the container, if it is not already running.
+        /// </summary>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves when the container's main process has started.</returns>
+        /// <remarks>
+        /// <para>
+        /// From the perspective of Docker, there's no concept of whether the container's main process has "finished
+        /// starting"--just that the process has been started at all. Thus, for example, if the process is a web server,
+        /// this method's <c>Task</c> may resolve before the web server is ready for connections. If the application
+        /// using this library needs to synchronize with events happening inside the container, it should monitor the
+        /// container's logs or use other real-time mechanisms to do so.
+        /// </para>
+        /// <para>
+        /// It's also possible that a short-lived process might exit before the method's <c>Task</c> resolves.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ContainerNotFoundException">The indicated container no longer exists.</exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        public Task StartAsync(CancellationToken ct = default)
+            => _client.Containers.StartAsync(Id, ct);
+
         // TODO: GetDetailsAsync
         // TODO: ListProcessesAsync
         // TODO: GetLogsAsync

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Containers;
 
 namespace DockerSdk.Images
 {
@@ -40,6 +41,25 @@ namespace DockerSdk.Images
         /// </exception>
         public Task<ImageDetails> GetDetailsAsync(CancellationToken ct = default)
             => ImageDetails.LoadAsync(_client, Id, ct);
+
+        /// <summary>
+        /// Creates a new container from this image and starts it.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves when the container has started. It resolves to the new container.</returns>
+        /// <remarks>This method does <em>not</em> wait for the container to finish.</remarks>
+        public Task<Container> RunAsync(CancellationToken ct = default)
+            => RunAsync(new CreateContainerOptions(), ct);
+
+        /// <summary>
+        /// Creates a new container from this image and starts it.
+        /// </summary>
+        /// <param name="options">Settings for the new container.</param>
+        /// <param name="ct"></param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves when the container has started. It resolves to the new container.</returns>
+        /// <remarks>This method does <em>not</em> wait for the container to finish.</remarks>
+        public Task<Container> RunAsync(CreateContainerOptions options, CancellationToken ct = default)
+            => _client.Containers.CreateAndStartAsync(Id, options, ct);
 
         // TODO: PushAsync
         // TODO: RemoveAsync

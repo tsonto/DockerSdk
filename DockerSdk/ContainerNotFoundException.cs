@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using DockerSdk.Containers;
+using Core = Docker.DotNet;
 
 namespace DockerSdk
 {
@@ -38,5 +41,20 @@ namespace DockerSdk
         protected ContainerNotFoundException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        internal static bool TryWrap(Core.DockerApiException ex, ContainerReference container, [NotNullWhen(returnValue:true)] out DockerException? wrapper)
+        {
+            if (ex is Core.DockerContainerNotFoundException)
+            {
+                wrapper = Wrap(ex, container);
+                return true;
+            }
+
+            wrapper = null;
+            return false;
+        }
+
+        internal static ContainerNotFoundException Wrap(Core.DockerApiException ex, ContainerReference container)
+            => new($"No container named \"{container}\" exists.", ex);
     }
 }

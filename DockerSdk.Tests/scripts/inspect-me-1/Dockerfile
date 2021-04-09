@@ -7,5 +7,6 @@ LABEL label-with-equals="abc=def"
 LABEL override-1="from-image"
 LABEL override-2="from-image"
 LABEL org.opencontainers.image.title="Sample image for testing image inspection"
-
+ENV override1="from-image"
+ENV override2="from-image"
 WORKDIR sample

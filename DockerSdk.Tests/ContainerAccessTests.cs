@@ -174,5 +174,175 @@ namespace DockerSdk.Tests
 
             containers.Should().Contain(container => container.Id == containerId);
         }
+
+        [Fact]
+        public async Task CreateAsync_CreatesContainer()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            Container? container = null;
+            try
+            {
+                container = await client.Containers.CreateAsync("ddnt:infinite-loop");
+
+                var output = cli.Invoke("container ls --all --quiet --no-trunc");
+                output.Should().Contain(container.Id.ToString());
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_SpecifyName_HasThatName()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+            const string name = "ddnt-" + nameof(CreateAsync_SpecifyName_HasThatName);
+
+            Container? container = null;
+            try
+            {
+                var options = new CreateContainerOptions { Name = name };
+                container = await client.Containers.CreateAsync("ddnt:infinite-loop", options);
+
+                var output = cli.Invoke("container ls --all --format=\"{{.ID}}={{.Names}}\" --no-trunc ");
+                output.Should().Contain($"{container.Id}={name}");
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_WithLabels_SetsLabels()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            Container? container = null;
+            try
+            {
+                var options = new CreateContainerOptions 
+                { 
+                    Labels =
+                    {
+                        ["abc"] = "123",
+                        ["override-1"] = "from-creation",
+                    }
+                };
+                container = await client.Containers.CreateAsync("ddnt:inspect-me-1", options);
+
+                var output = cli.Invoke("container inspect --format=\"{{json .Config.Labels}}\" " + container.Id)[0];
+                output.Should().Contain("\"abc\":\"123\"");
+                output.Should().Contain("\"override-1\":\"from-creation\"");
+                output.Should().Contain("\"override-2\":\"from-image\"");
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_WithEnvironmentVariables_SetsEnvironmentVariables()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            Container? container = null;
+            try
+            {
+                var options = new CreateContainerOptions
+                {
+                    EnvironmentVariables =
+                    {
+                        ["abc"] = "123",
+                        ["override1"] = "from-creation",
+                        ["override2"] = null,
+                    },
+                    Command = new[] { "printenv" }
+                };
+                container = await client.Containers.CreateAsync("ddnt:inspect-me-1", options);
+
+                _ = cli.Invoke("container start " + container.Id);
+                var output = cli.Invoke("container logs " + container.Id);
+                output.Should().Contain("abc=123");
+                output.Should().Contain("override1=from-creation");
+                output.Should().NotContain("override2");
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_WithPullNever_NoSuchImage_ThrowsImageNotFound()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            Container? container = null;
+            try
+            {
+                await Assert.ThrowsAsync<ImageNotFoundLocallyException>(
+                    async () => container = await client.Containers.CreateAsync("ddnt:no-such-image-exists-with-this-name"));
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_WithPullIfMissing_NoSuchImage_Pulls()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+
+            Container? container = null;
+            try
+            {
+                var options = new CreateContainerOptions { PullCondition = PullImageCondition.IfMissing };
+                container = await client.Containers.CreateAsync("emdot/dockersdk:empty", options);
+
+                var result = cli.Invoke("image ls emdot/dockersdk:empty --quiet");
+                result.Length.Should().Be(1);
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+                cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task StartAsync_AlreadyStarted_NoError()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            var id = cli.Invoke("run --detach ddnt:infinite-loop")[0];
+            try
+            {
+                await client.Containers.StartAsync(id);
+            }
+            finally
+            {
+                cli.Invoke("container rm --force " + id, ignoreErrors: true);
+            }
+        }
     }
 }

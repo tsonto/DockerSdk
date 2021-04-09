@@ -49,6 +49,19 @@ namespace DockerSdk.Containers
             }
         }
 
+        /// <summary>
+        /// Parses the input as a Docker container name.
+        /// </summary>
+        /// <param name="input">The text to parse.</param>
+        /// <returns>The reference.</returns>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a validly-formatted container name.
+        /// </exception>
+        public static new ContainerName Parse(string input)
+            => TryParse(input, out ContainerName? name)
+            ? name
+            : throw new MalformedReferenceException($"\"{input}\" is not a valid container name.");
+
         private static readonly Regex _nameRegex = new(
             @"^
                 [a-zA-Z0-9]         # Must start with an alphanum character
