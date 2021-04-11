@@ -4,8 +4,10 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Containers.Events;
 using DockerSdk.Images;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
@@ -19,7 +21,7 @@ namespace DockerSdk.Containers
     /// Not all container functionality is available directly on this class. See <see cref="Container"/> for more
     /// functionality.
     /// </remarks>
-    public class ContainerAccess
+    public class ContainerAccess : IObservable<ContainerEvent>
     {
         internal ContainerAccess(DockerClient client)
         {
@@ -46,9 +48,7 @@ namespace DockerSdk.Containers
         /// It's also possible that a short-lived process might exit before the method's <c>Task</c> resolves.
         /// </para>
         /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="image"/> is null or empty.
-        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null or empty.</exception>
         /// <exception cref="ImageNotFoundLocallyException">
         /// The Docker daemon cannot find the image locally, and the <see cref="CreateContainerOptions.PullCondition"/>
         /// option is not set to pull it automatically.
@@ -57,7 +57,9 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="MalformedReferenceException">The <paramref name="image"/> input is not well-formed.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The <paramref name="image"/> input is not well-formed.
+        /// </exception>
         public Task<Container> CreateAndStartAsync(string image, CancellationToken ct = default)
             => CreateAndStartAsync(ImageReference.Parse(image), new CreateContainerOptions(), ct);
 
@@ -79,9 +81,7 @@ namespace DockerSdk.Containers
         /// It's also possible that a short-lived process might exit before the method's <c>Task</c> resolves.
         /// </para>
         /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="image"/> is null.
-        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null.</exception>
         /// <exception cref="ImageNotFoundLocallyException">
         /// The Docker daemon cannot find the image locally, and the <see cref="CreateContainerOptions.PullCondition"/>
         /// option is not set to pull it automatically.
@@ -124,8 +124,8 @@ namespace DockerSdk.Containers
         /// default.)
         /// </exception>
         /// <exception cref="MalformedReferenceException">
-        /// The <paramref name="image"/> input is not well-formed. --or-- The options specified a name for the image, but the name does not meet the expectations of a well-formed
-        /// container name.
+        /// The <paramref name="image"/> input is not well-formed. --or-- The options specified a name for the image,
+        /// but the name does not meet the expectations of a well-formed container name.
         /// </exception>
         /// <exception cref="RegistryAuthException">
         /// The registry requires credentials that the client hasn't been given. (Only applies when pulling an image,
@@ -193,9 +193,7 @@ namespace DockerSdk.Containers
         /// <param name="image">The image to create the container from.</param>
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="image"/> is null or empty.
-        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null or empty.</exception>
         /// <exception cref="ImageNotFoundLocallyException">
         /// The Docker daemon cannot find the image locally, and the <see cref="CreateContainerOptions.PullCondition"/>
         /// option is not set to pull it automatically.
@@ -216,9 +214,7 @@ namespace DockerSdk.Containers
         /// <param name="image">The image to create the container from.</param>
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="image"/> is null.
-        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="image"/> is null.</exception>
         /// <exception cref="ImageNotFoundLocallyException">
         /// The Docker daemon cannot find the image locally, and the <see cref="CreateContainerOptions.PullCondition"/>
         /// option is not set to pull it automatically.
@@ -249,8 +245,8 @@ namespace DockerSdk.Containers
         /// default.)
         /// </exception>
         /// <exception cref="MalformedReferenceException">
-        /// The image name is not well-formed. --or-- The options specified a name for the image, but the name does not meet the expectations of a well-formed
-        /// container name.
+        /// The image name is not well-formed. --or-- The options specified a name for the image, but the name does not
+        /// meet the expectations of a well-formed container name.
         /// </exception>
         /// <exception cref="RegistryAuthException">
         /// The registry requires credentials that the client hasn't been given. (Only applies when pulling an image,
@@ -334,6 +330,17 @@ namespace DockerSdk.Containers
                 Labels = options.Labels,
             };
 
+            // Start capturing creation events. We want to find the event about the new container, but we don't have the
+            // container's ID yet. So we store up events behind a "dam" and will release them once we have the ID.
+            var found = new TaskCompletionSource<ContainerEvent>();
+            string? id = null;
+            using var sub = this
+                .OfType<ContainerCreatedEvent>()
+                .Dam(out Action open)
+                .Where(ev => ev.ContainerId == id)
+                .Subscribe(ev => found.SetResult(ev));
+
+            // Call the API endpoint.
             CoreModels.CreateContainerResponse response;
             try
             {
@@ -346,7 +353,18 @@ namespace DockerSdk.Containers
                 throw DockerException.Wrap(ex);
             }
 
-            return new Container(_docker, new ContainerFullId(response.ID));
+            // Now that we have the ID, start processing events to look for it.
+            id = response.ID;
+            open();
+
+            var output = new Container(_docker, new ContainerFullId(response.ID));
+
+            // Don't leave the method until we have acknowledgement that the operation has completed *and* all direct
+            // observers have been notified.
+            ContainerEvent completionEvent = await found.Task.ConfigureAwait(false);
+            await completionEvent.Delivered.ConfigureAwait(false);
+
+            return output;
         }
 
         /// <summary>
@@ -542,7 +560,9 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="MalformedReferenceException">The <paramref name="container"/> input is not a well-formed container reference.</exception>
+        /// <exception cref="MalformedReferenceException">
+        /// The <paramref name="container"/> input is not a well-formed container reference.
+        /// </exception>
         /// <exception cref="ArgumentException"><paramref name="container"/> is null or empty.</exception>
         public Task StartAsync(string container, CancellationToken ct = default)
             => StartAsync(ContainerReference.Parse(container), ct);
@@ -571,11 +591,24 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public Task StartAsync(ContainerReference container, CancellationToken ct = default)
+        public async Task StartAsync(ContainerReference container, CancellationToken ct = default)
         {
+            // The event match condition needs the full ID, so fetch it if we don't have it already.
+            if (container is not ContainerFullId cfid)
+                cfid = await ToFullIdAsync(container, ct).ConfigureAwait(false);
+
+            // Start watching for the event that means the operation is done.
+            var found = new TaskCompletionSource<ContainerEvent>();
+            using var subscription = this
+                .OfType<ContainerStartedEvent>()
+                .Where(ev => ev.ContainerId == cfid)
+                .Subscribe(ev => found.SetResult(ev));
+
+            // Send the request to the API.
+            bool alreadyRunning;
             try
             {
-                return _docker.Core.Containers.StartContainerAsync(container, new(), ct);
+                alreadyRunning = !await _docker.Core.Containers.StartContainerAsync(container, new(), ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {
@@ -583,7 +616,26 @@ namespace DockerSdk.Containers
                     throw wrapper;
                 throw DockerException.Wrap(ex);
             }
+
+            // If the container was already running, don't wait for a message about it. (There won't be one.)
+            if (alreadyRunning)
+                return;
+
+            // Wait until we receive the confirmation message *and* all direct subscribers have been notified.
+            var completionEvent = await found.Task.ConfigureAwait(false);
+            await completionEvent.Delivered.ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Subscribes to events about containers.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+            => _docker.OfType<ContainerEvent>().Subscribe(observer);
 
         internal static IDictionary<string, IList<CoreModels.PortBinding>> MakePortBindings(IEnumerable<PortBinding> portBindings)
         {
@@ -700,6 +752,15 @@ namespace DockerSdk.Containers
                 await _docker.Images.PullAsync(image, ct).ConfigureAwait(false);
                 return;
             }
+        }
+
+        private async Task<ContainerFullId> ToFullIdAsync(ContainerReference input, CancellationToken ct = default)
+        {
+            if (input is ContainerFullId cfid)
+                return cfid;
+
+            var container = await GetAsync(input, ct).ConfigureAwait(false);
+            return container.Id;
         }
 
         // TODO: StopAsync, optionally combine with wait

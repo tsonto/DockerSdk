@@ -8,7 +8,7 @@ Push-Location $PSScriptRoot
 . ./definitions.ps1
 
 # Shut down containers.
-foreach ($id in docker container ls --filter="name=ddnt" --quiet)
+foreach ($id in docker container ls --filter="name=ddnt" --quiet --no-trunc)
 {
     docker container stop $id --time 1
 }
@@ -24,9 +24,18 @@ $tags = $imageDefinitions.Name
 $tags = [System.Linq.Enumerable]::Reverse([string[]] $tags) 
 foreach ($tag in $tags)
 {
+    # Does the image exist?
     $id = docker image ls ddnt:$tag --quiet --no-trunc
     if ($id)
     {
+        # Remove all containers for it, force-stopping them if needed. This catches containers that 
+        # aren't named as expected, which can happen when troubleshooting.
+        foreach ($container in docker container ls --filter=ancestor=ddnt:$tag --quiet --no-trunc --all)
+        {
+            docker container rm --force $container
+        }
+
+        # Remove the image.
         docker image rm $id --force
     }
 }
@@ -38,6 +47,14 @@ $ids += @( docker image ls emdot/emdotsdk --quiet )
 $ids += @( docker image ls emdot/emdotsdk-private --quiet )
 foreach ($id in $ids)
 {
+    # Remove all containers for it, force-stopping them if needed. This catches containers that 
+    # aren't named as expected, which can happen when troubleshooting.
+    foreach ($container in docker container ls --filter=ancestor=$id --quiet --no-trunc --all)
+    {
+        docker container rm --force $container
+    }
+
+    # Remove image.
     docker image rm --force $id
 }
 

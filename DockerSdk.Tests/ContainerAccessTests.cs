@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Containers.Events;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -197,6 +199,30 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
+        public async Task CreateAsync_DoesNotResolveUntilDone()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+            var name = "ddnt-" + nameof(CreateAsync_DoesNotResolveUntilDone);
+            
+            bool found = false;
+            using var subscription = client.Containers.Where(e => name == e.ContainerName!).Subscribe(e => found = true);
+
+            Container? container = null;
+            try
+            {
+                var request = new CreateContainerOptions { Name = name };
+                container = await client.Containers.CreateAsync("ddnt:infinite-loop", request);
+                Assert.True(found);
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
         public async Task CreateAsync_SpecifyName_HasThatName()
         {
             using var cli = new DockerCli(toh);
@@ -342,6 +368,29 @@ namespace DockerSdk.Tests
             finally
             {
                 cli.Invoke("container rm --force " + id, ignoreErrors: true);
+            }
+        }
+
+        [Fact]
+        public async Task StartAsync_DoesNotResolveUntilDone()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            var id = cli.Invoke($"container create ddnt:infinite-loop")[0];
+            Container? container = null;
+            try
+            {
+                bool found = false;
+                using var subscription = client.Containers.OfType<ContainerStartedEvent>().Where(e => e.ContainerId == id).Subscribe(e => found = true);
+
+                await client.Containers.StartAsync(id);
+                Assert.True(found);
+            }
+            finally
+            {
+                if (container is not null)
+                    cli.Invoke($"container rm --force {id}", ignoreErrors: true);
             }
         }
     }
