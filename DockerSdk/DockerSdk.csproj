@@ -27,6 +27,7 @@
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
         <PackageReference Include="Docker.DotNet" Version="3.125.4" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
         <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     </ItemGroup>
 

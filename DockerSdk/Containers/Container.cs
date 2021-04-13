@@ -1,29 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Containers.Events;
 
 namespace DockerSdk.Containers
 {
     /// <summary>
     /// Represents a Docker container.
     /// </summary>
-    public class Container
+    public class Container : IObservable<ContainerEvent>
     {
-        private readonly DockerClient _client;
+        internal Container(DockerClient client, ContainerFullId id)
+        {
+            _client = client;
+            Id = id;
+        }
 
         /// <summary>
         /// Gets the container's full ID.
         /// </summary>
         public ContainerFullId Id { get; }
 
-        internal Container(DockerClient client, ContainerFullId id)
-        {
-            _client = client;
-            Id = id;
-        }
+        private readonly DockerClient _client;
 
         /// <summary>
         /// Gets detailed information about the container.
@@ -61,6 +61,17 @@ namespace DockerSdk.Containers
         /// </exception>
         public Task StartAsync(CancellationToken ct = default)
             => _client.Containers.StartAsync(Id, ct);
+
+        /// <summary>
+        /// Subscribes to events from this container.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+            => _client.Containers.Where(ev => ev.ContainerId == Id).Subscribe(observer);
 
         // TODO: GetDetailsAsync
         // TODO: ListProcessesAsync

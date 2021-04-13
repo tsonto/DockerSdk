@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Registries;
-
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 
@@ -13,10 +13,13 @@ namespace DockerSdk
     /// <summary>
     /// Provides remote access to a Docker daemon.
     /// </summary>
-    public class DockerClient : IDisposable
+    public class DockerClient : IDisposable, IObservable<Event>
     {
         private DockerClient(Core.DockerClient core, ClientOptions options, Version negotiatedApiVersion)
         {
+            // Start listening to events.
+            EventListener = new EventListener(this);
+
             Core = core;
             Options = options;
             ApiVersion = negotiatedApiVersion;
@@ -32,6 +35,11 @@ namespace DockerSdk
         public Version ApiVersion { get; }
 
         /// <summary>
+        /// Provides access to functionality related to Docker containers.
+        /// </summary>
+        public ContainerAccess Containers { get; }
+
+        /// <summary>
         /// Provides access to functionality related to Docker images.
         /// </summary>
         public ImageAccess Images { get; }
@@ -42,16 +50,12 @@ namespace DockerSdk
         public RegistryAccess Registries { get; }
 
         /// <summary>
-        /// Provides access to functionality related to Docker containers.
-        /// </summary>
-        public ContainerAccess Containers { get; }
-
-        /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.
         /// </summary>
         internal Core.IDockerClient Core { get; }
 
         internal ClientOptions Options { get; }
+        internal readonly EventListener EventListener;
 
         /// <summary>
         /// The minimum Docker API version that the SDK supports.
@@ -148,6 +152,17 @@ namespace DockerSdk
         }
 
         /// <summary>
+        /// Subscribes to events from the Docker daemon.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<Event> observer)
+            => EventListener.Subscribe(observer);
+
+        /// <summary>
         /// Determines which API version to use for communications between the SDK and the Docker daemon, or throws an
         /// exception if there's no acceptable answer.
         /// </summary>
@@ -219,6 +234,7 @@ namespace DockerSdk
             {
                 if (disposing)
                 {
+                    EventListener.Dispose();
                     Core?.Dispose();
                 }
 
