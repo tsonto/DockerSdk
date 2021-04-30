@@ -25,6 +25,7 @@ namespace DockerSdk.Containers
         /// <param name="input">The string to parse.</param>
         /// <param name="id">The ID, or null if parsing failed.</param>
         /// <returns>True if the input is well-formed as a container ID; false otherwise.</returns>
+        /// <exception cref="ArgumentException">The input is null or blank.</exception>
         public static bool TryParse(string input, [NotNullWhen(returnValue: true)] out ContainerFullId? id)
         {
             if (string.IsNullOrEmpty(input))
@@ -41,6 +42,20 @@ namespace DockerSdk.Containers
                 return false;
             }
         }
+
+        /// <summary>
+        /// Parses the input as a full-length Docker container ID.
+        /// </summary>
+        /// <param name="input">The text to parse.</param>
+        /// <returns>The ID object.</returns>
+        /// <exception cref="MalformedReferenceException">
+        /// The input is not a validly-formatted full-length container ID.
+        /// </exception>
+        /// <exception cref="ArgumentException">The input is null or blank.</exception>
+        public static new ContainerFullId Parse(string input)
+            => TryParse(input, out ContainerFullId? id)
+            ? id
+            : throw new MalformedReferenceException($"\"{input}\" is not a valid full-length container ID.");
 
         private static readonly Regex _fullIdRegex = new(
             @"^

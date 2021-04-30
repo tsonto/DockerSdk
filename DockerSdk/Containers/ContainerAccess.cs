@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
 using DockerSdk.Images;
+using DockerSdk.Registries;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 

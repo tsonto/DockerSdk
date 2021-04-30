@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Docker.DotNet;
 
-namespace DockerSdk
+namespace DockerSdk.Registries
 {
     /// <summary>
     /// Represents a failure to authenticate with a Docker registry.
@@ -33,7 +33,8 @@ namespace DockerSdk
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="RegistryAuthException"/> class. This overload is used for deserialization.
+        /// Creates a new instance of the <see cref="RegistryAuthException"/> class. This overload is used for
+        /// deserialization.
         /// </summary>
         protected RegistryAuthException(
           System.Runtime.Serialization.SerializationInfo info,
@@ -53,7 +54,8 @@ namespace DockerSdk
             }
             if (ex.StatusCode == HttpStatusCode.InternalServerError && ex.Message.Contains("no basic auth credentials"))
             {
-                // This happens when we attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token.
+                // This happens when we attempt to access an image on a private registry that expects basic auth, but we
+                // gave it either no credentials or an identity token.
                 wrapped = new RegistryAuthException($"Authorization to registry {registry} failed: expected basic auth credentials.", ex);
                 return true;
             }

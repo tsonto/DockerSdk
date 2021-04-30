@@ -47,7 +47,7 @@ namespace DockerSdk
         internal static DockerException Wrap(Core.DockerApiException ex)
             => ex.StatusCode switch
             {
-                HttpStatusCode.BadRequest => new DockerException("The Docker daemon rejected the request because a parameter is invalid.", ex),
+                HttpStatusCode.BadRequest => new DockerException("The Docker daemon rejected the request because of an invalid value or invalid combination of values.", ex),
                 HttpStatusCode.InternalServerError => new DockerException("The Docker daemon reported an internal error.", ex),
                 _ => new DockerException($"The Docker daemon responded with unexpected status code {(int)ex.StatusCode}.", ex),
             };

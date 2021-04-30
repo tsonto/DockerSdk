@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Events;
 using DockerSdk.Images;
+using DockerSdk.Networks;
 using DockerSdk.Registries;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
@@ -23,9 +24,10 @@ namespace DockerSdk
             Core = core;
             Options = options;
             ApiVersion = negotiatedApiVersion;
-            Images = new ImageAccess(this);
-            Registries = new RegistryAccess(this);
             Containers = new ContainerAccess(this);
+            Images = new ImageAccess(this);
+            Networks = new NetworkAccess(this);
+            Registries = new RegistryAccess(this);
         }
 
         /// <summary>
@@ -43,6 +45,11 @@ namespace DockerSdk
         /// Provides access to functionality related to Docker images.
         /// </summary>
         public ImageAccess Images { get; }
+
+        /// <summary>
+        /// Provides access to functionality related to Docker networks.
+        /// </summary>
+        public NetworkAccess Networks { get; }
 
         /// <summary>
         /// Provides access to functionality related to Docker registries.

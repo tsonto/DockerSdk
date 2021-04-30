@@ -17,6 +17,14 @@ function VerifySetup()
         }
     }
 
+    foreach ($name in $networkDefinitions.Name)
+    {
+        if (!(VerifyNetwork $name))
+        {
+            return $false
+        }
+    }
+
     foreach ($name in $imageDefinitions.Name)
     {
         if (!(VerifyImage $name))
@@ -39,6 +47,32 @@ function VerifyContainer($name)
     $fileId = Get-Content $path | Select-Object -First 1
 
     $dockerId = docker container ls --all --quiet --no-trunc --filter=name=ddnt-$name
+    if (!$dockerId)
+    {
+        # The setup has run, but Docker isn't in the correct state. Clean and rebuild.
+        return $false
+    }
+    
+    if ($fileId -ne $dockerId)
+    {
+        # The setup has run, but for a different set of IDs (possibly a copy of ./up.ps1 from a different path ran). Clean and rebuild.
+        return $false
+    }
+
+    return $true
+}
+
+function VerifyNetwork($name)
+{
+    $path = "$name.network.id"
+    if (!(Test-Path $path))
+    {
+        # Either the tests haven't been set up, or someone has deleted the .network.id file (such as by `git clean -f`). Clean and rebuild.
+        return $false
+    }
+    $fileId = Get-Content $path | Select-Object -First 1
+
+    $dockerId = docker network ls --filter=name=ddnt-$name --quiet --no-trunc
     if (!$dockerId)
     {
         # The setup has run, but Docker isn't in the correct state. Clean and rebuild.
@@ -99,6 +133,14 @@ foreach ($entry in $imageDefinitions)
     Push-Location $name
     Invoke-Expression "docker build . --tag ddnt:$name --quiet $args > image.id"
     Pop-Location
+}
+
+# Create the networks.
+foreach ($entry in $networkDefinitions)
+{
+    $name = $entry.Name
+    $args = $entry['Args'] ?? ''
+    Invoke-Expression "docker network create $args ddnt-$name > $name.network.id"
 }
 
 # Start the containers.

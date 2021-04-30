@@ -31,8 +31,8 @@ namespace DockerSdk.Containers
         /// The input is not a validly-formatted container ID.
         /// </exception>
         public static new ContainerId Parse(string input)
-            => TryParse(input, out ContainerId? name)
-            ? name
+            => TryParse(input, out ContainerId? id)
+            ? id
             : throw new MalformedReferenceException($"\"{input}\" is not a valid container ID.");
 
         /// <summary>

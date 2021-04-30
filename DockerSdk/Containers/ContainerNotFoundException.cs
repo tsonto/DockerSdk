@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using DockerSdk.Containers;
 using Core = Docker.DotNet;
 
-namespace DockerSdk
+namespace DockerSdk.Containers
 {
     /// <summary>
     /// Indicates that no Docker container with the given name is known to the Docker daemon.
@@ -36,13 +35,14 @@ namespace DockerSdk
         }
 
         /// <summary>
-        /// Creates an instance of the <see cref="ContainerNotFoundException"/> class. This constructor is used for deserialization.
+        /// Creates an instance of the <see cref="ContainerNotFoundException"/> class. This constructor is used for
+        /// deserialization.
         /// </summary>
         protected ContainerNotFoundException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        internal static bool TryWrap(Core.DockerApiException ex, ContainerReference container, [NotNullWhen(returnValue:true)] out DockerException? wrapper)
+        internal static bool TryWrap(Core.DockerApiException ex, ContainerReference container, [NotNullWhen(returnValue: true)] out DockerException? wrapper)
         {
             if (ex is Core.DockerContainerNotFoundException)
             {

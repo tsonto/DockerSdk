@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using DockerSdk.Images;
 using Core = Docker.DotNet;
 
-namespace DockerSdk
+namespace DockerSdk.Images
 {
     /// <summary>
     /// Indicates that the indicated image does not exist at the Docker registry its name indicates.
@@ -34,7 +33,8 @@ namespace DockerSdk
         }
 
         /// <summary>
-        /// Creates an instance of the <see cref="ImageNotFoundRemotelyException"/> class. This overload is intended for deserialization only.
+        /// Creates an instance of the <see cref="ImageNotFoundRemotelyException"/> class. This overload is intended for
+        /// deserialization only.
         /// </summary>
         protected ImageNotFoundRemotelyException(
           System.Runtime.Serialization.SerializationInfo info,

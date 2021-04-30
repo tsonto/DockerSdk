@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DockerSdk.Images;
+using DockerSdk.Registries;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
