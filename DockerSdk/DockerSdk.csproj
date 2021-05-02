@@ -11,7 +11,17 @@
 
     <PropertyGroup>
         <DocumentationFile>DockerSdk.xml</DocumentationFile>
-        <Version>0.1.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/Emdot/DockerSdk</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Emdot/DockerSdk.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <UseFullSemVerForNuGet>true</UseFullSemVerForNuGet>
+        <Product>Docker SDK for .NET</Product>
+        <Authors>Matt Tsōnto</Authors>
+        <Company>Tsōnto</Company>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,6 +37,10 @@
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
         <PackageReference Include="Docker.DotNet" Version="3.125.4" />
+        <PackageReference Include="GitVersion.MsBuild" Version="5.6.9">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="System.Reactive" Version="5.0.0" />
         <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     </ItemGroup>
