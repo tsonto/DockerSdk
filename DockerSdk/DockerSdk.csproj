@@ -37,7 +37,7 @@
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
         <PackageReference Include="Docker.DotNet" Version="3.125.4" />
-        <PackageReference Include="GitVersion.MsBuild" Version="5.6.9">
+        <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" Condition=" '$(CI_IS_PUSH_TO_MAIN)' == 'true' ">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
