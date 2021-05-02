@@ -1,10 +1,6 @@
-name: Build and test
+name: On pull request
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: pull_request
 
 jobs:
   
@@ -13,9 +9,13 @@ jobs:
     env:
       DOCKER_BUILDKIT: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Set up .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
@@ -23,6 +23,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
+
     - name: Install Powershell
       if: ${{ env.ACT }}
       run: |
