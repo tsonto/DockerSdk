@@ -1,10 +1,6 @@
-name: Build and test
+name: On pull request
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: pull_request
 
 jobs:
   
@@ -18,8 +14,6 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
     
     - name: Set up .NET
       uses: actions/setup-dotnet@v1
@@ -30,11 +24,6 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
 
-    - name: Pack
-      run: dotnet pack --configuration Release --no-build --output nuget-out
-    - name: Publish to nuget.org
-      run: dotnet nuget push --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} --source https://api.nuget.org/v3/index.json nuget-out/*.nupkg
-    
     - name: Install Powershell
       if: ${{ env.ACT }}
       run: |

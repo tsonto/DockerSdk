@@ -1,0 +1,55 @@
+name: On push to main
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY_DOCKERSDK }}
+    steps:
+    
+      # Get the code and set up the environment.
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+      # Build.
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore /warnaserror
+      
+      # Publish to nuget.org.
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output nuget-out
+      if: ${{ github.ref == 'refs/heads/main' }}
+    - name: Publish to nuget.org
+      run: dotnet nuget push --source https://api.nuget.org/v3/index.json nuget-out/*.nupkg
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY_DOCKERSDK }}
+
+      # Generate the documentation for the SDK. The result is in folder DockerSdk/html/.
+    - name: Generate documentation
+      uses: mattnotmitt/doxygen-action@v1
+      with:
+        working-directory: 'DockerSdk/'
+        doxyfile-path: './Doxyfile'
+
+      # Publish the documentation to GitHub Pages.
+    - name: Publish documentation
+      uses: Cecilapp/GitHub-Pages-deploy@3.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        build_dir: DockerSdk/html/
