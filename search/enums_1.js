@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['guestostype_196',['GuestOsType',['../namespaceDockerSdk_1_1Images.html#a89133e6b5d458e3b48037a1269070aec',1,'DockerSdk::Images']]]
+  ['eventsubjecttype_291',['EventSubjectType',['../namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956',1,'DockerSdk::Events']]]
 ];

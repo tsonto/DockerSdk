@@ -153,7 +153,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the image object.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>No such image exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>No such image exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as loss of network connectivity. </td></tr>
   </table>
   </dd>
@@ -198,7 +198,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the image object.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>No such image exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>No such image exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as loss of network connectivity. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The image reference is improperly formatted.</td></tr>
   </table>
@@ -244,7 +244,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the details.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundException.html" title="Indicates that the Docker daemon could not find the indicated image where it was looking.">ImageNotFoundException</a></td><td>No such image exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundException.html" title="Indicates that the Docker daemon could not find the indicated image where it was looking.">ImageNotFoundException</a></td><td>No such image exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity. </td></tr>
   </table>
   </dd>
@@ -289,7 +289,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the details.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundException.html" title="Indicates that the Docker daemon could not find the indicated image where it was looking.">ImageNotFoundException</a></td><td>No such image exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundException.html" title="Indicates that the Docker daemon could not find the indicated image where it was looking.">ImageNotFoundException</a></td><td>No such image exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The image reference is improperly formatted.</td></tr>
   </table>
@@ -429,9 +429,9 @@ Public Member Functions</h2></td></tr>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null.</td></tr>
     <tr><td class="paramname">InvalidOperationException</td><td>One Task removed the auth object while another was getting it. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The image does not exist at the Registry indicated by its name.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The image does not exist at the Registry indicated by its name.</td></tr>
   </table>
   </dd>
 </dl>
@@ -479,9 +479,9 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty.</td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The input could not be parsed as an image name.</td></tr>
     <tr><td class="paramname">InvalidOperationException</td><td>One Task removed the auth object while another was getting it. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The image does not exist at the Registry indicated by its name.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Images_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The image does not exist at the Registry indicated by its name.</td></tr>
   </table>
   </dd>
 </dl>

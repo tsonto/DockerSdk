@@ -1,10 +1,21 @@
 var searchData=
 [
-  ['id_241',['Id',['../classDockerSdk_1_1Containers_1_1Container.html#a6e6d4f1610f5a3cc4ff4257461759fda',1,'DockerSdk.Containers.Container.Id()'],['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a88b88fa6b512b6ca99a6a1525d388e89',1,'DockerSdk.Containers.ContainerDetails.Id()'],['../classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1',1,'DockerSdk.Images.Image.Id()'],['../classDockerSdk_1_1Images_1_1ImageDetails.html#a82da28c36ae22b21755010e90717a319',1,'DockerSdk.Images.ImageDetails.Id()']]],
-  ['image_242',['Image',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae330005b9386877c467032897bb4e91d',1,'DockerSdk::Containers::ContainerDetails']]],
-  ['images_243',['Images',['../classDockerSdk_1_1DockerClient.html#ab047cc6cccdfe8304900946e77756c18',1,'DockerSdk::DockerClient']]],
-  ['isolationtech_244',['IsolationTech',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a91eb13564add02e7da1f19a3a6c0df16',1,'DockerSdk::Containers::CreateContainerOptions']]],
-  ['ispaused_245',['IsPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a6fc9e4fa13679f99678c2ce82ca42c5d',1,'DockerSdk::Containers::ContainerDetails']]],
-  ['isrunning_246',['IsRunning',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae3f0a71ec107d13ee89c723b71dbae89',1,'DockerSdk::Containers::ContainerDetails']]],
-  ['isrunningorpaused_247',['IsRunningOrPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#aa433e24739c6d80639dd1d2361828d5f',1,'DockerSdk::Containers::ContainerDetails']]]
+  ['id_366',['Id',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a88b88fa6b512b6ca99a6a1525d388e89',1,'DockerSdk.Containers.ContainerDetails.Id()'],['../classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1',1,'DockerSdk.Images.Image.Id()'],['../classDockerSdk_1_1Images_1_1ImageDetails.html#a82da28c36ae22b21755010e90717a319',1,'DockerSdk.Images.ImageDetails.Id()'],['../classDockerSdk_1_1Networks_1_1Network.html#a5591829d98f8a5e4423cd4a18a0f9c10',1,'DockerSdk.Networks.Network.Id()'],['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a7c8116439ce62d0b7adf5769a04e894c',1,'DockerSdk.Networks.NetworkDetails.Id()'],['../classDockerSdk_1_1Containers_1_1Container.html#a6e6d4f1610f5a3cc4ff4257461759fda',1,'DockerSdk.Containers.Container.Id()']]],
+  ['image_367',['Image',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae330005b9386877c467032897bb4e91d',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['imagereference_368',['ImageReference',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html#a5b3338055ba65ac87ba8e3f71a26004e',1,'DockerSdk::Containers::Events::ContainerEvent']]],
+  ['images_369',['Images',['../classDockerSdk_1_1DockerClient.html#ab047cc6cccdfe8304900946e77756c18',1,'DockerSdk::DockerClient']]],
+  ['ipamdrivername_370',['IpamDriverName',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a6fd6dadadf01ed8f9fa645852461ade8',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['ipamdriveroptions_371',['IpamDriverOptions',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a0d7b00282dd9ac2f7f91c9faa646dd02',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['ipv4address_372',['IPv4Address',['../classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a189e3fda518037db92471627cd019876',1,'DockerSdk::Networks::NetworkEndpoint']]],
+  ['ipv4subnet_373',['IPv4Subnet',['../classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a1d4697c5fc3c56917554b1a40de67ac3',1,'DockerSdk::Networks::NetworkEndpoint']]],
+  ['ipv6address_374',['IPv6Address',['../classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#afa10a402bdfcfd8fb78de53181872219',1,'DockerSdk::Networks::NetworkEndpoint']]],
+  ['ipv6subnet_375',['IPv6Subnet',['../classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#ad20bfd60411e2c9c4578e08b501afb8e',1,'DockerSdk::Networks::NetworkEndpoint']]],
+  ['isattachable_376',['IsAttachable',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a252ca0758eb16e146dbad39a5ee132e2',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['isingress_377',['IsIngress',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a71fac55ccfb629fcf10c630256c9d1de',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['isinternalonly_378',['IsInternalOnly',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#a4157bf8566051c46092c3ea7435d0601',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['isipv6enabled_379',['IsIPv6Enabled',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#abf3fc227fbfdb974b2888f3349a7ea64',1,'DockerSdk::Networks::NetworkDetails']]],
+  ['isolationtech_380',['IsolationTech',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a91eb13564add02e7da1f19a3a6c0df16',1,'DockerSdk::Containers::CreateContainerOptions']]],
+  ['ispaused_381',['IsPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#a6fc9e4fa13679f99678c2ce82ca42c5d',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['isrunning_382',['IsRunning',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae3f0a71ec107d13ee89c723b71dbae89',1,'DockerSdk::Containers::ContainerDetails']]],
+  ['isrunningorpaused_383',['IsRunningOrPaused',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html#aa433e24739c6d80639dd1d2361828d5f',1,'DockerSdk::Containers::ContainerDetails']]]
 ];

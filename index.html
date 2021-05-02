@@ -86,11 +86,13 @@ Getting started</h2>
 <h2><a class="anchor" id="autotoc_md2"></a>
 Examples</h2>
 <p>List containers:</p>
-<div class="fragment"><div class="line">Container[] containers = await client.Containers.ListAsync();</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956a0e7278cda02a9c0446dcc75a4df34eb2">Container</a>[] containers = await client.Containers.ListAsync();</div>
+<div class="ttc" id="anamespaceDockerSdk_1_1Events_html_aba093c7d62c4d159c4be64347f9f6956a0e7278cda02a9c0446dcc75a4df34eb2"><div class="ttname"><a href="namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956a0e7278cda02a9c0446dcc75a4df34eb2">DockerSdk.Events.EventSubjectType.Container</a></div><div class="ttdeci">@ Container</div><div class="ttdoc">A Docker container.</div></div>
 </div><!-- fragment --><p>Create an image by pulling from a Docker Registry:</p>
-<div class="fragment"><div class="line">Image image = await client.Images.PullAsync(<span class="stringliteral">&quot;fedora/memcached:alpha&quot;</span>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956abe53a0541a6d36f6ecb879fa2c584b08">Image</a> image = await client.Images.PullAsync(<span class="stringliteral">&quot;fedora/memcached:alpha&quot;</span>);</div>
+<div class="ttc" id="anamespaceDockerSdk_1_1Events_html_aba093c7d62c4d159c4be64347f9f6956abe53a0541a6d36f6ecb879fa2c584b08"><div class="ttname"><a href="namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956abe53a0541a6d36f6ecb879fa2c584b08">DockerSdk.Events.EventSubjectType.Image</a></div><div class="ttdeci">@ Image</div><div class="ttdoc">A Docker image.</div></div>
 </div><!-- fragment --><p>Run a container:</p>
-<div class="fragment"><div class="line">Container container = await client.Containers.CreateAndStartAsync(<span class="stringliteral">&quot;mcr.microsoft.com/powershell&quot;</span>); </div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceDockerSdk_1_1Events.html#aba093c7d62c4d159c4be64347f9f6956a0e7278cda02a9c0446dcc75a4df34eb2">Container</a> container = await client.Containers.CreateAndStartAsync(<span class="stringliteral">&quot;mcr.microsoft.com/powershell&quot;</span>); </div>
 </div><!-- fragment --><p>Stop a container:</p>
 <div class="fragment"><div class="line">await container.StopAsync();</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md3"></a>

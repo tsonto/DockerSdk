@@ -1,9 +1,19 @@
 var searchData=
 [
-  ['clientoptions_134',['ClientOptions',['../classDockerSdk_1_1ClientOptions.html',1,'DockerSdk']]],
-  ['container_135',['Container',['../classDockerSdk_1_1Containers_1_1Container.html',1,'DockerSdk::Containers']]],
-  ['containeraccess_136',['ContainerAccess',['../classDockerSdk_1_1Containers_1_1ContainerAccess.html',1,'DockerSdk::Containers']]],
-  ['containerdetails_137',['ContainerDetails',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html',1,'DockerSdk::Containers']]],
-  ['containernotfoundexception_138',['ContainerNotFoundException',['../classDockerSdk_1_1ContainerNotFoundException.html',1,'DockerSdk']]],
-  ['createcontaineroptions_139',['CreateContainerOptions',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html',1,'DockerSdk::Containers']]]
+  ['clientoptions_204',['ClientOptions',['../classDockerSdk_1_1ClientOptions.html',1,'DockerSdk']]],
+  ['container_205',['Container',['../classDockerSdk_1_1Containers_1_1Container.html',1,'DockerSdk::Containers']]],
+  ['containeraccess_206',['ContainerAccess',['../classDockerSdk_1_1Containers_1_1ContainerAccess.html',1,'DockerSdk::Containers']]],
+  ['containercreatedevent_207',['ContainerCreatedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerCreatedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerdeletedevent_208',['ContainerDeletedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerDeletedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerdetails_209',['ContainerDetails',['../classDockerSdk_1_1Containers_1_1ContainerDetails.html',1,'DockerSdk::Containers']]],
+  ['containerevent_210',['ContainerEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerexitedevent_211',['ContainerExitedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerExitedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containernotfoundexception_212',['ContainerNotFoundException',['../classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html',1,'DockerSdk::Containers']]],
+  ['containerpausedevent_213',['ContainerPausedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerPausedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerrestartcompletedevent_214',['ContainerRestartCompletedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerRestartCompletedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containersignalledevent_215',['ContainerSignalledEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerSignalledEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerstartedevent_216',['ContainerStartedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerStartedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerstopcompletedevent_217',['ContainerStopCompletedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerStopCompletedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['containerunpausedevent_218',['ContainerUnpausedEvent',['../classDockerSdk_1_1Containers_1_1Events_1_1ContainerUnpausedEvent.html',1,'DockerSdk::Containers::Events']]],
+  ['createcontaineroptions_219',['CreateContainerOptions',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html',1,'DockerSdk::Containers']]]
 ];

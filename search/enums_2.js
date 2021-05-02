@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['pullimagecondition_197',['PullImageCondition',['../namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01d',1,'DockerSdk::Containers']]]
+  ['guestostype_292',['GuestOsType',['../namespaceDockerSdk_1_1Images.html#a89133e6b5d458e3b48037a1269070aec',1,'DockerSdk::Images']]]
 ];

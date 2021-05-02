@@ -76,6 +76,12 @@ $(function() {
 
 <p>Provides access to functionality involving Docker containers.  
  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for DockerSdk.Containers.ContainerAccess:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classDockerSdk_1_1Containers_1_1ContainerAccess.png" alt=""/>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -124,9 +130,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9c5e99c091d48620fd58ead7933c2f26"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a9c5e99c091d48620fd58ead7933c2f26">StartAsync</a> (string container, CancellationToken ct=default)</td></tr>
 <tr class="memdesc:a9c5e99c091d48620fd58ead7933c2f26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts a Docker container, if it is not already running.  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a9c5e99c091d48620fd58ead7933c2f26">More...</a><br /></td></tr>
 <tr class="separator:a9c5e99c091d48620fd58ead7933c2f26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9aca8669fcbcafe35638a5f46e544490"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a9aca8669fcbcafe35638a5f46e544490">StartAsync</a> (<a class="el" href="namespaceDockerSdk_1_1Containers.html#a744223460cf90f78b636cccb1fe6ecf1">ContainerReference</a> container, CancellationToken ct=default)</td></tr>
-<tr class="memdesc:a9aca8669fcbcafe35638a5f46e544490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts a Docker container, if it is not already running.  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a9aca8669fcbcafe35638a5f46e544490">More...</a><br /></td></tr>
-<tr class="separator:a9aca8669fcbcafe35638a5f46e544490"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc420c0407334ccf4a1546631210cab"><td class="memItemLeft" align="right" valign="top">async Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a4bc420c0407334ccf4a1546631210cab">StartAsync</a> (<a class="el" href="namespaceDockerSdk_1_1Containers.html#a744223460cf90f78b636cccb1fe6ecf1">ContainerReference</a> container, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a4bc420c0407334ccf4a1546631210cab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts a Docker container, if it is not already running.  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a4bc420c0407334ccf4a1546631210cab">More...</a><br /></td></tr>
+<tr class="separator:a4bc420c0407334ccf4a1546631210cab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f68597ebd8adf9a8975b7245d1faf58"><td class="memItemLeft" align="right" valign="top">IDisposable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a3f68597ebd8adf9a8975b7245d1faf58">Subscribe</a> (IObserver&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html">ContainerEvent</a> &gt; observer)</td></tr>
+<tr class="memdesc:a3f68597ebd8adf9a8975b7245d1faf58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribes to events about containers.  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#a3f68597ebd8adf9a8975b7245d1faf58">More...</a><br /></td></tr>
+<tr class="separator:a3f68597ebd8adf9a8975b7245d1faf58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides access to functionality involving Docker containers. </p>
@@ -172,8 +181,8 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <p>It's also possible that a short-lived process might exit before the method's <code>Task</code> resolves. </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null.</td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -237,10 +246,10 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -288,10 +297,10 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <p>It's also possible that a short-lived process might exit before the method's <code>Task</code> resolves. </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty.</td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>image</em>  input is not well-formed.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>image</em>  input is not well-formed. </td></tr>
   </table>
   </dd>
 </dl>
@@ -346,10 +355,10 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>image</em>  input is not well-formed. &ndash;or&ndash; The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -394,8 +403,8 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null.</td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -456,10 +465,10 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -504,8 +513,8 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ArgumentException</td><td><em>image</em>  is null or empty.</td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>image</em>  input is not a validly-formatted image reference. </td></tr>
   </table>
@@ -559,10 +568,10 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null or empty. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundLocallyException.html" title="Indicates that the Docker daemon does not have a local copy of the indicated image.">ImageNotFoundLocallyException</a></td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ImageNotFoundRemotelyException.html" title="Indicates that the indicated image does not exist at the Docker registry its name indicates.">ImageNotFoundRemotelyException</a></td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
+    <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The image name is not well-formed. &ndash;or&ndash; The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1RegistryAuthException.html" title="Represents a failure to authenticate with a Docker registry.">RegistryAuthException</a></td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -616,7 +625,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null.</td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>No such container exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>No such container exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as loss of network connectivity. </td></tr>
   </table>
   </dd>
@@ -662,7 +671,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the container object.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>No such container exists.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>No such container exists.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as loss of network connectivity. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The container reference is improperly formatted.</td></tr>
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null or empty.</td></tr>
@@ -720,7 +729,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
   <table class="exception">
     <tr><td class="paramname">ArgumentNullException</td><td><em>container</em>  is null.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The daemon doesn't know of a container matching the given ID or name. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The daemon doesn't know of a container matching the given ID or name. </td></tr>
   </table>
   </dd>
 </dl>
@@ -765,7 +774,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The daemon doesn't know of a container matching the given ID or name. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The daemon doesn't know of a container matching the given ID or name. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The given reference isn't in a valid format for a container ID or name. </td></tr>
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null or empty.</td></tr>
   </table>
@@ -857,8 +866,8 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 
 </div>
 </div>
-<a id="a9aca8669fcbcafe35638a5f46e544490"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9aca8669fcbcafe35638a5f46e544490">&#9670;&nbsp;</a></span>StartAsync() <span class="overload">[1/2]</span></h2>
+<a id="a4bc420c0407334ccf4a1546631210cab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bc420c0407334ccf4a1546631210cab">&#9670;&nbsp;</a></span>StartAsync() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -867,7 +876,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Task DockerSdk.Containers.ContainerAccess.StartAsync </td>
+          <td class="memname">async Task DockerSdk.Containers.ContainerAccess.StartAsync </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespaceDockerSdk_1_1Containers.html#a744223460cf90f78b636cccb1fe6ecf1">ContainerReference</a>&#160;</td>
           <td class="paramname"><em>container</em>, </td>
@@ -906,7 +915,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null.</td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -954,13 +963,40 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <p>It's also possible that a short-lived process might exit before the method's <code>Task</code> resolves. </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>container</em>  input is not a well-formed container reference.</td></tr>
+    <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>container</em>  input is not a well-formed container reference. </td></tr>
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null or empty.</td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a3f68597ebd8adf9a8975b7245d1faf58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f68597ebd8adf9a8975b7245d1faf58">&#9670;&nbsp;</a></span>Subscribe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IDisposable DockerSdk.Containers.ContainerAccess.Subscribe </td>
+          <td>(</td>
+          <td class="paramtype">IObserver&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html">ContainerEvent</a> &gt;&#160;</td>
+          <td class="paramname"><em>observer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Subscribes to events about containers. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observer</td><td>An object to observe the events.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An IDisposable representing the subscription. Disposing this unsubscribes and releases resources. </dd></dl>
 
 </div>
 </div>
