@@ -29,10 +29,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore /warnaserror
+
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output nuget-out
     - name: Publish to nuget.org
-      run: dotnet nuget push --api-key TEMPTEMP nuget-out/*.nupkg
+      run: dotnet nuget push --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} nuget-out/*.nupkg
     
     - name: Install Powershell
       if: ${{ env.ACT }}
@@ -58,19 +59,3 @@ jobs:
         docker container ls --all
     - name: Run the tests
       run: dotnet test --configuration Release --no-build --verbosity normal
-    
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.7
-      with:
-        versionSpec: '5.x'
-    - run: dotnet-gitversion /showConfig
-    - name: Use GitVersion
-      id: gitversion # Subsequent steps use this ID to access this step's outputs
-      uses: gittools/actions/gitversion/execute@v0.9.7
-    - run: |
-        echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
-        echo "NuGetPreReleaseTagV2: ${{ steps.gitversion.outputs.CommitsSinceVersionSourcePadded }}"
-    - name: Pack
-      run: dotnet pack --output nuget-packages --configuration Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}-${{ steps.gitversion.outputs.CommitsSinceVersionSourcePadded }} --no-build --include-symbols --include-source --nologo
-    - name: Push to nuget.org
-      run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} --source https://api.nuget.org/v3/index.json
