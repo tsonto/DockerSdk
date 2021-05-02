@@ -33,7 +33,7 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output nuget-out
     - name: Publish to nuget.org
-      run: dotnet nuget push --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} nuget-out/*.nupkg
+      run: dotnet nuget push --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} --source https://api.nuget.org/v3/index.json nuget-out/*.nupkg
     
     - name: Install Powershell
       if: ${{ env.ACT }}
