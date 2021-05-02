@@ -14,9 +14,15 @@ foreach ($id in docker container ls --filter="name=ddnt" --quiet --no-trunc)
 }
 
 # Remove containers.
-foreach ($id in docker container ls --filter="name=ddnt" --quiet --all)
+foreach ($id in docker container ls --filter="name=ddnt" --quiet --no-trunc --all)
 {
     docker container rm $id --force --volumes
+}
+
+# Remove networks.
+foreach ($id in docker network ls --filter="name=ddnt" --quiet --no-trunc)
+{
+    docker network rm $id
 }
 
 # Remove images in reverse order of how they were created.

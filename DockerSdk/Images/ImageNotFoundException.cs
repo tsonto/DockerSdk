@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using DockerSdk.Images;
 using Core = Docker.DotNet;
 
-namespace DockerSdk
+namespace DockerSdk.Images
 {
     /// <summary>
     /// Indicates that the Docker daemon could not find the indicated image where it was looking.

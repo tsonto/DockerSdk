@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using DockerSdk.Images;
 using Core = Docker.DotNet;
 
-namespace DockerSdk
+namespace DockerSdk.Images
 {
     /// <summary>
     /// Indicates that the Docker daemon does not have a local copy of the indicated image.

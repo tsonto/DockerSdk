@@ -28,6 +28,16 @@ $imageDefinitions = @(
     }
 )
 
+# Defines the networks to build.
+# It's important that the network creation args specify subnets. If we don't, we may hit Docker's limit of how 
+# many IPv4 or IPv6 addresses it can supply from the default subnets, which is rather small by default.
+$networkDefinitions = @(
+    @{
+        name = 'general'
+        args = '--attachable --ipv6 --subnet 12.34.56.0/24 --subnet 1234:5678::/32 --label ddnt1=alpha --label ddnt2=beta --gateway 12.34.56.1 --ip-range 12.34.56.0/25 --aux-address foo=12.34.56.2 --aux-address bar=12.34.56.3'
+    }
+)
+
 # Defines the containers to start. If the image is not specified, it defaults to the name.
 # It's intentional that error-out immediately fails and that some other containers immediately run to completion.
 $containerDefinitions = @(

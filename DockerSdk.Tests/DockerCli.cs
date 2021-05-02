@@ -29,6 +29,13 @@ namespace DockerSdk.Tests
             return File.ReadAllLines(path)[0];
         }
 
+        public string GetNetworkId(string network)
+        {
+            var name = network.Replace("ddnt-", "");
+            var path = $"./scripts/{name}.network.id";
+            return File.ReadAllLines(path)[0];
+        }
+
         public string GetContainerId(string container)
         {
             var name = container.Replace("ddnt-", "");

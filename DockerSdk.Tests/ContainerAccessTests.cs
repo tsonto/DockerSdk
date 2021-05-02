@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Containers.Events;
+using DockerSdk.Images;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

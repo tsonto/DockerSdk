@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Registries;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 
