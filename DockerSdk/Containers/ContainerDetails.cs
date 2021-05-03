@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using DockerSdk.Images;
+using DockerSdk.Networks;
 using CodeModels = Docker.DotNet.Models;
 
 namespace DockerSdk.Containers
@@ -12,25 +14,33 @@ namespace DockerSdk.Containers
     /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
     public class ContainerDetails
     {
-        internal ContainerDetails(CodeModels.ContainerInspectResponse response)
+        internal ContainerDetails(DockerClient docker, CodeModels.ContainerInspectResponse response)
         {
             Id = new ContainerFullId(response.ID);
-            Name = new ContainerName(response.Name);
-            Image = new ImageFullId(response.Image);
-            State = Enum.Parse<ContainerStatus>(response.State.Status, ignoreCase: true);
-            IsRunning = State == ContainerStatus.Running;
-            IsRunningOrPaused = State == ContainerStatus.Running || State == ContainerStatus.Paused;
-            IsPaused = State == ContainerStatus.Paused;
+
+            CreationTime = response.Created;
+            ErrorMessage = string.IsNullOrEmpty(response.State.Error) ? null : response.State.Error;
             Executable = response.Path;
             ExecutableArgs = response.Args.ToImmutableArray();
-            CreationTime = response.Created;
-            Labels = response.Config.Labels.ToImmutableDictionary();
-            RanOutOfMemory = State == ContainerStatus.Dead ? response.State.OOMKilled : null;
-            MainProcessId = IsRunningOrPaused ? response.State.Pid : null;
             ExitCode = State == ContainerStatus.Exited ? response.State.ExitCode : null;
-            ErrorMessage = string.IsNullOrEmpty(response.State.Error) ? null : response.State.Error;
+            Image = new Image(docker, new ImageFullId(response.Image));
+            IsPaused = State == ContainerStatus.Paused;
+            IsRunning = State == ContainerStatus.Running;
+            IsRunningOrPaused = State == ContainerStatus.Running || State == ContainerStatus.Paused;
+            Labels = response.Config.Labels.ToImmutableDictionary();
+            MainProcessId = IsRunningOrPaused ? response.State.Pid : null;
+            Name = new ContainerName(response.Name);
+            RanOutOfMemory = State == ContainerStatus.Dead ? response.State.OOMKilled : null;
+            State = Enum.Parse<ContainerStatus>(response.State.Status, ignoreCase: true);
             StartTime = ConvertDate(response.State.StartedAt);
             StopTime = ConvertDate(response.State.FinishedAt);
+            NetworkSandbox = new NetworkSandbox(response.NetworkSettings.SandboxID, response.NetworkSettings.SandboxKey);
+
+            NetworkEndpointsByNetworkName = response.NetworkSettings.Networks.ToImmutableDictionary(
+                kvp => new NetworkName(kvp.Key),
+                kvp => new NetworkEndpoint(docker, kvp.Value, Id));
+            NetworkEndpoints = NetworkEndpointsByNetworkName.Values.ToImmutableArray();
+            Networks = NetworkEndpoints.Select(ep => ep.Network).ToImmutableArray();
         }
 
         /// <summary>
@@ -78,9 +88,9 @@ namespace DockerSdk.Containers
         public ContainerFullId Id { get; }
 
         /// <summary>
-        /// Gets the full ID of the Docker image that the container was created from.
+        /// Gets the Docker image that the container was created from.
         /// </summary>
-        public ImageFullId Image { get; }
+        public Image Image { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container was in the "paused" state when the query was performed.
@@ -168,6 +178,11 @@ namespace DockerSdk.Containers
         /// exited since the most recent restart.
         /// </remarks>
         public DateTimeOffset? StopTime { get; }
+
+        public IReadOnlyDictionary<NetworkName, NetworkEndpoint> NetworkEndpointsByNetworkName { get; }
+        public IReadOnlyList<NetworkEndpoint> NetworkEndpoints { get; }
+        public IReadOnlyList<Network> Networks { get; }
+        public NetworkSandbox NetworkSandbox { get; }
 
         private static DateTimeOffset? ConvertDate(string input)
         {

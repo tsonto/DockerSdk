@@ -477,7 +477,7 @@ namespace DockerSdk.Containers
                 throw DockerException.Wrap(ex);
             }
 
-            return new ContainerDetails(response);
+            return new ContainerDetails(_docker, response);
         }
 
         /// <summary>

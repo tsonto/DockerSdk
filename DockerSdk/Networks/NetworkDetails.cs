@@ -62,7 +62,7 @@ namespace DockerSdk.Networks
         /// </summary>
         /// <seealso cref="AttachedContainers"/>
         /// <seealso cref="EndpointsByContainerId"/>
-        public IReadOnlyList<NetworkEndpoint> Endpoints { get; }
+        public IReadOnlyList<NetworkEndpointBrief> Endpoints { get; }
 
         /// <summary>
         /// Gets a mapping from container IDs to endpoints. An endpoint defines an attachment point between a network
@@ -70,7 +70,7 @@ namespace DockerSdk.Networks
         /// </summary>
         /// <seealso cref="Endpoints"/>
         /// <seealso cref="AttachedContainers"/>
-        public IReadOnlyDictionary<ContainerFullId, NetworkEndpoint> EndpointsByContainerId { get; }
+        public IReadOnlyDictionary<ContainerFullId, NetworkEndpointBrief> EndpointsByContainerId { get; }
 
         /// <summary>
         /// Gets the network's full ID.
@@ -151,13 +151,13 @@ namespace DockerSdk.Networks
         /// </summary>
         public NetworkScope Scope { get; }
 
-        private static Dictionary<ContainerFullId, NetworkEndpoint> MakeEndpoints(DockerClient client, CoreModels.NetworkResponse raw, Network network)
+        private static Dictionary<ContainerFullId, NetworkEndpointBrief> MakeEndpoints(DockerClient client, CoreModels.NetworkResponse raw, Network network)
         {
             var endpoints =
                 from kvp in raw.Containers
                 let id = new ContainerFullId(kvp.Key)
                 let container = new Container(client, id)
-                select new NetworkEndpoint(kvp.Value, container, network);
+                select new NetworkEndpointBrief(kvp.Value, container, network);
 
             return endpoints.ToDictionary(endpoint => endpoint.Container.Id);
         }
