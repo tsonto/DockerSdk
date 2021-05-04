@@ -86,16 +86,16 @@ namespace DockerSdk.Tests
             ContainerFullId containerIdObject = ContainerFullId.Parse(containerIdString);
             try
             {
-                NetworkDetails network = await client.Networks.GetDetailsAsync(networkId);
+                NetworkInfo network = await client.Networks.GetInfoAsync(networkId);
 
                 network.AttachedContainers.Should().HaveCount(1);   
                 network.Endpoints.Should().HaveCount(1);
-                network.EndpointsByContainerId.Should().HaveCount(1);
-                network.EndpointsByContainerId.Keys.Should().Contain(containerIdObject);
+                network.EndpointsByContainerName.Should().HaveCount(1);
+                network.EndpointsByContainerName.Keys.Should().Contain(containerIdObject);
 
-                var endpoint = network.EndpointsByContainerId[containerIdObject];
+                var endpoint = network.EndpointsByContainerName[containerIdObject];
                 endpoint.Container.Id.ToString().Should().Be(containerIdString);
-                endpoint.EndpointId.Should().NotBeNullOrWhiteSpace();
+                endpoint.Id.Should().NotBeNullOrWhiteSpace();
                 endpoint.IPv4Address?.ToString().Should().Be("12.34.56.71");
                 endpoint.IPv6Address.Should().Be(IPAddress.Parse("1234:5678::ff00:42:8329"));
                 endpoint.MacAddress.Should().NotBeNull();
@@ -114,7 +114,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string networkId = cli.GetNetworkId("general");
 
-            NetworkDetails network = await client.Networks.GetDetailsAsync(networkId);
+            NetworkInfo network = await client.Networks.GetInfoAsync(networkId);
 
             network.Labels["ddnt1"].Should().Be("alpha");
             network.Labels["ddnt2"].Should().Be("beta");

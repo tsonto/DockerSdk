@@ -25,6 +25,9 @@ namespace DockerSdk.Images
         /// <summary>
         /// Gets the image's full ID.
         /// </summary>
+        /// <remarks>
+        /// This is a hash of the image's config file. Even with identical build inputs, this will be different for each build.
+        /// </remarks>
         public ImageFullId Id { get; }
 
         private readonly DockerClient _client;

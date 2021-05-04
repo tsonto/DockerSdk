@@ -6,8 +6,8 @@ namespace DockerSdk.Networks
     /// <summary>
     /// Represents a Docker network.
     /// </summary>
-    /// <seealso cref="NetworkDetails"/>
-    public sealed class Network
+    /// <seealso cref="NetworkInfo"/>
+    internal class Network : INetwork
     {
         private readonly DockerClient client;
 
@@ -31,7 +31,9 @@ namespace DockerSdk.Networks
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity.
         /// </exception>
-        public Task<NetworkDetails> GetDetailsAsync(CancellationToken ct = default)
-            => client.Networks.GetDetailsAsync(Id, ct);
+        public Task<INetworkInfo> GetDetailsAsync(CancellationToken ct = default)
+            => this is INetworkInfo info
+            ? Task.FromResult(info)
+            : client.Networks.GetInfoAsync(Id, ct);
     }
 }

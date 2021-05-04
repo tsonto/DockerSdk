@@ -441,7 +441,7 @@ namespace DockerSdk.Containers
         /// The given reference isn't in a valid format for a container ID or name.
         /// </exception>
         /// <exception cref="ArgumentException"><paramref name="container"/> is null or empty.</exception>
-        public Task<ContainerDetails> GetDetailsAsync(string container, CancellationToken ct = default)
+        public Task<IContainerInfo> GetDetailsAsync(string container, CancellationToken ct = default)
             => GetDetailsAsync(ContainerReference.Parse(container), ct);
 
         /// <summary>
@@ -458,26 +458,30 @@ namespace DockerSdk.Containers
         /// <exception cref="ContainerNotFoundException">
         /// The daemon doesn't know of a container matching the given ID or name.
         /// </exception>
-        public async Task<ContainerDetails> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
+        public Task<IContainerInfo> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
+            => GetDetailsAsync(container, ContainerIncludes.None, ct);
+
+        /// <summary>
+        /// Gets detailed information about a container.
+        /// </summary>
+        /// <param name="container">The name or ID of a container.</param>
+        /// <param name="options">Specifies which information to load.</param>
+        /// <param name="ct">A <see cref="CancellationToken"/> used to cancel the operation.</param>
+        /// <returns>A <see cref="Task"/> that completes when the result is available.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="container"/> is null.</exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
+        /// validation, or timeout.
+        /// </exception>
+        /// <exception cref="ContainerNotFoundException">
+        /// The daemon doesn't know of a container matching the given ID or name.
+        /// </exception>
+        public async Task<IContainerInfo> GetDetailsAsync(ContainerReference container, ContainerLoadOptions options, CancellationToken ct = default)
         {
             if (container is null)
                 throw new ArgumentNullException(nameof(container));
 
-            CoreModels.ContainerInspectResponse response;
-            try
-            {
-                response = await _docker.Core.Containers.InspectContainerAsync(container, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerContainerNotFoundException ex)
-            {
-                throw new ContainerNotFoundException($"No such container \"{container}\".", ex);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
-
-            return new ContainerDetails(_docker, response);
+            return (IContainerInfo)await ContainerLoader.LoadAsync(_docker, container, options, new LoadContext(), ct);
         }
 
         /// <summary>

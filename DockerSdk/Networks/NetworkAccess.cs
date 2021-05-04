@@ -30,7 +30,7 @@ namespace DockerSdk.Networks
         /// </exception>
         /// <exception cref="MalformedReferenceException">The network reference is improperly formatted.</exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public Task<Network> GetAsync(string network, CancellationToken ct = default)
+        public Task<INetwork> GetAsync(string network, CancellationToken ct = default)
             => GetAsync(NetworkReference.Parse(network), ct);
 
         /// <summary>
@@ -44,21 +44,12 @@ namespace DockerSdk.Networks
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public async Task<Network> GetAsync(NetworkReference network, CancellationToken ct = default)
+        public Task<INetwork> GetAsync(NetworkReference network, CancellationToken ct = default)
         {
-            CoreModels.NetworkResponse response;
-            try
-            {
-                response = await client.Core.Networks.InspectNetworkAsync(network, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (NetworkNotFoundException.TryWrap(ex, network, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
+            if (network is null)
+                throw new ArgumentNullException(nameof(network));
 
-            return new Network(client, new NetworkFullId(response.ID));
+            return NetworkLoader.LoadAsync(client, network, NetworkLoadOptions.Minimal, new LoadContext(), ct);
         }
 
         /// <summary>
@@ -73,8 +64,8 @@ namespace DockerSdk.Networks
         /// </exception>
         /// <exception cref="MalformedReferenceException">The network reference is improperly formatted.</exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public Task<NetworkDetails> GetDetailsAsync(string network, CancellationToken ct = default)
-            => GetDetailsAsync(NetworkReference.Parse(network), ct);
+        public Task<INetworkInfo> GetInfoAsync(string network, CancellationToken ct = default)
+            => GetInfoAsync(NetworkReference.Parse(network), ct);
 
         /// <summary>
         /// Loads detailed information about a Docker network.
@@ -87,21 +78,29 @@ namespace DockerSdk.Networks
         /// The request failed due to an underlying issue such as network connectivity.
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public async Task<NetworkDetails> GetDetailsAsync(NetworkReference network, CancellationToken ct = default)
-        {
-            CoreModels.NetworkResponse response;
-            try
-            {
-                response = await client.Core.Networks.InspectNetworkAsync(network, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (NetworkNotFoundException.TryWrap(ex, network, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
+        public Task<INetworkInfo> GetInfoAsync(NetworkReference network, CancellationToken ct = default)
+            => GetInfoAsync(network, NetworkLoadOptions.Shallow, ct);
 
-            return new NetworkDetails(client, response);
+        /// <summary>
+        /// Loads detailed information about a Docker network.
+        /// </summary>
+        /// <param name="network">A network name or ID.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves to the details.</returns>
+        /// <exception cref="NetworkNotFoundException">No such network exists.</exception>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as network connectivity.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">An input is null.</exception>
+        public async Task<INetworkInfo> GetInfoAsync(NetworkReference network, NetworkLoadOptions options, CancellationToken ct = default)
+        {
+            if (network is null)
+                throw new ArgumentNullException(nameof(network));
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+
+            options.IncludeDetails = true;
+            return (INetworkInfo)await NetworkLoader.LoadAsync(client, network, options, new LoadContext(), ct);
         }
     }
 }

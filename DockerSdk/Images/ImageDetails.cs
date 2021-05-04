@@ -11,15 +11,15 @@ using CoreModels = Docker.DotNet.Models;
 namespace DockerSdk.Images
 {
     /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
-    public class ImageDetails
+    public class ImageDetails : Image
     {
-        internal ImageDetails(CoreModels.ImageInspectResponse raw, ImageDetails? parent)
+        internal ImageDetails(DockerClient client, CoreModels.ImageInspectResponse raw, ImageDetails? parent)
+            : base(client, new ImageFullId(raw.ID))
         {
             Author = raw.Author ?? "";
             Comment = raw.Comment ?? "";
             CreationTime = raw.Created;
             Digest = raw.RepoDigests?.FirstOrDefault();
-            Id = new ImageFullId(raw.ID);
             Labels = raw.Config?.Labels?.ToImmutableDictionary() ?? ImmutableDictionary.Create<string, string>();
             OsType = Enum.Parse<GuestOsType>(raw.Os, true);
             ParentImage = parent;
@@ -56,15 +56,6 @@ namespace DockerSdk.Images
         /// that this value is not calculated until the image is pushed/pulled.
         /// </remarks>
         public string? Digest { get; }
-
-        /// <summary>
-        /// Gets the image's ID.
-        /// </summary>
-        /// <remarks>
-        /// This is a hash of the image's config file. Even with identical build inputs, this will be different for each
-        /// build.
-        /// </remarks>
-        public ImageFullId Id { get; }
 
         /// <summary>
         /// Gets the labels that have been applied to the image.
