@@ -34,7 +34,7 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
         /// <exception cref="MalformedReferenceException">The image reference is improperly formatted.</exception>
-        public Task<Image> GetAsync(string image, CancellationToken ct = default)
+        public Task<IImage> GetAsync(string image, CancellationToken ct = default)
             => GetAsync(ImageReference.Parse(image), ct);
 
         /// <summary>
@@ -47,19 +47,12 @@ namespace DockerSdk.Images
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
-        public async Task<Image> GetAsync(ImageReference image, CancellationToken ct = default)
+        public Task<IImage> GetAsync(ImageReference image, CancellationToken ct = default)
         {
-            try
-            {
-                CoreModels.ImageInspectResponse response = await _docker.Core.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
-                return new Image(_docker, new ImageFullId(response.ID));
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ImageNotFoundLocallyException.TryWrap(ex, image, out var wrapped))
-                    throw wrapped;
-                throw DockerException.Wrap(ex);
-            }
+            if (image is null)
+                throw new ArgumentNullException(nameof(image));
+
+            return ImageFactory.LoadAsync(_docker, image, ct);
         }
 
         /// <summary>
@@ -73,8 +66,8 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as network connectivity.
         /// </exception>
         /// <exception cref="MalformedReferenceException">The image reference is improperly formatted.</exception>
-        public Task<ImageDetails> GetDetailsAsync(string image, CancellationToken ct = default)
-            => ImageDetails.LoadAsync(_docker, ImageReference.Parse(image), ct);
+        public Task<IImageInfo> GetDetailsAsync(string image, CancellationToken ct = default)
+            => GetDetailsAsync(ImageReference.Parse(image), ct);
 
         /// <summary>
         /// Loads detailed information about an image.
@@ -86,8 +79,8 @@ namespace DockerSdk.Images
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity.
         /// </exception>
-        public Task<ImageDetails> GetDetailsAsync(ImageReference image, CancellationToken ct = default)
-            => ImageDetails.LoadAsync(_docker, image, ct);
+        public Task<IImageInfo> GetDetailsAsync(ImageReference image, CancellationToken ct = default)
+            => ImageFactory.LoadInfoAsync(_docker, image, ct);
 
         // TODO: GetHistoryAsync (docker image history)
 
@@ -106,7 +99,7 @@ namespace DockerSdk.Images
         /// </para>
         /// <para>The sequence of the results is undefined.</para>
         /// </remarks>
-        public Task<IReadOnlyList<Image>> ListAsync(CancellationToken ct = default)
+        public Task<IReadOnlyList<IImage>> ListAsync(CancellationToken ct = default)
             => ListAsync(new(), ct);
 
         /// <summary>
@@ -123,7 +116,7 @@ namespace DockerSdk.Images
         /// <para>The sequence of the results is undefined.</para>
         /// </remarks>
         /// <exception cref="ArgumentNullException"><paramref name="options"/> is null.</exception>
-        public async Task<IReadOnlyList<Image>> ListAsync(ListImagesOptions options, CancellationToken ct = default)
+        public async Task<IReadOnlyList<IImage>> ListAsync(ListImagesOptions options, CancellationToken ct = default)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
@@ -169,8 +162,10 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="ImageNotFoundRemotelyException">The image does not exist at the Registry indicated by its name.</exception>
-        public Task<Image> PullAsync(string image, CancellationToken ct = default)
+        /// <exception cref="ImageNotFoundRemotelyException">
+        /// The image does not exist at the Registry indicated by its name.
+        /// </exception>
+        public Task<IImage> PullAsync(string image, CancellationToken ct = default)
             => PullAsync(ImageReference.Parse(image), ct);
 
         /// <summary>
@@ -194,8 +189,10 @@ namespace DockerSdk.Images
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="ImageNotFoundRemotelyException">The image does not exist at the Registry indicated by its name.</exception>
-        public async Task<Image> PullAsync(ImageReference image, CancellationToken ct = default)
+        /// <exception cref="ImageNotFoundRemotelyException">
+        /// The image does not exist at the Registry indicated by its name.
+        /// </exception>
+        public async Task<IImage> PullAsync(ImageReference image, CancellationToken ct = default)
         {
             // Get the authentication information for the image's registry.
             var registryName = _docker.Registries.GetRegistryName(image);

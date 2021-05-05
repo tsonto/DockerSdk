@@ -61,7 +61,7 @@ namespace DockerSdk.Containers
         /// <exception cref="MalformedReferenceException">
         /// The <paramref name="image"/> input is not well-formed.
         /// </exception>
-        public Task<Container> CreateAndStartAsync(string image, CancellationToken ct = default)
+        public Task<IContainer> CreateAndStartAsync(string image, CancellationToken ct = default)
             => CreateAndStartAsync(ImageReference.Parse(image), new CreateContainerOptions(), ct);
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public Task<Container> CreateAndStartAsync(ImageReference image, CancellationToken ct = default)
+        public Task<IContainer> CreateAndStartAsync(ImageReference image, CancellationToken ct = default)
             => CreateAndStartAsync(image, new CreateContainerOptions(), ct);
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public Task<Container> CreateAndStartAsync(string image, CreateContainerOptions options, CancellationToken ct = default)
+        public Task<IContainer> CreateAndStartAsync(string image, CreateContainerOptions options, CancellationToken ct = default)
             => CreateAndStartAsync(ImageReference.Parse(image), options, ct);
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public async Task<Container> CreateAndStartAsync(ImageReference image, CreateContainerOptions options, CancellationToken ct = default)
+        public async Task<IContainer> CreateAndStartAsync(ImageReference image, CreateContainerOptions options, CancellationToken ct = default)
         {
             var container = await CreateAsync(image, options, ct).ConfigureAwait(false);
             await container.StartAsync(ct).ConfigureAwait(false);
@@ -206,7 +206,7 @@ namespace DockerSdk.Containers
         /// <exception cref="MalformedReferenceException">
         /// The <paramref name="image"/> input is not a validly-formatted image reference.
         /// </exception>
-        public Task<Container> CreateAsync(string image, CancellationToken ct = default)
+        public Task<IContainer> CreateAsync(string image, CancellationToken ct = default)
             => CreateAsync(ImageReference.Parse(image), new CreateContainerOptions(), ct);
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public Task<Container> CreateAsync(ImageReference image, CancellationToken ct = default)
+        public Task<IContainer> CreateAsync(ImageReference image, CancellationToken ct = default)
             => CreateAsync(image, new CreateContainerOptions(), ct);
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public Task<Container> CreateAsync(string image, CreateContainerOptions options, CancellationToken ct = default)
+        public Task<IContainer> CreateAsync(string image, CreateContainerOptions options, CancellationToken ct = default)
             => CreateAsync(ImageReference.Parse(image), options, ct);
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace DockerSdk.Containers
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        public async Task<Container> CreateAsync(ImageReference image, CreateContainerOptions options, CancellationToken ct = default)
+        public async Task<IContainer> CreateAsync(ImageReference image, CreateContainerOptions options, CancellationToken ct = default)
         {
             if (image is null)
                 throw new ArgumentNullException(nameof(image));
@@ -384,7 +384,7 @@ namespace DockerSdk.Containers
         /// Caution: Container names and short IDs are not guaranteed to be unique. If there is more than one match for
         /// the reference, the result is undefined.
         /// </remarks>
-        public Task<Container> GetAsync(string container, CancellationToken ct = default)
+        public Task<IContainer> GetAsync(string container, CancellationToken ct = default)
             => GetAsync(ContainerReference.Parse(container), ct);
 
         /// <summary>
@@ -402,26 +402,12 @@ namespace DockerSdk.Containers
         /// Caution: Container names and short IDs are not guaranteed to be unique. If there is more than one match for
         /// the reference, the result is undefined.
         /// </remarks>
-        public async Task<Container> GetAsync(ContainerReference container, CancellationToken ct = default)
+        public async Task<IContainer> GetAsync(ContainerReference container, CancellationToken ct = default)
         {
             if (container is null)
                 throw new ArgumentNullException(nameof(container));
 
-            CoreModels.ContainerInspectResponse response;
-            try
-            {
-                response = await _docker.Core.Containers.InspectContainerAsync(container, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerContainerNotFoundException ex)
-            {
-                throw new ContainerNotFoundException($"No such container \"{container}\".", ex);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
-
-            return new Container(_docker, new ContainerFullId(response.ID));
+            return await ContainerFactory.LoadAsync(_docker, container, ct).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -441,7 +427,7 @@ namespace DockerSdk.Containers
         /// The given reference isn't in a valid format for a container ID or name.
         /// </exception>
         /// <exception cref="ArgumentException"><paramref name="container"/> is null or empty.</exception>
-        public Task<ContainerDetails> GetDetailsAsync(string container, CancellationToken ct = default)
+        public Task<IContainerInfo> GetDetailsAsync(string container, CancellationToken ct = default)
             => GetDetailsAsync(ContainerReference.Parse(container), ct);
 
         /// <summary>
@@ -458,26 +444,12 @@ namespace DockerSdk.Containers
         /// <exception cref="ContainerNotFoundException">
         /// The daemon doesn't know of a container matching the given ID or name.
         /// </exception>
-        public async Task<ContainerDetails> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
+        public async Task<IContainerInfo> GetDetailsAsync(ContainerReference container, CancellationToken ct = default)
         {
             if (container is null)
                 throw new ArgumentNullException(nameof(container));
 
-            CoreModels.ContainerInspectResponse response;
-            try
-            {
-                response = await _docker.Core.Containers.InspectContainerAsync(container, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerContainerNotFoundException ex)
-            {
-                throw new ContainerNotFoundException($"No such container \"{container}\".", ex);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
-
-            return new ContainerDetails(response);
+            return await ContainerFactory.LoadInfoAsync(_docker, container, ct);
         }
 
         /// <summary>
@@ -493,7 +465,7 @@ namespace DockerSdk.Containers
         /// </para>
         /// <para>The sequence of the results is undefined.</para>
         /// </remarks>
-        public Task<IReadOnlyList<Container>> ListAsync(CancellationToken ct = default)
+        public Task<IReadOnlyList<IContainer>> ListAsync(CancellationToken ct = default)
             => ListAsync(new ListContainersOptions(), ct);
 
         /// <summary>
@@ -510,7 +482,7 @@ namespace DockerSdk.Containers
         /// </para>
         /// <para>The sequence of the results is undefined.</para>
         /// </remarks>
-        public async Task<IReadOnlyList<Container>> ListAsync(ListContainersOptions options, CancellationToken ct = default)
+        public async Task<IReadOnlyList<IContainer>> ListAsync(ListContainersOptions options, CancellationToken ct = default)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));

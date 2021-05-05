@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
 
 namespace DockerSdk.Networks
 {
@@ -30,7 +28,7 @@ namespace DockerSdk.Networks
         /// </exception>
         /// <exception cref="MalformedReferenceException">The network reference is improperly formatted.</exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public Task<Network> GetAsync(string network, CancellationToken ct = default)
+        public Task<INetwork> GetAsync(string network, CancellationToken ct = default)
             => GetAsync(NetworkReference.Parse(network), ct);
 
         /// <summary>
@@ -44,21 +42,12 @@ namespace DockerSdk.Networks
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public async Task<Network> GetAsync(NetworkReference network, CancellationToken ct = default)
+        public async Task<INetwork> GetAsync(NetworkReference network, CancellationToken ct = default)
         {
-            CoreModels.NetworkResponse response;
-            try
-            {
-                response = await client.Core.Networks.InspectNetworkAsync(network, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (NetworkNotFoundException.TryWrap(ex, network, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
+            if (network is null)
+                throw new ArgumentNullException(nameof(network));
 
-            return new Network(client, new NetworkFullId(response.ID));
+            return await NetworkFactory.LoadAsync(client, network, ct).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -73,8 +62,8 @@ namespace DockerSdk.Networks
         /// </exception>
         /// <exception cref="MalformedReferenceException">The network reference is improperly formatted.</exception>
         /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public Task<NetworkDetails> GetDetailsAsync(string network, CancellationToken ct = default)
-            => GetDetailsAsync(NetworkReference.Parse(network), ct);
+        public Task<INetworkInfo> GetInfoAsync(string network, CancellationToken ct = default)
+            => GetInfoAsync(NetworkReference.Parse(network), ct);
 
         /// <summary>
         /// Loads detailed information about a Docker network.
@@ -86,22 +75,13 @@ namespace DockerSdk.Networks
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity.
         /// </exception>
-        /// <exception cref="ArgumentNullException">The <paramref name="network"/> input is null.</exception>
-        public async Task<NetworkDetails> GetDetailsAsync(NetworkReference network, CancellationToken ct = default)
+        /// <exception cref="ArgumentNullException">An input is null.</exception>
+        public async Task<INetworkInfo> GetInfoAsync(NetworkReference network, CancellationToken ct = default)
         {
-            CoreModels.NetworkResponse response;
-            try
-            {
-                response = await client.Core.Networks.InspectNetworkAsync(network, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (NetworkNotFoundException.TryWrap(ex, network, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
+            if (network is null)
+                throw new ArgumentNullException(nameof(network));
 
-            return new NetworkDetails(client, response);
+            return await NetworkFactory.LoadInfoAsync(client, network, ct).ConfigureAwait(false);
         }
     }
 }

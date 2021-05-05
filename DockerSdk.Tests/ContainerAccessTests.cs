@@ -65,7 +65,7 @@ namespace DockerSdk.Tests
             toh.WriteLine("**ExitCode " + actual.ExitCode);
             actual.ExitCode.Should().BeNull();
             actual.Id.ToString().Should().Be(containerId);
-            actual.Image.ToString().Should().Be(imageId);
+            actual.Image.Id.ToString().Should().Be(imageId);
             actual.IsPaused.Should().BeFalse();
             actual.IsRunning.Should().BeTrue();
             actual.IsRunningOrPaused.Should().BeTrue();
@@ -96,7 +96,7 @@ namespace DockerSdk.Tests
             actual.ErrorMessage.Should().BeNull();
             actual.ExitCode.Should().Be(0);
             actual.Id.ToString().Should().Be(containerId);
-            actual.Image.ToString().Should().Be(imageId);
+            actual.Image.Id.ToString().Should().Be(imageId);
             actual.IsPaused.Should().BeFalse();
             actual.IsRunning.Should().BeFalse();
             actual.IsRunningOrPaused.Should().BeFalse();
@@ -141,7 +141,7 @@ namespace DockerSdk.Tests
             //actual.ErrorMessage.Should().Be("This is the error message.");    // how to set this?
             actual.ExitCode.Should().BeOneOf(1, 126);   // The exit code differs on local tests vs CI. Not sure why that is, but the important things is that, whatever the exit code is, we report it correctly.
             actual.Id.ToString().Should().Be(containerId);
-            actual.Image.ToString().Should().Be(imageId);
+            actual.Image.Id.ToString().Should().Be(imageId);
             actual.IsPaused.Should().BeFalse();
             actual.IsRunning.Should().BeFalse();
             actual.IsRunningOrPaused.Should().BeFalse();
@@ -184,7 +184,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 container = await client.Containers.CreateAsync("ddnt:infinite-loop");
@@ -209,7 +209,7 @@ namespace DockerSdk.Tests
             bool found = false;
             using var subscription = client.Containers.Where(e => name == e.ContainerName!).Subscribe(e => found = true);
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 var request = new CreateContainerOptions { Name = name };
@@ -230,7 +230,7 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             const string name = "ddnt-" + nameof(CreateAsync_SpecifyName_HasThatName);
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions { Name = name };
@@ -252,7 +252,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions 
@@ -283,7 +283,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions
@@ -317,7 +317,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 await Assert.ThrowsAsync<ImageNotFoundLocallyException>(
@@ -338,7 +338,7 @@ namespace DockerSdk.Tests
 
             cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
 
-            Container? container = null;
+            IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions { PullCondition = PullImageCondition.IfMissing };

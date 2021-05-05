@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using DockerSdk.Images;
-using CodeModels = Docker.DotNet.Models;
+using DockerSdk.Networks;
 
 namespace DockerSdk.Containers
 {
@@ -10,38 +9,17 @@ namespace DockerSdk.Containers
     /// Holds detailed information about a Docker container.
     /// </summary>
     /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
-    public class ContainerDetails
+    public interface IContainerInfo : IContainer
     {
-        internal ContainerDetails(CodeModels.ContainerInspectResponse response)
-        {
-            Id = new ContainerFullId(response.ID);
-            Name = new ContainerName(response.Name);
-            Image = new ImageFullId(response.Image);
-            State = Enum.Parse<ContainerStatus>(response.State.Status, ignoreCase: true);
-            IsRunning = State == ContainerStatus.Running;
-            IsRunningOrPaused = State == ContainerStatus.Running || State == ContainerStatus.Paused;
-            IsPaused = State == ContainerStatus.Paused;
-            Executable = response.Path;
-            ExecutableArgs = response.Args.ToImmutableArray();
-            CreationTime = response.Created;
-            Labels = response.Config.Labels.ToImmutableDictionary();
-            RanOutOfMemory = State == ContainerStatus.Dead ? response.State.OOMKilled : null;
-            MainProcessId = IsRunningOrPaused ? response.State.Pid : null;
-            ExitCode = State == ContainerStatus.Exited ? response.State.ExitCode : null;
-            ErrorMessage = string.IsNullOrEmpty(response.State.Error) ? null : response.State.Error;
-            StartTime = ConvertDate(response.State.StartedAt);
-            StopTime = ConvertDate(response.State.FinishedAt);
-        }
-
         /// <summary>
         /// Gets the timestamp for when the container was created.
         /// </summary>
-        public DateTimeOffset CreationTime { get; }
+        DateTimeOffset CreationTime { get; }
 
         /// <summary>
         /// Gets an error message for why the container exited. Not all exited containers will have this set.
         /// </summary>
-        public string? ErrorMessage { get; }
+        string? ErrorMessage { get; }
 
         /// <summary>
         /// Gets the main executable that the container runs. This is what <see cref="MainProcessId"/> points to.
@@ -53,34 +31,29 @@ namespace DockerSdk.Containers
         /// Windows).
         /// </remarks>
         /// <seealso cref="ExecutableArgs"/>
-        public string Executable { get; }
+        string Executable { get; }
 
         /// <summary>
         /// Gets the arguments to the main executable that the container runs.
         /// </summary>
         /// <remarks>
-        /// This gives the arguments to the actual executable run by the main process. Note that ENTRYPOINT/CMD directives in
-        /// <em>shell</em> format are shorthands for running a shell, so the text provided to those directives will really be
-        /// part of the arguments.
+        /// This gives the arguments to the actual executable run by the main process. Note that ENTRYPOINT/CMD
+        /// directives in <em>shell</em> format are shorthands for running a shell, so the text provided to those
+        /// directives will really be part of the arguments.
         /// </remarks>
         /// <seealso cref="Executable"/>
-        public IReadOnlyList<string> ExecutableArgs { get; }
+        IReadOnlyList<string> ExecutableArgs { get; }
 
         /// <summary>
         /// Gets the exit code of the main process. This property is non-null for containers in the Exited state, and
         /// null in all other states.
         /// </summary>
-        public long? ExitCode { get; }
+        long? ExitCode { get; }
 
         /// <summary>
-        /// Gets the container's full ID.
+        /// Gets the Docker image that the container was created from.
         /// </summary>
-        public ContainerFullId Id { get; }
-
-        /// <summary>
-        /// Gets the full ID of the Docker image that the container was created from.
-        /// </summary>
-        public ImageFullId Image { get; }
+        IImage Image { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container was in the "paused" state when the query was performed.
@@ -89,7 +62,7 @@ namespace DockerSdk.Containers
         /// Caution: The container's status might change between when the daemon reads it and when this object is
         /// available for reading. Beware of race conditions.
         /// </remarks>
-        public bool IsPaused { get; }
+        bool IsPaused { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container was in the "running" state when the query was performed.
@@ -104,7 +77,7 @@ namespace DockerSdk.Containers
         /// <seealso cref="IsRunningOrPaused"/>
         /// <seealso cref="State"/>
         /// <seealso cref="ContainerStatus"/>
-        public bool IsRunning { get; }
+        bool IsRunning { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container was in either the "running" or "paused" state when the query
@@ -114,31 +87,53 @@ namespace DockerSdk.Containers
         /// Caution: The container's status might change between when the daemon reads it and when this object is
         /// available for reading. Beware of race conditions.
         /// </remarks>
-        public bool IsRunningOrPaused { get; }
+        bool IsRunningOrPaused { get; }
 
         /// <summary>
         /// Gets the labels and their values that have been applied to the container.
         /// </summary>
-        public IReadOnlyDictionary<string, string> Labels { get; }
+        IReadOnlyDictionary<string, string> Labels { get; }
 
         /// <summary>
         /// Gets the process ID of the container's main process. This property is non-null for containers that are
         /// running or paused. and null in all other states.
         /// </summary>
         /// <remarks>The container will automatically exit when this process exits.</remarks>
-        public long? MainProcessId { get; }
+        long? MainProcessId { get; }
 
         /// <summary>
         /// Gets the containe's name.
         /// </summary>
-        public ContainerName Name { get; }
+        ContainerName Name { get; }
+
+        /// <summary>
+        /// Gets a list of network endpoints on the container. A network end-point is the link between a container and a
+        /// network.
+        /// </summary>
+        IReadOnlyList<INetworkEndpoint> NetworkEndpoints { get; }
+
+        /// <summary>
+        /// Gets a mapping from network names to network endpoints on the container. A network end-point is the link
+        /// between a container and a network.
+        /// </summary>
+        IReadOnlyDictionary<NetworkName, INetworkEndpoint> NetworkEndpointsByNetworkName { get; }
+
+        /// <summary>
+        /// Gets a list of networks attached to the container.
+        /// </summary>
+        IReadOnlyList<INetwork> Networks { get; }
+
+        /// <summary>
+        /// Gets information about the network sandbox. The sandbox is in charge of the network endpoints.
+        /// </summary>
+        NetworkSandbox? NetworkSandbox { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container was forcibly shut down by the Docker daemon due to an
         /// out-of-memory condition. This property is non-null for containers in the Killed state, and null in all other
         /// states.
         /// </summary>
-        public bool? RanOutOfMemory { get; }
+        bool? RanOutOfMemory { get; }
 
         /// <summary>
         /// Gets the time when the container was most recently started, or null if the container has not been started
@@ -148,7 +143,7 @@ namespace DockerSdk.Containers
         /// Caution: It's possible for the <see cref="StopTime"/> to be earlier than this, if the container previously
         /// exited, was restarted, and has not yet exited since the most recent restart.
         /// </remarks>
-        public DateTimeOffset? StartTime { get; }
+        DateTimeOffset? StartTime { get; }
 
         /// <summary>
         /// Gets a value that summarizes the container's overall state at the time of the query.
@@ -157,7 +152,7 @@ namespace DockerSdk.Containers
         /// The container's status might change between when the daemon reads it and when this object is available for
         /// reading. Beware of race conditions.
         /// </remarks>
-        public ContainerStatus State { get; }
+        ContainerStatus State { get; }
 
         /// <summary>
         /// Gets the time when the container most recently exited, or null if the container has never exited.
@@ -167,44 +162,6 @@ namespace DockerSdk.Containers
         ///          cref="StartTime"/>. This is true if the container previously exited, was restarted, and has not yet
         /// exited since the most recent restart.
         /// </remarks>
-        public DateTimeOffset? StopTime { get; }
-
-        private static DateTimeOffset? ConvertDate(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return null;
-            var parsed = DateTimeOffset.Parse(input);
-            if (parsed == default)
-                return null;
-            return parsed;
-        }
-
-        /*
-         * TODO:
-         * Mounts
-         * SizeRootFs   include image's base size? bytes?
-         * SizeRw       bytes?
-         * GraphDriver
-         * HostConfig
-         * ExecIDs
-         * AppArmorProfile  what is it? linux only?
-         * ProcessLabel
-         * MountLabel
-         * Platform
-         * Driver       fs driver?
-         * RestartCount
-         * Node
-         * LogPath
-         * HostsPath
-         * HostnamePath
-         * ResolvConfPath
-         * Config:
-         *      StopSignal
-         *      OnBuild
-         *      Restarting
-         *      Dead
-         *      Health
-         * NetworkSettings
-         * */
+        DateTimeOffset? StopTime { get; }
     }
 }
