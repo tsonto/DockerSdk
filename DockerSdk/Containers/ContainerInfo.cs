@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 
@@ -11,153 +12,71 @@ namespace DockerSdk.Containers
     /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
     internal class ContainerInfo : Container, IContainerInfo
     {
-        internal ContainerInfo(DockerClient docker, ContainerFullId id)
+        internal ContainerInfo(DockerClient docker, ContainerFullId id, ContainerName name, Image image)
             : base(docker, id)
         {
+            Name = name;
+            Image = image;
         }
 
-        /// <summary>
-        /// Gets the timestamp for when the container was created.
-        /// </summary>
+        /// <inheritdoc/>
         public DateTimeOffset CreationTime { get; init; }
 
-        /// <summary>
-        /// Gets an error message for why the container exited. Not all exited containers will have this set.
-        /// </summary>
+        /// <inheritdoc/>
         public string? ErrorMessage { get; init; }
 
-        /// <summary>
-        /// Gets the main executable that the container runs. This is what <see cref="MainProcessId"/> points to.
-        /// </summary>
-        /// <remarks>
-        /// This gives the actual executable run by the main process. Note that ENTRYPOINT/CMD directives in
-        /// <em>shell</em> format are shorthands for running a shell, so the actual executable in that case will be
-        /// whatever you specified for the SHELL directive (which defaults to <c>/bin/sh</c> for Linux or <c>cmd</c> for
-        /// Windows).
-        /// </remarks>
-        /// <seealso cref="ExecutableArgs"/>
-        public string Executable { get; init; }
+        /// <inheritdoc/>
+        public string Executable { get; init; } = "";
 
-        /// <summary>
-        /// Gets the arguments to the main executable that the container runs.
-        /// </summary>
-        /// <remarks>
-        /// This gives the arguments to the actual executable run by the main process. Note that ENTRYPOINT/CMD
-        /// directives in <em>shell</em> format are shorthands for running a shell, so the text provided to those
-        /// directives will really be part of the arguments.
-        /// </remarks>
-        /// <seealso cref="Executable"/>
-        public IReadOnlyList<string> ExecutableArgs { get; init; }
+        /// <inheritdoc/>
+        public IReadOnlyList<string> ExecutableArgs { get; init; } = Array.Empty<string>();
 
-        /// <summary>
-        /// Gets the exit code of the main process. This property is non-null for containers in the Exited state, and
-        /// null in all other states.
-        /// </summary>
+        /// <inheritdoc/>
         public long? ExitCode { get; init; }
 
-        /// <summary>
-        /// Gets the container's full ID.
-        /// </summary>
-        public ContainerFullId Id { get; init; }
+        /// <inheritdoc/>
+        public IImage Image { get; }
 
-        /// <summary>
-        /// Gets the Docker image that the container was created from.
-        /// </summary>
-        public Image Image { get; init; }
-
-        /// <summary>
-        /// Gets a value indicating whether the container was in the "paused" state when the query was performed.
-        /// </summary>
-        /// <remarks>
-        /// Caution: The container's status might change between when the daemon reads it and when this object is
-        /// available for reading. Beware of race conditions.
-        /// </remarks>
+        /// <inheritdoc/>
         public bool IsPaused { get; init; }
 
-        /// <summary>
-        /// Gets a value indicating whether the container was in the "running" state when the query was performed.
-        /// </summary>
-        /// <remarks>
-        /// Cautions:
-        /// * Unlike the `docker container inspect` command, this property does not consider paused containers to be
-        /// "running". Instead, this is equivalent to `State == ContainerStatus.Running`.
-        /// * The container's status might change between when the daemon reads it and when this object is available for
-        /// reading. Beware of race conditions.
-        /// </remarks>
-        /// <seealso cref="IsRunningOrPaused"/>
-        /// <seealso cref="State"/>
-        /// <seealso cref="ContainerStatus"/>
+        /// <inheritdoc/>
         public bool IsRunning { get; init; }
 
-        /// <summary>
-        /// Gets a value indicating whether the container was in either the "running" or "paused" state when the query
-        /// was performed.
-        /// </summary>
-        /// <remarks>
-        /// Caution: The container's status might change between when the daemon reads it and when this object is
-        /// available for reading. Beware of race conditions.
-        /// </remarks>
+        /// <inheritdoc/>
         public bool IsRunningOrPaused { get; init; }
 
-        /// <summary>
-        /// Gets the labels and their values that have been applied to the container.
-        /// </summary>
-        public IReadOnlyDictionary<string, string> Labels { get; init; }
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<string, string> Labels { get; init; } = ImmutableDictionary<string, string>.Empty;
 
-        /// <summary>
-        /// Gets the process ID of the container's main process. This property is non-null for containers that are
-        /// running or paused. and null in all other states.
-        /// </summary>
-        /// <remarks>The container will automatically exit when this process exits.</remarks>
+        /// <inheritdoc/>
         public long? MainProcessId { get; init; }
 
-        /// <summary>
-        /// Gets the containe's name.
-        /// </summary>
-        public ContainerName Name { get; init; }
+        /// <inheritdoc/>
+        public ContainerName Name { get; }
 
-        public IReadOnlyList<INetworkEndpoint> NetworkEndpoints { get; internal set; }
+        /// <inheritdoc/>
+        public IReadOnlyList<INetworkEndpoint> NetworkEndpoints { get; init; } = ImmutableArray<INetworkEndpoint>.Empty;
 
-        public IReadOnlyDictionary<NetworkName, INetworkEndpoint> NetworkEndpointsByNetworkName { get; internal set; }
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<NetworkName, INetworkEndpoint> NetworkEndpointsByNetworkName { get; init; } = ImmutableDictionary<NetworkName, INetworkEndpoint>.Empty;
 
-        public IReadOnlyList<INetwork> Networks { get; internal set; }
+        /// <inheritdoc/>
+        public IReadOnlyList<INetwork> Networks { get; init; } = ImmutableArray<INetwork>.Empty;
 
-        public NetworkSandbox NetworkSandbox { get; init; }
+        /// <inheritdoc/>
+        public NetworkSandbox? NetworkSandbox { get; init; }
 
-        /// <summary>
-        /// Gets a value indicating whether the container was forcibly shut down by the Docker daemon due to an
-        /// out-of-memory condition. This property is non-null for containers in the Killed state, and null in all other
-        /// states.
-        /// </summary>
+        /// <inheritdoc/>
         public bool? RanOutOfMemory { get; init; }
 
-        /// <summary>
-        /// Gets the time when the container was most recently started, or null if the container has not been started
-        /// yet.
-        /// </summary>
-        /// <remarks>
-        /// Caution: It's possible for the <see cref="StopTime"/> to be earlier than this, if the container previously
-        /// exited, was restarted, and has not yet exited since the most recent restart.
-        /// </remarks>
+        /// <inheritdoc/>
         public DateTimeOffset? StartTime { get; init; }
 
-        /// <summary>
-        /// Gets a value that summarizes the container's overall state at the time of the query.
-        /// </summary>
-        /// <remarks>
-        /// The container's status might change between when the daemon reads it and when this object is available for
-        /// reading. Beware of race conditions.
-        /// </remarks>
+        /// <inheritdoc/>
         public ContainerStatus State { get; init; }
 
-        /// <summary>
-        /// Gets the time when the container most recently exited, or null if the container has never exited.
-        /// </summary>
-        /// <remarks>
-        /// Caution: It's possible for this to be non-null for a running/paused container and earlier than <see
-        ///          cref="StartTime"/>. This is true if the container previously exited, was restarted, and has not yet
-        /// exited since the most recent restart.
-        /// </remarks>
+        /// <inheritdoc/>
         public DateTimeOffset? StopTime { get; init; }
 
         /*

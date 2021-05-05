@@ -26,7 +26,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            Image result = await client.Images.GetAsync(id);
+            IImage result = await client.Images.GetAsync(id);
 
             result.Id.ToString().Should().Be(id);
         }
@@ -38,7 +38,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            Image result = await client.Images.GetAsync("ddnt:inspect-me-1");
+            IImage result = await client.Images.GetAsync("ddnt:inspect-me-1");
 
             result.Id.ToString().Should().Be(id);
         }
@@ -50,7 +50,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            Image result = await client.Images.GetAsync(ImageId.Shorten(id));
+            IImage result = await client.Images.GetAsync(ImageId.Shorten(id));
 
             result.Id.Should().Equals(id);
         }
@@ -71,7 +71,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            ImageDetails actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
+            IImageInfo actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
 
             actual.Author.Should().Be("3241034+Emdot@users.noreply.github.com");
             actual.Comment.Should().Contain("buildkit");  // BuildKit sets this
@@ -95,7 +95,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            ImageDetails actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
+            IImageInfo actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
 
             actual.Labels["override-1"].Should().Be("from-build");
         }
@@ -107,7 +107,7 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            ImageDetails actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
+            IImageInfo actual = await client.Images.GetDetailsAsync("ddnt:inspect-me-1");
 
             actual.Labels["override-2"].Should().Be("from-image");
         }

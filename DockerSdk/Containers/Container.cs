@@ -25,13 +25,7 @@ namespace DockerSdk.Containers
 
         /// <inheritdoc/>
         public Task<IContainerInfo> GetDetailsAsync(CancellationToken ct)
-            => GetDetailsAsync(ContainerLoadOptions.Shallow, ct);
-
-        /// <inheritdoc/>
-        public Task<IContainerInfo> GetDetailsAsync(ContainerLoadOptions options, CancellationToken ct)
-            => this is IContainerInfo info
-            ? Task.FromResult(info)
-            : _client.Containers.GetDetailsAsync(Id, options, ct);
+            => GetDetailsAsync(ct);
 
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken ct = default)

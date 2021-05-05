@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 using DockerSdk.Containers;
 
 namespace DockerSdk.Networks
@@ -11,13 +9,20 @@ namespace DockerSdk.Networks
     /// a Docker network.
     /// </summary>
     /// <remarks>This class holds a snapshot in time. Its information is immutable once created.</remarks>
-    public class NetworkEndpoint: INetworkEndpoint
+    internal class NetworkEndpoint : INetworkEndpoint
     {
-        /// <inheritdoc/>
-        public IContainer Container { get; internal set; }
+        public NetworkEndpoint(string id, INetwork network, IContainer container)
+        {
+            Id = id;
+            Network = network;
+            Container = container;
+        }
 
         /// <inheritdoc/>
-        public string Id { get; init; }
+        public IContainer Container { get; }
+
+        /// <inheritdoc/>
+        public string Id { get; }
 
         /// <inheritdoc/>
         public IPAddress? IPv4Address { get; init; }
@@ -26,9 +31,9 @@ namespace DockerSdk.Networks
         public IPAddress? IPv6Address { get; init; }
 
         /// <inheritdoc/>
-        public PhysicalAddress MacAddress { get; init; }
+        public PhysicalAddress MacAddress { get; init; } = PhysicalAddress.None;
 
         /// <inheritdoc/>
-        public INetwork Network { get; internal set; }
+        public INetwork Network { get; }
     }
 }
