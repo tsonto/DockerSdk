@@ -129,3 +129,4 @@ ServiceFabricBackup/
 *.orig
 *.id
 act/
+/DockerSdk.Tests/TestResults
