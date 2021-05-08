@@ -9,6 +9,6 @@ var searchData=
   ['always_6',['Always',['../namespaceDockerSdk_1_1Containers.html#aebfa530429025cc82d07ebae04e3e01da68eec46437c384d8dad18d5464ebc35c',1,'DockerSdk::Containers']]],
   ['ancestorfilter_7',['AncestorFilter',['../classDockerSdk_1_1Containers_1_1ListContainersOptions.html#a3038ee88df1a5abf78ceecefd1626d80',1,'DockerSdk::Containers::ListContainersOptions']]],
   ['apiversion_8',['ApiVersion',['../classDockerSdk_1_1DockerClient.html#af837e46228265795d4774f48ff6e50f4',1,'DockerSdk::DockerClient']]],
-  ['attachedcontainers_9',['AttachedContainers',['../classDockerSdk_1_1Networks_1_1NetworkDetails.html#aac900fb0fcd957af5c9abc37cc9f396c',1,'DockerSdk::Networks::NetworkDetails']]],
-  ['author_10',['Author',['../classDockerSdk_1_1Images_1_1ImageDetails.html#ac539c27065693bf3eb570364fdc4b512',1,'DockerSdk::Images::ImageDetails']]]
+  ['attachedcontainers_9',['AttachedContainers',['../interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a1fe31ab48a29726922ddae6abd5917ad',1,'DockerSdk::Networks::INetworkInfo']]],
+  ['author_10',['Author',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html#aad2189c7b18574b405d04ed49e480824',1,'DockerSdk::Images::IImageInfo']]]
 ];

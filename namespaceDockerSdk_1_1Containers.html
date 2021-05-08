@@ -79,20 +79,28 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a Docker container.  <a href="classDockerSdk_1_1Containers_1_1Container.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>Container</b></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a Docker container. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerAccess.html">ContainerAccess</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides access to functionality involving Docker containers.  <a href="classDockerSdk_1_1Containers_1_1ContainerAccess.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html">ContainerDetails</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds detailed information about a Docker container.  <a href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ContainerFactory</b></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ContainerInfo</b></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds detailed information about a Docker container. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html">ContainerNotFoundException</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates that no Docker container with the given name is known to the Docker daemon.  <a href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Settings for how to create a container and how it should behave.  <a href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html">IContainer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a Docker container.  <a href="interfaceDockerSdk_1_1Containers_1_1IContainer.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html">IContainerInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds detailed information about a Docker container.  <a href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html">ListContainersOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filters for container listings.  <a href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#details">More...</a><br /></td></tr>
@@ -305,7 +313,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Represents a Docker container's name. </p>
-<p><a class="el" href="classDockerSdk_1_1Containers_1_1Container.html" title="Represents a Docker container.">Container</a> names are case-sensitive. The must be at least two characters long. The first character must be alphanumeric (ASCII character set), and subsequent characters may be alphanumeric, underscore, hyphen, or period. </p>
+<p>Container names are case-sensitive. The must be at least two characters long. The first character must be alphanumeric (ASCII character set), and subsequent characters may be alphanumeric, underscore, hyphen, or period. </p>
 
 </div>
 </div>

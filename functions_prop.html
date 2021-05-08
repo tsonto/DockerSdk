@@ -81,10 +81,10 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1DockerClient.html#af837e46228265795d4774f48ff6e50f4">DockerSdk.DockerClient</a>
 </li>
 <li>AttachedContainers
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#aac900fb0fcd957af5c9abc37cc9f396c">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a1fe31ab48a29726922ddae6abd5917ad">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>Author
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#ac539c27065693bf3eb570364fdc4b512">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#aad2189c7b18574b405d04ed49e480824">DockerSdk.Images.IImageInfo</a>
 </li>
 </ul>
 
@@ -102,10 +102,10 @@ $(function() {
 , <a class="el" href="classDockerSdk_1_1Images_1_1ListImagesOptions.html#a3807a0d303567c3e72daa4997ddc8442">DockerSdk.Images.ListImagesOptions</a>
 </li>
 <li>Comment
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#ac9cf349d9f85e6cc52cfd81227d7d8dc">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a8bc1aa4cee07ae990a222b513036f0a9">DockerSdk.Images.IImageInfo</a>
 </li>
 <li>Container
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a1f17123322801770e594ac082d838415">DockerSdk.Networks.NetworkEndpoint</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#a0149764f3dc1f0a6bf9af85bcbc14336">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>ContainerId
 : <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html#a127de22d51cba03728508a1e30a4be9b">DockerSdk.Containers.Events.ContainerEvent</a>
@@ -117,9 +117,9 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1DockerClient.html#a34cdcd73bd54e5ec82ea721cfbdb8f1b">DockerSdk.DockerClient</a>
 </li>
 <li>CreationTime
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a15db5f5cfa85518c69f2d6ca862da359">DockerSdk.Containers.ContainerDetails</a>
-, <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#ab4aa1172e5c85cb49a6e03bf988d5da1">DockerSdk.Images.ImageDetails</a>
-, <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a9aa00fa15d1e253d96cc179061650212">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a3bcb3aef0aaac9df3711a5b0ea1777a2">DockerSdk.Containers.IContainerInfo</a>
+, <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a923e2c526200dfa7b5822f64c726b0b9">DockerSdk.Images.IImageInfo</a>
+, <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a508ba3c82fd266ad719747f0ca88b27c">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>Credentials
 : <a class="el" href="classDockerSdk_1_1ClientOptions.html#a2eb926f0ca779b74dc2abdf2994c4f7b">DockerSdk.ClientOptions</a>
@@ -138,7 +138,7 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1ClientOptions.html#ac0830301c62989a75a63259553cbd3e0">DockerSdk.ClientOptions</a>
 </li>
 <li>Digest
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a7f9c0c5604ee0abc15c0273f96089e4a">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#ab65d55ee143a5f29f3a7624c885ef013">DockerSdk.Images.IImageInfo</a>
 </li>
 <li>DisableNetworking
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aead8f001ee0604d017dc1a63f4b9b048">DockerSdk.Containers.CreateContainerOptions</a>
@@ -150,14 +150,11 @@ $(function() {
 
 
 <h3><a id="index_e"></a>- e -</h3><ul>
-<li>EndpointId
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a76e87894c99f438c42a1514fb9d08df0">DockerSdk.Networks.NetworkEndpoint</a>
-</li>
 <li>Endpoints
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#ab40570187029529c08ff065db3ee7273">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#ac4374f6b8a578c4f28d2a6cf1dec0582">DockerSdk.Networks.INetworkInfo</a>
 </li>
-<li>EndpointsByContainerId
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a170f7b28f15df82d0662452738cd8e12">DockerSdk.Networks.NetworkDetails</a>
+<li>EndpointsByContainerName
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#ad4aa038f960c7d9db8274042cd3de5a6">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>Entrypoint
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a139fe32c9b75d737d73bd28cca1392ea">DockerSdk.Containers.CreateContainerOptions</a>
@@ -166,23 +163,23 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a83c4b2b3a1d05be4150f712712e73d74">DockerSdk.Containers.CreateContainerOptions</a>
 </li>
 <li>ErrorMessage
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a40a9982ff347b4c10a863d5fb2e4a0e4">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#ac977c86b801a8a5f0b814e59ed07e2a7">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>EventType
 : <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html#a938221676de25b35dae0790680c13e95">DockerSdk.Containers.Events.ContainerEvent</a>
 </li>
 <li>Executable
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a6964294bc7eadb002955ed6354d2faab">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a967862270b217de8b09995e92383e447">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>ExecutableArgs
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#accd9bc4b8729e46ad64b90d278c26fc9">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a2d39bdd5f7a4dfed745a7fd0c41e0460">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>ExitAction
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a52c837151ec96f7270bc28797dc8a2a0">DockerSdk.Containers.CreateContainerOptions</a>
 </li>
 <li>ExitCode
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae018832d99591705eaa0f4ebb6a9b40d">DockerSdk.Containers.ContainerDetails</a>
-, <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerExitedEvent.html#a30efb6d438cf4bbd5faa7bc713a9cc54">DockerSdk.Containers.Events.ContainerExitedEvent</a>
+: <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerExitedEvent.html#a30efb6d438cf4bbd5faa7bc713a9cc54">DockerSdk.Containers.Events.ContainerExitedEvent</a>
+, <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#ac7a1c28983eaf2fa6d8f7f20695670b7">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>ExitCodeFilter
 : <a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#a85a4c1795e8b123f57e0ccede138232f">DockerSdk.Containers.ListContainersOptions</a>
@@ -202,15 +199,13 @@ $(function() {
 
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>Id
-: <a class="el" href="classDockerSdk_1_1Containers_1_1Container.html#a6e6d4f1610f5a3cc4ff4257461759fda">DockerSdk.Containers.Container</a>
-, <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a88b88fa6b512b6ca99a6a1525d388e89">DockerSdk.Containers.ContainerDetails</a>
-, <a class="el" href="classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1">DockerSdk.Images.Image</a>
-, <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a82da28c36ae22b21755010e90717a319">DockerSdk.Images.ImageDetails</a>
-, <a class="el" href="classDockerSdk_1_1Networks_1_1Network.html#a5591829d98f8a5e4423cd4a18a0f9c10">DockerSdk.Networks.Network</a>
-, <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a7c8116439ce62d0b7adf5769a04e894c">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html#a1382f0822fa0d4f0dfefd9758b7295aa">DockerSdk.Containers.IContainer</a>
+, <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html#ab150ee215b2bcb29b27a8ec290a853b3">DockerSdk.Images.IImage</a>
+, <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html#a94290cb72a38f6a2d5105de7db094762">DockerSdk.Networks.INetwork</a>
+, <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#a797c11cd714fd7ff3b782e151fd1af56">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>Image
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae330005b9386877c467032897bb4e91d">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a2c7c390dcabcd36446d0265028bf024d">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>ImageReference
 : <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html#a5b3338055ba65ac87ba8e3f71a26004e">DockerSdk.Containers.Events.ContainerEvent</a>
@@ -219,46 +214,40 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1DockerClient.html#ab047cc6cccdfe8304900946e77756c18">DockerSdk.DockerClient</a>
 </li>
 <li>IpamDriverName
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a6fd6dadadf01ed8f9fa645852461ade8">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a25a41081d6e8faab012373574d259f76">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IpamDriverOptions
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a0d7b00282dd9ac2f7f91c9faa646dd02">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a3f3eed79d2ca803cf018167b410a3aed">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IPv4Address
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a189e3fda518037db92471627cd019876">DockerSdk.Networks.NetworkEndpoint</a>
-</li>
-<li>IPv4Subnet
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a1d4697c5fc3c56917554b1a40de67ac3">DockerSdk.Networks.NetworkEndpoint</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#adb866d0b474d69a2e59c4bb09805163d">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>IPv6Address
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#afa10a402bdfcfd8fb78de53181872219">DockerSdk.Networks.NetworkEndpoint</a>
-</li>
-<li>IPv6Subnet
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#ad20bfd60411e2c9c4578e08b501afb8e">DockerSdk.Networks.NetworkEndpoint</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#a5ea226cedcb67c164d33133b49dad186">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>IsAttachable
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a252ca0758eb16e146dbad39a5ee132e2">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a20a87b4edaa0b8cfc2e8ab34961a7664">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IsIngress
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a71fac55ccfb629fcf10c630256c9d1de">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a6b88f0e39fc2220f392a561681117c61">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IsInternalOnly
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a4157bf8566051c46092c3ea7435d0601">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a7d566d705e7bcf0734508bd71acf374f">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IsIPv6Enabled
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#abf3fc227fbfdb974b2888f3349a7ea64">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a5cb0ff1549d3b2602cc16bc48e2f505d">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>IsolationTech
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a91eb13564add02e7da1f19a3a6c0df16">DockerSdk.Containers.CreateContainerOptions</a>
 </li>
 <li>IsPaused
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a6fc9e4fa13679f99678c2ce82ca42c5d">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a1b3a9f9dd11c01011a7d12539119785a">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>IsRunning
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ae3f0a71ec107d13ee89c723b71dbae89">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a434216a10bf262d8247741284cfae30b">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>IsRunningOrPaused
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#aa433e24739c6d80639dd1d2361828d5f">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a41743fcff982e2f6d887a129b2ae5107">DockerSdk.Containers.IContainerInfo</a>
 </li>
 </ul>
 
@@ -269,10 +258,10 @@ $(function() {
 , <a class="el" href="classDockerSdk_1_1Images_1_1ListImagesOptions.html#aaae834749376a7d36480f21cc8e99951">DockerSdk.Images.ListImagesOptions</a>
 </li>
 <li>Labels
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ad6f9068a3230ccb390544d353891277e">DockerSdk.Containers.ContainerDetails</a>
-, <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abdf5e7483bf3fe79e21d34de564115ec">DockerSdk.Containers.CreateContainerOptions</a>
-, <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a70a7575ecf2e21654d6a1f0e4fb6ac51">DockerSdk.Images.ImageDetails</a>
-, <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#acba40b70317267273d0fb5548a6a183b">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abdf5e7483bf3fe79e21d34de564115ec">DockerSdk.Containers.CreateContainerOptions</a>
+, <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#ab0059bfce4e564e24549f6de68c99134">DockerSdk.Containers.IContainerInfo</a>
+, <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a782f0d5cda24f9f4117ce84d63771cd3">DockerSdk.Images.IImageInfo</a>
+, <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#abc6a4c4ec5b03a41e5468125448578c7">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>LabelValueFilters
 : <a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#a28ea43ad103e75e703a16a2f982da6b6">DockerSdk.Containers.ListContainersOptions</a>
@@ -283,10 +272,10 @@ $(function() {
 
 <h3><a id="index_m"></a>- m -</h3><ul>
 <li>MacAddress
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#a750477e150c99be70ad6cb9b1d5704bc">DockerSdk.Networks.NetworkEndpoint</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#a5a638daf4175c4b0f4d9d6eccc2826d2">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>MainProcessId
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a32f05870a663473e085ec2f2c9546984">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#ac9224abb2d3b986f302d72cf63f82e32">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>MaximumRetriesCount
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a8799fa52282cb66e8f979bd58dc352fc">DockerSdk.Containers.CreateContainerOptions</a>
@@ -299,24 +288,34 @@ $(function() {
 
 <h3><a id="index_n"></a>- n -</h3><ul>
 <li>Name
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ac02c2d27734da41152b27b139a9fe732">DockerSdk.Containers.ContainerDetails</a>
-, <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a42e178e8afed61162df9a5b30fe1ffdf">DockerSdk.Containers.CreateContainerOptions</a>
-, <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#adbd68da6844ac071b296f67a3385f6b0">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a42e178e8afed61162df9a5b30fe1ffdf">DockerSdk.Containers.CreateContainerOptions</a>
+, <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a90d3ab0e2da6cf65326f191134ff551c">DockerSdk.Containers.IContainerInfo</a>
+, <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#ab76bd201e2994240fbc6b8a0dbebc184">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>NameFilter
 : <a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#aa2b8de77f8b8b8243222cade48c6d481">DockerSdk.Containers.ListContainersOptions</a>
 </li>
 <li>Network
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkEndpoint.html#ad22d7adf59f4df63c1b414c1201a1def">DockerSdk.Networks.NetworkEndpoint</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html#a66e35b1c7f552577ecfb6e66568abc54">DockerSdk.Networks.INetworkEndpoint</a>
 </li>
 <li>NetworkDriverName
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#ae460b5b5d6a6d4e3c0e59cd8de6082f1">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a5608021fd38ea219772d7d0fbc62da76">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>NetworkDriverOptions
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#afdcdfb3ad57359e465bdfad5a701246e">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#ae0970f60170f4dd4f7bb349c2a9b092c">DockerSdk.Networks.INetworkInfo</a>
+</li>
+<li>NetworkEndpoints
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#ade86d71ec44e611fa195a53343aab570">DockerSdk.Containers.IContainerInfo</a>
+</li>
+<li>NetworkEndpointsByNetworkName
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a53a0efd7a0cc1181c91cb300bc0bef70">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>Networks
-: <a class="el" href="classDockerSdk_1_1DockerClient.html#ae39f7147b48b7ddef6a92c521172fca5">DockerSdk.DockerClient</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a83ef105d6e4e13fb34facf08b4ac8397">DockerSdk.Containers.IContainerInfo</a>
+, <a class="el" href="classDockerSdk_1_1DockerClient.html#ae39f7147b48b7ddef6a92c521172fca5">DockerSdk.DockerClient</a>
+</li>
+<li>NetworkSandbox
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a275e5e9adac7c6c6db350d0eecdff3b8">DockerSdk.Containers.IContainerInfo</a>
 </li>
 </ul>
 
@@ -326,17 +325,17 @@ $(function() {
 : <a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#acac89783a95782600a0016e64eefe264">DockerSdk.Containers.ListContainersOptions</a>
 </li>
 <li>OsType
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#aa065e020f899885906552b7f72d4b227">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#ac24d3d25496e0dde5cf84969341a08be">DockerSdk.Images.IImageInfo</a>
 </li>
 </ul>
 
 
 <h3><a id="index_p"></a>- p -</h3><ul>
 <li>ParentImage
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a9eac15962d2728550b7deb1fc641f6b4">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a8dee1e846e2828e53d9a2ec5d2a6355d">DockerSdk.Images.IImageInfo</a>
 </li>
 <li>Pools
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a25ff12a424e6e250d6640d3321f2d99a">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a231b61cfb49f92f369d61728d16979b2">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>PortBindings
 : <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a41e68b530765c818d27556ef4caaca6a">DockerSdk.Containers.CreateContainerOptions</a>
@@ -349,7 +348,7 @@ $(function() {
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>RanOutOfMemory
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a5302515d292b075e9fc32010a88a7c61">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a0714e4974d3e3017a9ee8656d3a24316">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>ReferencePatternFilters
 : <a class="el" href="classDockerSdk_1_1Images_1_1ListImagesOptions.html#afdb25c20460e9ccf99b5efe9fec22ba3">DockerSdk.Images.ListImagesOptions</a>
@@ -363,25 +362,25 @@ $(function() {
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>Scope
-: <a class="el" href="classDockerSdk_1_1Networks_1_1NetworkDetails.html#a17308bdf452128962389fbe173a09030">DockerSdk.Networks.NetworkDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#af901c27c1f906e195259fa947bbbdf75">DockerSdk.Networks.INetworkInfo</a>
 </li>
 <li>SignalNumber
 : <a class="el" href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerSignalledEvent.html#a38df91c188a233c1a968fac9c17d8f38">DockerSdk.Containers.Events.ContainerSignalledEvent</a>
 </li>
 <li>Size
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#aa574335989f983380a10fabf19ca9d0a">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a3ea447b7a9af3bde395af73ac9690f88">DockerSdk.Images.IImageInfo</a>
 </li>
 <li>StartTime
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a942ad1e1a9a5fccdcce7f7f072b2785d">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#aa325e2a7e76e367c1fbc099da8051245">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>State
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#ad29fbcb7290793497a8d2df74726da41">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a4bc62f1b6691b78be3d827c6fc6838e4">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>StatusFilter
 : <a class="el" href="classDockerSdk_1_1Containers_1_1ListContainersOptions.html#accd9996265ce99c3d7c5d89762c39d5a">DockerSdk.Containers.ListContainersOptions</a>
 </li>
 <li>StopTime
-: <a class="el" href="classDockerSdk_1_1Containers_1_1ContainerDetails.html#a7a999dc2ef77514288aea72e0359d397">DockerSdk.Containers.ContainerDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#afdb2a014150c8d8570c9a73dc7669c2b">DockerSdk.Containers.IContainerInfo</a>
 </li>
 <li>SubjectType
 : <a class="el" href="classDockerSdk_1_1Events_1_1Event.html#a9bfa94c1a7b4db0912d1294f1060af4b">DockerSdk.Events.Event</a>
@@ -392,7 +391,7 @@ $(function() {
 
 <h3><a id="index_t"></a>- t -</h3><ul>
 <li>Tags
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a6b5e949d04eb18360a0c8e357f778b64">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#aebd4f5aa602f4c6bdcdc0d22963315f1">DockerSdk.Images.IImageInfo</a>
 </li>
 <li>Timestamp
 : <a class="el" href="classDockerSdk_1_1Events_1_1Event.html#a799ec0747394eb2bb0d4e80fb95cbfce">DockerSdk.Events.Event</a>
@@ -413,14 +412,14 @@ $(function() {
 
 <h3><a id="index_v"></a>- v -</h3><ul>
 <li>VirtualSize
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a2033cf9f8ab5d9a5fdb1b3dfc330038e">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a612793544bd53fa2d92660cd6998c178">DockerSdk.Images.IImageInfo</a>
 </li>
 </ul>
 
 
 <h3><a id="index_w"></a>- w -</h3><ul>
 <li>WorkingDirectory
-: <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html#a45bef97dc8c3d5d0be2383f90c782b46">DockerSdk.Images.ImageDetails</a>
+: <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html#af98cfe60beccaf7733d003c57c2724e6">DockerSdk.Images.IImageInfo</a>
 </li>
 </ul>
 </div><!-- contents -->

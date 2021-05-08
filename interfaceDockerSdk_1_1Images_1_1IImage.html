@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>DockerSdk: DockerSdk.Images.Image Class Reference</title>
+<title>DockerSdk: DockerSdk.Images.IImage Interface Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,52 +62,61 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceDockerSdk.html">DockerSdk</a></li><li class="navelem"><a class="el" href="namespaceDockerSdk_1_1Images.html">Images</a></li><li class="navelem"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html">Image</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceDockerSdk.html">DockerSdk</a></li><li class="navelem"><a class="el" href="namespaceDockerSdk_1_1Images.html">Images</a></li><li class="navelem"><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html">IImage</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#properties">Properties</a> &#124;
-<a href="classDockerSdk_1_1Images_1_1Image-members.html">List of all members</a>  </div>
+<a href="interfaceDockerSdk_1_1Images_1_1IImage-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">DockerSdk.Images.Image Class Reference</div>  </div>
+<div class="title">DockerSdk.Images.IImage Interface Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>Represents a Docker image, which is a read-only template for creating containers.  
- <a href="classDockerSdk_1_1Images_1_1Image.html#details">More...</a></p>
+ <a href="interfaceDockerSdk_1_1Images_1_1IImage.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for DockerSdk.Images.IImage:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="interfaceDockerSdk_1_1Images_1_1IImage.png" usemap="#DockerSdk.Images.IImage_map" alt=""/>
+  <map id="DockerSdk.Images.IImage_map" name="DockerSdk.Images.IImage_map">
+<area href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html" alt="DockerSdk.Images.IImageInfo" shape="rect" coords="0,56,178,80"/>
+  </map>
+</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aecd707ea73085a0ab838d9468b8f1678"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html">ImageDetails</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#aecd707ea73085a0ab838d9468b8f1678">GetDetailsAsync</a> (CancellationToken ct=default)</td></tr>
-<tr class="memdesc:aecd707ea73085a0ab838d9468b8f1678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets detailed information about the image.  <a href="classDockerSdk_1_1Images_1_1Image.html#aecd707ea73085a0ab838d9468b8f1678">More...</a><br /></td></tr>
-<tr class="separator:aecd707ea73085a0ab838d9468b8f1678"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa9be2661d0cadab08b8aeae28741eb7"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#afa9be2661d0cadab08b8aeae28741eb7">RunAsync</a> (CancellationToken ct=default)</td></tr>
-<tr class="memdesc:afa9be2661d0cadab08b8aeae28741eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="classDockerSdk_1_1Images_1_1Image.html#afa9be2661d0cadab08b8aeae28741eb7">More...</a><br /></td></tr>
-<tr class="separator:afa9be2661d0cadab08b8aeae28741eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a639f10c7e18b53deecfa0dba3e745d41"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#a639f10c7e18b53deecfa0dba3e745d41">RunAsync</a> (<a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a> options, CancellationToken ct=default)</td></tr>
-<tr class="memdesc:a639f10c7e18b53deecfa0dba3e745d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="classDockerSdk_1_1Images_1_1Image.html#a639f10c7e18b53deecfa0dba3e745d41">More...</a><br /></td></tr>
-<tr class="separator:a639f10c7e18b53deecfa0dba3e745d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3e0648413916e590281960f89a13875"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html">IImageInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html#ac3e0648413916e590281960f89a13875">GetDetailsAsync</a> (CancellationToken ct=default)</td></tr>
+<tr class="memdesc:ac3e0648413916e590281960f89a13875"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets detailed information about the image.  <a href="interfaceDockerSdk_1_1Images_1_1IImage.html#ac3e0648413916e590281960f89a13875">More...</a><br /></td></tr>
+<tr class="separator:ac3e0648413916e590281960f89a13875"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcf2c6be587a9fd2b893ede7930fe92a"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html">IContainer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html#abcf2c6be587a9fd2b893ede7930fe92a">RunAsync</a> (CancellationToken ct=default)</td></tr>
+<tr class="memdesc:abcf2c6be587a9fd2b893ede7930fe92a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="interfaceDockerSdk_1_1Images_1_1IImage.html#abcf2c6be587a9fd2b893ede7930fe92a">More...</a><br /></td></tr>
+<tr class="separator:abcf2c6be587a9fd2b893ede7930fe92a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65e69b4b2603a7d4a8961a76817d0eb9"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html">IContainer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html#a65e69b4b2603a7d4a8961a76817d0eb9">RunAsync</a> (<a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a> options, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a65e69b4b2603a7d4a8961a76817d0eb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new container from this image and starts it.  <a href="interfaceDockerSdk_1_1Images_1_1IImage.html#a65e69b4b2603a7d4a8961a76817d0eb9">More...</a><br /></td></tr>
+<tr class="separator:a65e69b4b2603a7d4a8961a76817d0eb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
-<tr class="memitem:a4daf37a932c624daa0f528020df8b5b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceDockerSdk_1_1Images.html#a92a8e83a91077e8247df43ff2c4ac05d">ImageFullId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1">Id</a><code> [get]</code></td></tr>
-<tr class="memdesc:a4daf37a932c624daa0f528020df8b5b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the image's full ID.  <a href="classDockerSdk_1_1Images_1_1Image.html#a4daf37a932c624daa0f528020df8b5b1">More...</a><br /></td></tr>
-<tr class="separator:a4daf37a932c624daa0f528020df8b5b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab150ee215b2bcb29b27a8ec290a853b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceDockerSdk_1_1Images.html#a92a8e83a91077e8247df43ff2c4ac05d">ImageFullId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html#ab150ee215b2bcb29b27a8ec290a853b3">Id</a><code> [get]</code></td></tr>
+<tr class="memdesc:ab150ee215b2bcb29b27a8ec290a853b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the image's full ID.  <a href="interfaceDockerSdk_1_1Images_1_1IImage.html#ab150ee215b2bcb29b27a8ec290a853b3">More...</a><br /></td></tr>
+<tr class="separator:ab150ee215b2bcb29b27a8ec290a853b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a Docker image, which is a read-only template for creating containers. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html">ImageDetails</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html">IImageInfo</a></dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="aecd707ea73085a0ab838d9468b8f1678"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecd707ea73085a0ab838d9468b8f1678">&#9670;&nbsp;</a></span>GetDetailsAsync()</h2>
+<a id="ac3e0648413916e590281960f89a13875"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3e0648413916e590281960f89a13875">&#9670;&nbsp;</a></span>GetDetailsAsync()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Images_1_1ImageDetails.html">ImageDetails</a>&gt; DockerSdk.Images.Image.GetDetailsAsync </td>
+          <td class="memname">Task&lt;<a class="el" href="interfaceDockerSdk_1_1Images_1_1IImageInfo.html">IImageInfo</a>&gt; DockerSdk.Images.IImage.GetDetailsAsync </td>
           <td>(</td>
           <td class="paramtype">CancellationToken&#160;</td>
           <td class="paramname"><em>ct</em> = <code>default</code></td><td>)</td>
@@ -134,14 +143,14 @@ Properties</h2></td></tr>
 
 </div>
 </div>
-<a id="afa9be2661d0cadab08b8aeae28741eb7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa9be2661d0cadab08b8aeae28741eb7">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[1/2]</span></h2>
+<a id="abcf2c6be587a9fd2b893ede7930fe92a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcf2c6be587a9fd2b893ede7930fe92a">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a>&gt; DockerSdk.Images.Image.RunAsync </td>
+          <td class="memname">Task&lt;<a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html">IContainer</a>&gt; DockerSdk.Images.IImage.RunAsync </td>
           <td>(</td>
           <td class="paramtype">CancellationToken&#160;</td>
           <td class="paramname"><em>ct</em> = <code>default</code></td><td>)</td>
@@ -157,19 +166,19 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container. </dd></dl>
 <p>This method does <em>not</em> wait for the container to finish.</p>
 
 </div>
 </div>
-<a id="a639f10c7e18b53deecfa0dba3e745d41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a639f10c7e18b53deecfa0dba3e745d41">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[2/2]</span></h2>
+<a id="a65e69b4b2603a7d4a8961a76817d0eb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65e69b4b2603a7d4a8961a76817d0eb9">&#9670;&nbsp;</a></span>RunAsync() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Task&lt;<a class="el" href="classDockerSdk_1_1Containers_1_1Container.html">Container</a>&gt; DockerSdk.Images.Image.RunAsync </td>
+          <td class="memname">Task&lt;<a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainer.html">IContainer</a>&gt; DockerSdk.Images.IImage.RunAsync </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html">CreateContainerOptions</a>&#160;</td>
           <td class="paramname"><em>options</em>, </td>
@@ -196,14 +205,14 @@ Properties</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves when the container has started. It resolves to the new container. </dd></dl>
 <p>This method does <em>not</em> wait for the container to finish.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Property Documentation</h2>
-<a id="a4daf37a932c624daa0f528020df8b5b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4daf37a932c624daa0f528020df8b5b1">&#9670;&nbsp;</a></span>Id</h2>
+<a id="ab150ee215b2bcb29b27a8ec290a853b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab150ee215b2bcb29b27a8ec290a853b3">&#9670;&nbsp;</a></span>Id</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -212,7 +221,7 @@ Properties</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceDockerSdk_1_1Images.html#a92a8e83a91077e8247df43ff2c4ac05d">ImageFullId</a> DockerSdk.Images.Image.Id</td>
+          <td class="memname"><a class="el" href="namespaceDockerSdk_1_1Images.html#a92a8e83a91077e8247df43ff2c4ac05d">ImageFullId</a> DockerSdk.Images.IImage.Id</td>
         </tr>
       </table>
   </td>
@@ -223,11 +232,12 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the image's full ID. </p>
+<p>This is a hash of the image's config file. Even with identical build inputs, this will be different for each build. (Except when you've hacking the process to prevent that.) </p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li>Images/Image.cs</li>
+<hr/>The documentation for this interface was generated from the following file:<ul>
+<li>Images/IImage.cs</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

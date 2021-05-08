@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['virtualsize_418',['VirtualSize',['../classDockerSdk_1_1Images_1_1ImageDetails.html#a2033cf9f8ab5d9a5fdb1b3dfc330038e',1,'DockerSdk::Images::ImageDetails']]]
+  ['virtualsize_423',['VirtualSize',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a612793544bd53fa2d92660cd6998c178',1,'DockerSdk::Images::IImageInfo']]]
 ];
