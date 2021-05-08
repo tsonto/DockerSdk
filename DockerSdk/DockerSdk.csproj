@@ -37,7 +37,7 @@
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
         <PackageReference Include="Docker.DotNet" Version="3.125.4" />
-        <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" Condition=" '$(CI_IS_PUSH_TO_MAIN)' == 'true' ">
+        <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" Condition=" '$(CI_IS_PUSH_TO_MAIN)' == 'true' AND '$(IS_ACT)' != '1' ">  <!-- Skip in act because it has a path-delimiter bug that makes it fail when running a Linux runner from Windows. -->
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

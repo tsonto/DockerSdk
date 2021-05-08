@@ -33,15 +33,16 @@ jobs:
       # Publish to nuget.org.
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output nuget-out
-      if: ${{ github.ref == 'refs/heads/main' }}
     - name: Publish to nuget.org
       run: dotnet nuget push --api-key ${{ secrets.NUGET_API_KEY_DOCKERSDK }} --source https://api.nuget.org/v3/index.json nuget-out/*.nupkg
+      if: ${{ (github.ref == 'refs/heads/main') && (env.DRY_RUN != '1') }}
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY_DOCKERSDK }}
 
       # Generate the documentation for the SDK. The result is in folder DockerSdk/html/.
     - name: Generate documentation
-      uses: mattnotmitt/doxygen-action@v1
+      uses: mattnotmitt/doxygen-action@v1.3.1
+      if: ${{ env.IS_ACT != '1' }}  # Skip in act because it has a path-delimiter bug that makes it fail when running a Linux runner from Windows.
       with:
         working-directory: 'DockerSdk/'
         doxyfile-path: './Doxyfile'
@@ -49,6 +50,7 @@ jobs:
       # Publish the documentation to GitHub Pages.
     - name: Publish documentation
       uses: Cecilapp/GitHub-Pages-deploy@3.1.0
+      if: ${{ env.DRY_RUN != '1' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
