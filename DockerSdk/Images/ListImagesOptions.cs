@@ -62,11 +62,11 @@ namespace DockerSdk.Images
         /// </list>
         /// </para>
         /// <para>
-        /// The patterns can match the repository (in which case all tags for that repository are returned) or the
+        /// The patterns can match on the repository (in which case all tags for that repository are returned) or the
         /// repository:tag or the repository@digest. Patterns do not match against the ID.
         /// </para>
         /// <para>
-        /// Caution: If you use <c>*</c> without <c>:</c> or <c>@</c> you might accidentally match more than you expect.
+        /// Caution: If you use <c>*</c> without <c>:</c> or <c>@</c>, you might accidentally match more than you expect.
         /// For example, glob "a*b" will match "axb:1.0", "a:xb", and
         /// "ax@sha256:bf756fb1ae65adf866bd8c456593cd24beb6a0a061dedf42b26a993176745f6b". Even with <c>:</c> it's
         /// possible to accidentally match a digest, such as "a*:*b" matching
