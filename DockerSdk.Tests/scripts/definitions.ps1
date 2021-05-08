@@ -35,6 +35,10 @@ $networkDefinitions = @(
     @{
         name = 'general'
         args = '--attachable --ipv6 --subnet 12.34.56.0/24 --subnet 1234:5678::/32 --label ddnt1=alpha --label ddnt2=beta --gateway 12.34.56.1 --ip-range 12.34.56.0/25 --aux-address foo=12.34.56.2 --aux-address bar=12.34.56.3'
+    },
+    @{
+        name = 'overlay'
+        args = '--attachable --ipv6 --subnet 12.34.57.0/24 --subnet 1234:5679::/32 --label ddnt1=apple --driver overlay'
     }
 )
 

@@ -160,7 +160,8 @@ namespace DockerSdk.Containers
         /// <remarks>
         /// Caution: It's possible for this to be non-null for a running/paused container and earlier than <see
         ///          cref="StartTime"/>. This is true if the container previously exited, was restarted, and has not yet
-        /// exited since the most recent restart.
+        /// exited since the most recent restart. I've also observed it being slightly before the start time even in
+        /// a container that was never restarted--perhaps due to some timing bug in Docker.
         /// </remarks>
         DateTimeOffset? StopTime { get; }
     }
