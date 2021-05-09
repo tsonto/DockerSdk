@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['virtualsize_423',['VirtualSize',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a612793544bd53fa2d92660cd6998c178',1,'DockerSdk::Images::IImageInfo']]]
+  ['user_433',['User',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa304c6b5e2ab943967c8d0a9f90e38f9',1,'DockerSdk::Containers::CreateContainerOptions']]],
+  ['usetls_434',['UseTls',['../classDockerSdk_1_1ClientOptions.html#a7b793640689a2485bd3753614edf5948',1,'DockerSdk::ClientOptions']]]
 ];

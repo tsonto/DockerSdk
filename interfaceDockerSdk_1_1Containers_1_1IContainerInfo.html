@@ -661,7 +661,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the time when the container most recently exited, or null if the container has never exited. </p>
-<p>Caution: It's possible for this to be non-null for a running/paused container and earlier than <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#aa325e2a7e76e367c1fbc099da8051245" title="Gets the time when the container was most recently started, or null if the container has not been sta...">StartTime</a>. This is true if the container previously exited, was restarted, and has not yet exited since the most recent restart. </p>
+<p>Caution: It's possible for this to be non-null for a running/paused container and earlier than <a class="el" href="interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#aa325e2a7e76e367c1fbc099da8051245" title="Gets the time when the container was most recently started, or null if the container has not been sta...">StartTime</a>. This is true if the container previously exited, was restarted, and has not yet exited since the most recent restart. I've also observed it being slightly before the start time even in a container that was never restarted&ndash;perhaps due to some timing bug in Docker. </p>
 
 </div>
 </div>

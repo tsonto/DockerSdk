@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['ranoutofmemory_408',['RanOutOfMemory',['../interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html#a0714e4974d3e3017a9ee8656d3a24316',1,'DockerSdk::Containers::IContainerInfo']]],
-  ['referencepatternfilters_409',['ReferencePatternFilters',['../classDockerSdk_1_1Images_1_1ListImagesOptions.html#afdb25c20460e9ccf99b5efe9fec22ba3',1,'DockerSdk::Images::ListImagesOptions']]],
-  ['registries_410',['Registries',['../classDockerSdk_1_1DockerClient.html#a43c3a35ee344b6d0be720221b2e6bb2d',1,'DockerSdk.DockerClient.Registries()'],['../classDockerSdk_1_1Registries_1_1RegistryAccess.html#a5e0584ad426da1a294fa47fd34be618a',1,'DockerSdk.Registries.RegistryAccess.Registries()']]]
+  ['parentimage_415',['ParentImage',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html#a8dee1e846e2828e53d9a2ec5d2a6355d',1,'DockerSdk::Images::IImageInfo']]],
+  ['pools_416',['Pools',['../interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html#a231b61cfb49f92f369d61728d16979b2',1,'DockerSdk::Networks::INetworkInfo']]],
+  ['portbindings_417',['PortBindings',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#a41e68b530765c818d27556ef4caaca6a',1,'DockerSdk::Containers::CreateContainerOptions']]],
+  ['pullcondition_418',['PullCondition',['../classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2',1,'DockerSdk::Containers::CreateContainerOptions']]]
 ];

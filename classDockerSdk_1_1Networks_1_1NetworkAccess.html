@@ -91,6 +91,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aedfea7ec194eed2f305aa98d72bd4c41"><td class="memItemLeft" align="right" valign="top">async Task&lt; <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html">INetworkInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#aedfea7ec194eed2f305aa98d72bd4c41">GetInfoAsync</a> (<a class="el" href="namespaceDockerSdk_1_1Networks.html#ad893328569d9db6fca3ac72bbd4a00ff">NetworkReference</a> network, CancellationToken ct=default)</td></tr>
 <tr class="memdesc:aedfea7ec194eed2f305aa98d72bd4c41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads detailed information about a Docker network.  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#aedfea7ec194eed2f305aa98d72bd4c41">More...</a><br /></td></tr>
 <tr class="separator:aedfea7ec194eed2f305aa98d72bd4c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1506cbce39fbc8ffb586ff99bfaef12"><td class="memItemLeft" align="right" valign="top">Task&lt; IReadOnlyList&lt; <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html">INetwork</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#ab1506cbce39fbc8ffb586ff99bfaef12">ListAsync</a> (CancellationToken ct=default)</td></tr>
+<tr class="memdesc:ab1506cbce39fbc8ffb586ff99bfaef12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a list of Docker networks known to the daemon.  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#ab1506cbce39fbc8ffb586ff99bfaef12">More...</a><br /></td></tr>
+<tr class="separator:ab1506cbce39fbc8ffb586ff99bfaef12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96710d78de05d429e53ac2267e86d44f"><td class="memItemLeft" align="right" valign="top">async Task&lt; IReadOnlyList&lt; <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html">INetwork</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#a96710d78de05d429e53ac2267e86d44f">ListAsync</a> (<a class="el" href="classDockerSdk_1_1Networks_1_1ListNetworksOptions.html">ListNetworksOptions</a> options, CancellationToken ct=default)</td></tr>
+<tr class="memdesc:a96710d78de05d429e53ac2267e86d44f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a list of Docker networks known to the daemon.  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#a96710d78de05d429e53ac2267e86d44f">More...</a><br /></td></tr>
+<tr class="separator:a96710d78de05d429e53ac2267e86d44f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides methods for interacting with Docker networks. </p>
@@ -291,6 +297,95 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The network reference is improperly formatted.</td></tr>
     <tr><td class="paramname">ArgumentNullException</td><td>The <em>network</em>  input is null.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab1506cbce39fbc8ffb586ff99bfaef12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1506cbce39fbc8ffb586ff99bfaef12">&#9670;&nbsp;</a></span>ListAsync() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;IReadOnlyList&lt;<a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html">INetwork</a>&gt; &gt; DockerSdk.Networks.NetworkAccess.ListAsync </td>
+          <td>(</td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets a list of Docker networks known to the daemon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ct</td><td>A token used to cancel the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the list of images.</dd></dl>
+<p>The sequence of the results is undefined.</p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity. </td></tr>
+    <tr><td class="paramname">ArgumentNullException</td><td>An input is null.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a96710d78de05d429e53ac2267e86d44f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96710d78de05d429e53ac2267e86d44f">&#9670;&nbsp;</a></span>ListAsync() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">async Task&lt;IReadOnlyList&lt;<a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html">INetwork</a>&gt; &gt; DockerSdk.Networks.NetworkAccess.ListAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classDockerSdk_1_1Networks_1_1ListNetworksOptions.html">ListNetworksOptions</a>&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>ct</em> = <code>default</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a list of Docker networks known to the daemon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">options</td><td>Filters for the search.</td></tr>
+    <tr><td class="paramname">ct</td><td>A token used to cancel the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task&lt;TResult&gt; that resolves to the list of images.</dd></dl>
+<p>The sequence of the results is undefined.</p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity. </td></tr>
+    <tr><td class="paramname">ArgumentNullException</td><td>An input is null.</td></tr>
   </table>
   </dd>
 </dl>
