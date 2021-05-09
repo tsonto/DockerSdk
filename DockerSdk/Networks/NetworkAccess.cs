@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using DockerSdk.Networks.Events;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
 
@@ -12,7 +13,7 @@ namespace DockerSdk.Networks
     /// <summary>
     /// Provides methods for interacting with Docker networks.
     /// </summary>
-    public class NetworkAccess
+    public class NetworkAccess : IObservable<NetworkEvent>
     {
         internal NetworkAccess(DockerClient dockerClient)
         {
@@ -20,6 +21,17 @@ namespace DockerSdk.Networks
         }
 
         private readonly DockerClient client;
+
+        /// <summary>
+        /// Subscribes to events about networks.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<NetworkEvent> observer)
+            => client.OfType<NetworkEvent>().Subscribe(observer);
 
         /// <summary>
         /// Loads an object that can be used to interact with the indicated network.
@@ -53,6 +65,15 @@ namespace DockerSdk.Networks
                 throw new ArgumentNullException(nameof(network));
 
             return await NetworkFactory.LoadAsync(client, network, ct).ConfigureAwait(false);
+        }
+
+        internal async Task<NetworkFullId> ToFullIdAsync(NetworkReference input, CancellationToken ct)
+        {
+            if (input is NetworkFullId nfid)
+                return nfid;
+
+            var network = await GetAsync(input, ct).ConfigureAwait(false);
+            return network.Id;
         }
 
         /// <summary>

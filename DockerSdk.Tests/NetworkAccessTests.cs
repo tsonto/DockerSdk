@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Networks;
@@ -210,6 +212,45 @@ namespace DockerSdk.Tests
             actual.Select(net => net.Id.ToString()).Should().Contain(generalNetworkId);
             actual.Select(net => net.Id.ToString()).Should().Contain(noneNetworkId);
             actual.Select(net => net.Id.ToString()).Should().Contain(hostNetworkId);
+        }
+
+        [Fact]
+        public async Task AttachAsync_ContainerDoesNotExist_ThrowsContainerNotFoundException()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+            var network = cli.GetNetwork(client, "ddnt-general");
+            
+            // Attach a non-existent container. This is the code under test.
+            await Assert.ThrowsAsync<ContainerNotFoundException>(
+                () => network.AttachAsync("ddnt-no-such-container-exists"));
+        }
+
+        [Fact]
+        public async Task AttachAsync_ContainerExists_AttachesNetwork()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+            var network = cli.GetNetwork(client, "ddnt-general");
+
+            IContainer? container = null;
+            try
+            {
+                // Create and start a container to test with.
+                container = cli.CreateAndStartContainer(client);
+
+                // Attach a network. This is the code under test.
+                await container.AttachNetwork(network.Id);
+
+                // Check the attachment.
+                var json = cli.Invoke("container inspect --format \"{{json .NetworkSettings.Networks}}\" " + container.Id)[0];
+                var result = JsonSerializer.Deserialize<Dictionary<string, object>>(json)!.Select(kvp => kvp.Key).ToArray();
+                result.Should().Contain("ddnt-general");
+            }
+            finally
+            {
+                cli.CleanUpContainer(container);
+            }
         }
     }
 }

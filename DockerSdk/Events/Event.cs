@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
+using DockerSdk.Networks.Events;
 using Message = Docker.DotNet.Models.Message;
 
 namespace DockerSdk.Events
@@ -22,25 +22,6 @@ namespace DockerSdk.Events
         }
 
         /// <summary>
-        /// Gets the date and time at which the event occurred, in UTC, per the daemon's clock.
-        /// </summary>
-        /// <remarks>
-        /// This timestamp comes from the Docker daemon, and is based on the daemon's server's clock. Unless the caller
-        /// and the daemon are on the same computer, their clocks might not be in sync. Attempting to compute elapsed
-        /// time based on different clocks can cause meaningless values, including negative durations. Note that even
-        /// two computers that synchronize to the same <a href="https://en.wikipedia.org/wiki/Time_server">time
-        /// server</a> can have a small amount of clock drift.
-        /// </remarks>
-        public DateTimeOffset Timestamp { get; }
-
-        private readonly Message raw;
-        private readonly TaskCompletionSource delivery;
-
-        internal Task Delivered => delivery.Task;
-
-        internal void MarkDelivered() => delivery.TrySetResult();
-
-        /// <summary>
         /// Gets a value indicating the type of event this is.
         /// </summary>
         string IEventLowLevel.Action => raw.Action;
@@ -55,6 +36,22 @@ namespace DockerSdk.Events
         public EventSubjectType SubjectType { get; }
 
         /// <summary>
+        /// Gets the date and time at which the event occurred, in UTC, per the daemon's clock.
+        /// </summary>
+        /// <remarks>
+        /// This timestamp comes from the Docker daemon, and is based on the daemon's server's clock. Unless the caller
+        /// and the daemon are on the same computer, their clocks might not be in sync. Attempting to compute elapsed
+        /// time based on different clocks can cause meaningless values, including negative durations. Note that even
+        /// two computers that synchronize to the same <a href="https://en.wikipedia.org/wiki/Time_server">time
+        /// server</a> can have a small amount of clock drift.
+        /// </remarks>
+        public DateTimeOffset Timestamp { get; }
+
+        internal Task Delivered => delivery.Task;
+        private readonly TaskCompletionSource delivery;
+        private readonly Message raw;
+
+        /// <summary>
         /// Given a message from the underlying API, produce a strongly-typed subclass of <see cref="Event"/>.
         /// </summary>
         /// <param name="message">The message to wrap.</param>
@@ -63,8 +60,11 @@ namespace DockerSdk.Events
             => message.Type switch
             {
                 "container" => ContainerEvent.Wrap(message),
+                "network" => NetworkEvent.Wrap(message),
                 _ => null
             };
+
+        internal void MarkDelivered() => delivery.TrySetResult();
 
         private static DateTimeOffset MakeTimestamp(long seconds, long nanoseconds)
             => DateTimeOffset.FromUnixTimeSeconds(seconds).AddSeconds(nanoseconds / 1e9);

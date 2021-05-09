@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DockerSdk.Images;
+using DockerSdk.Networks;
 
 namespace DockerSdk.Containers
 {
@@ -133,6 +134,12 @@ namespace DockerSdk.Containers
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> for setting labels on the container.
         /// </summary>
         public Dictionary<string, string> Labels { get; } = new();
+
+        /// <summary>
+        /// Gets the set of networks to attach to the container. In additiona to the networks mentioned here, Docker may
+        /// also attach the built-in network named "bridge".
+        /// </summary>
+        public ISet<NetworkReference> Networks { get; } = new HashSet<NetworkReference>();
 
         // NOTE: Not adding ExposedPorts because I don't see a use case for it. (Note that exposing ports is different
         // than publishing ports, which is done via PortBindings.)

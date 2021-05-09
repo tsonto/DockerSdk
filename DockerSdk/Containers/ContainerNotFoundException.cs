@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
+using DockerSdk.Networks;
 using Core = Docker.DotNet;
 
 namespace DockerSdk.Containers
@@ -55,6 +57,6 @@ namespace DockerSdk.Containers
         }
 
         internal static ContainerNotFoundException Wrap(Core.DockerApiException ex, ContainerReference container)
-            => new($"No container named \"{container}\" exists.", ex);
+            => new($"No container \"{container}\" exists.", ex);
     }
 }
