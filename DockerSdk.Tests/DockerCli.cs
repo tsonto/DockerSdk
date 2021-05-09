@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using DockerSdk.Containers;
+using DockerSdk.Networks;
 using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
@@ -36,7 +38,74 @@ namespace DockerSdk.Tests
             return File.ReadAllLines(path)[0];
         }
 
+        public IContainer CreateContainer(DockerClient client, string? image = null, string? containerName = null, string args = "")
+        {
+            if (image is null)
+                image = "ddnt:infinite-loop";
+
+            if (containerName is null)
+            {
+                containerName = "ddnt-" + Guid.NewGuid();
+            }
+            else
+            {
+                if (!containerName.StartsWith("ddnt-"))
+                    throw new ArgumentException("Container name must start with ddnt- so the cleanup script will find it if needed.");
+                _ = Invoke($"container rm --force {containerName}", ignoreErrors: true);
+            }
+
+            var containerId = Invoke($"container create --name {containerName} {args} {image}")[0];
+            return new Container(client, new ContainerFullId(containerId));
+        }
+
+        public INetwork CreateNetwork(DockerClient client, string? networkName = null, string args = "")
+        {
+            if (networkName is null)
+            {
+                networkName = "ddnt-" + Guid.NewGuid();
+            }
+            else
+            {
+                if (!networkName.StartsWith("ddnt-"))
+                    throw new ArgumentException("Network name must start with ddnt- so the cleanup script will find it if needed.");
+                _ = Invoke($"network rm {networkName}", ignoreErrors: true);
+            }
+
+            var networkId = Invoke($"network create {args} {networkName}")[0];
+            return new Network(client, new NetworkFullId(networkId));
+        }
+
+        public void CleanUpNetwork(INetwork? network)
+            => CleanUpNetwork(network?.Id?.ToString());
+
+        private void CleanUpNetwork(string? id)
+        {
+            if (!string.IsNullOrEmpty(id))
+                _ = Invoke("network rm " + id, ignoreErrors: true);
+        }
+
+        public IContainer CreateAndStartContainer(DockerClient client, string? image = null, string? containerName = null, string args = "")
+        {
+            var container = CreateContainer(client, image, containerName, args);
+            _ = Invoke($"container start {container.Id}");
+            return container;
+        }
+
+        public void CleanUpContainer(IContainer? container)
+            => CleanUpContainer(container?.Id?.ToString());
+
+        public void CleanUpContainer(string? id)
+        {
+            if (!string.IsNullOrEmpty(id))
+                _ = Invoke("container rm --force " + id, ignoreErrors: true);
+        }
+
+        public INetwork GetNetwork(DockerClient client, string network)
+            => new Network(client, new NetworkFullId(GetNetworkId(network)));
+
         public string GetHostNetworkId() => Invoke("network ls --filter=driver=host --no-trunc --quiet")[0];
+
+        public string GetBridgeNetworkId() => Invoke("network inspect bridge --format \"{{.ID}}\"")[0];
 
         public string GetNoneNetworkId() => Invoke("network ls --filter=driver=null --no-trunc --quiet")[0];
 

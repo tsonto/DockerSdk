@@ -5,10 +5,12 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
 using DockerSdk.Images;
+using DockerSdk.Networks;
 using DockerSdk.Registries;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
@@ -124,6 +126,7 @@ namespace DockerSdk.Containers
         /// The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by
         /// default.)
         /// </exception>
+        /// <exception cref="NetworkNotFoundException">One of the networks specified does not exist.</exception>
         /// <exception cref="MalformedReferenceException">
         /// The <paramref name="image"/> input is not well-formed. --or-- The options specified a name for the image,
         /// but the name does not meet the expectations of a well-formed container name.
@@ -169,6 +172,7 @@ namespace DockerSdk.Containers
         /// The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by
         /// default.)
         /// </exception>
+        /// <exception cref="NetworkNotFoundException">One of the networks specified does not exist.</exception>
         /// <exception cref="MalformedReferenceException">
         /// The options specified a name for the image, but the name does not meet the expectations of a well-formed
         /// container name.
@@ -329,6 +333,7 @@ namespace DockerSdk.Containers
                 Env = MakeEnvironmentVariables(options.EnvironmentVariables),
                 NetworkDisabled = options.DisableNetworking,
                 Labels = options.Labels,
+                NetworkingConfig = MakeNetworkConfigs(options.Networks),
             };
 
             // Start capturing creation events. We want to find the event about the new container, but we don't have the
@@ -529,6 +534,7 @@ namespace DockerSdk.Containers
         /// </para>
         /// </remarks>
         /// <exception cref="ContainerNotFoundException">The indicated container does not exist.</exception>
+        /// <exception cref="NetworkNotFoundException">One of the networks specified during container creation does not exist.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -560,6 +566,7 @@ namespace DockerSdk.Containers
         /// </remarks>
         /// <exception cref="ArgumentException"><paramref name="container"/> is null.</exception>
         /// <exception cref="ContainerNotFoundException">The indicated container does not exist.</exception>
+        /// <exception cref="NetworkNotFoundException">One of the networks specified during container creation does not exist.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -585,6 +592,17 @@ namespace DockerSdk.Containers
             }
             catch (Core.DockerApiException ex)
             {
+                // A bug in Docker.DotNet (https://github.com/dotnet/Docker.DotNet/issues/519) causes a
+                // ContainerNotFoundException exception when it should really be a network-not-found exception. Attempt
+                // to detect this and return the correct exception. When the bug is fixed, we can change this code to
+                // detect network-not-found more properly.
+                var match = Regex.Match(ex.ResponseBody, "\"message\":\"network (.*) not found\"");
+                if (match.Success)
+                {
+                    var network = match.Groups[0].Value;
+                    throw new NetworkNotFoundException($"No network \"{network}\" exists.");
+                }
+
                 if (ContainerNotFoundException.TryWrap(ex, container, out var wrapper))
                     throw wrapper;
                 throw DockerException.Wrap(ex);
@@ -703,6 +721,17 @@ namespace DockerSdk.Containers
             return output;
         }
 
+        private CoreModels.NetworkingConfig? MakeNetworkConfigs(IEnumerable<NetworkReference> networks)
+        {
+            if (!networks.Any())
+                return null;
+            var x = networks.ToDictionary(net => net.ToString(), net => new CoreModels.EndpointSettings());
+            return new CoreModels.NetworkingConfig
+            {
+                EndpointsConfig = x,
+            };
+        }
+
         private async Task PullConditionallyAsync(PullImageCondition pullCondition, ImageReference image, CancellationToken ct)
         {
             if (pullCondition == PullImageCondition.Never)
@@ -727,7 +756,7 @@ namespace DockerSdk.Containers
             }
         }
 
-        private async Task<ContainerFullId> ToFullIdAsync(ContainerReference input, CancellationToken ct = default)
+        internal async Task<ContainerFullId> ToFullIdAsync(ContainerReference input, CancellationToken ct = default)
         {
             if (input is ContainerFullId cfid)
                 return cfid;
