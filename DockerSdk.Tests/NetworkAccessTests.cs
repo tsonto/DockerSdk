@@ -148,16 +148,16 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             using var cli = new DockerCli(toh);
             var generalNetworkId = cli.GetNetworkId("general");
-            var overlayNetworkId = cli.GetNetworkId("overlay");
+            var hostNetworkId = cli.GetHostNetworkId();
 
             var options = new ListNetworksOptions
             {
-                DriverFilter = new[] { "overlay" },
+                DriverFilter = new[] { "host" },
             };
             var actual = await client.Networks.ListAsync(options);
 
             actual.Select(net => net.Id.ToString()).Should().NotContain(generalNetworkId);
-            actual.Select(net => net.Id.ToString()).Should().Contain(overlayNetworkId);
+            actual.Select(net => net.Id.ToString()).Should().Contain(hostNetworkId);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             using var cli = new DockerCli(toh);
             var generalNetworkId = cli.GetNetworkId("general");
-            var overlayNetworkId = cli.GetNetworkId("overlay");
+            var hostNetworkId = cli.GetHostNetworkId();
 
             var options = new ListNetworksOptions
             {
@@ -175,7 +175,7 @@ namespace DockerSdk.Tests
             var actual = await client.Networks.ListAsync(options);
 
             actual.Select(net => net.Id.ToString()).Should().Contain(generalNetworkId);
-            actual.Select(net => net.Id.ToString()).Should().NotContain(overlayNetworkId);
+            actual.Select(net => net.Id.ToString()).Should().NotContain(hostNetworkId);
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             using var cli = new DockerCli(toh);
             var generalNetworkId = cli.GetNetworkId("general");
-            var overlayNetworkId = cli.GetNetworkId("overlay");
+            var noneNetworkId = cli.GetNoneNetworkId();
 
             var options = new ListNetworksOptions
             {
@@ -193,7 +193,7 @@ namespace DockerSdk.Tests
             var actual = await client.Networks.ListAsync(options);
 
             actual.Select(net => net.Id.ToString()).Should().Contain(generalNetworkId);
-            actual.Select(net => net.Id.ToString()).Should().NotContain(overlayNetworkId);
+            actual.Select(net => net.Id.ToString()).Should().NotContain(noneNetworkId);
         }
 
         [Fact]
@@ -202,12 +202,14 @@ namespace DockerSdk.Tests
             using var client = await DockerClient.StartAsync();
             using var cli = new DockerCli(toh);
             var generalNetworkId = cli.GetNetworkId("general");
-            var overlayNetworkId = cli.GetNetworkId("overlay");
+            var noneNetworkId = cli.GetNoneNetworkId();
+            var hostNetworkId = cli.GetHostNetworkId();
 
             var actual = await client.Networks.ListAsync();
 
             actual.Select(net => net.Id.ToString()).Should().Contain(generalNetworkId);
-            actual.Select(net => net.Id.ToString()).Should().Contain(overlayNetworkId);
+            actual.Select(net => net.Id.ToString()).Should().Contain(noneNetworkId);
+            actual.Select(net => net.Id.ToString()).Should().Contain(hostNetworkId);
         }
     }
 }

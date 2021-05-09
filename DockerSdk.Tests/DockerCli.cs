@@ -36,6 +36,10 @@ namespace DockerSdk.Tests
             return File.ReadAllLines(path)[0];
         }
 
+        public string GetHostNetworkId() => Invoke("network ls --filter=driver=host --no-trunc --quiet")[0];
+
+        public string GetNoneNetworkId() => Invoke("network ls --filter=driver=null --no-trunc --quiet")[0];
+
         public string GetContainerId(string container)
         {
             var name = container.Replace("ddnt-", "");
