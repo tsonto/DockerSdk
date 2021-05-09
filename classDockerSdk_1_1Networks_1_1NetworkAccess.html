@@ -76,9 +76,18 @@ $(function() {
 
 <p>Provides methods for interacting with Docker networks.  
  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for DockerSdk.Networks.NetworkAccess:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classDockerSdk_1_1Networks_1_1NetworkAccess.png" alt=""/>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a43b73bf4764f87b2c3f97d27d3950d4c"><td class="memItemLeft" align="right" valign="top">IDisposable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#a43b73bf4764f87b2c3f97d27d3950d4c">Subscribe</a> (IObserver&lt; <a class="el" href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkEvent.html">NetworkEvent</a> &gt; observer)</td></tr>
+<tr class="memdesc:a43b73bf4764f87b2c3f97d27d3950d4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribes to events about networks.  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#a43b73bf4764f87b2c3f97d27d3950d4c">More...</a><br /></td></tr>
+<tr class="separator:a43b73bf4764f87b2c3f97d27d3950d4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab276aa034094a19569f1e00deb36bef4"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interfaceDockerSdk_1_1Networks_1_1INetwork.html">INetwork</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#ab276aa034094a19569f1e00deb36bef4">GetAsync</a> (string network, CancellationToken ct=default)</td></tr>
 <tr class="memdesc:ab276aa034094a19569f1e00deb36bef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads an object that can be used to interact with the indicated network.  <a href="classDockerSdk_1_1Networks_1_1NetworkAccess.html#ab276aa034094a19569f1e00deb36bef4">More...</a><br /></td></tr>
 <tr class="separator:ab276aa034094a19569f1e00deb36bef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -389,6 +398,33 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a43b73bf4764f87b2c3f97d27d3950d4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43b73bf4764f87b2c3f97d27d3950d4c">&#9670;&nbsp;</a></span>Subscribe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IDisposable DockerSdk.Networks.NetworkAccess.Subscribe </td>
+          <td>(</td>
+          <td class="paramtype">IObserver&lt; <a class="el" href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkEvent.html">NetworkEvent</a> &gt;&#160;</td>
+          <td class="paramname"><em>observer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Subscribes to events about networks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observer</td><td>An object to observe the events.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An IDisposable representing the subscription. Disposing this unsubscribes and releases resources. </dd></dl>
 
 </div>
 </div>

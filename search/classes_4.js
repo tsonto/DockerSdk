@@ -1,6 +1,15 @@
 var searchData=
 [
-  ['listcontainersoptions_245',['ListContainersOptions',['../classDockerSdk_1_1Containers_1_1ListContainersOptions.html',1,'DockerSdk::Containers']]],
-  ['listimagesoptions_246',['ListImagesOptions',['../classDockerSdk_1_1Images_1_1ListImagesOptions.html',1,'DockerSdk::Images']]],
-  ['listnetworksoptions_247',['ListNetworksOptions',['../classDockerSdk_1_1Networks_1_1ListNetworksOptions.html',1,'DockerSdk::Networks']]]
+  ['icontainer_248',['IContainer',['../interfaceDockerSdk_1_1Containers_1_1IContainer.html',1,'DockerSdk::Containers']]],
+  ['icontainerinfo_249',['IContainerInfo',['../interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html',1,'DockerSdk::Containers']]],
+  ['ieventlowlevel_250',['IEventLowLevel',['../interfaceDockerSdk_1_1Events_1_1IEventLowLevel.html',1,'DockerSdk::Events']]],
+  ['iimage_251',['IImage',['../interfaceDockerSdk_1_1Images_1_1IImage.html',1,'DockerSdk::Images']]],
+  ['iimageinfo_252',['IImageInfo',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html',1,'DockerSdk::Images']]],
+  ['imageaccess_253',['ImageAccess',['../classDockerSdk_1_1Images_1_1ImageAccess.html',1,'DockerSdk::Images']]],
+  ['imagenotfoundexception_254',['ImageNotFoundException',['../classDockerSdk_1_1Images_1_1ImageNotFoundException.html',1,'DockerSdk::Images']]],
+  ['imagenotfoundlocallyexception_255',['ImageNotFoundLocallyException',['../classDockerSdk_1_1Images_1_1ImageNotFoundLocallyException.html',1,'DockerSdk::Images']]],
+  ['imagenotfoundremotelyexception_256',['ImageNotFoundRemotelyException',['../classDockerSdk_1_1Images_1_1ImageNotFoundRemotelyException.html',1,'DockerSdk::Images']]],
+  ['inetwork_257',['INetwork',['../interfaceDockerSdk_1_1Networks_1_1INetwork.html',1,'DockerSdk::Networks']]],
+  ['inetworkendpoint_258',['INetworkEndpoint',['../interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html',1,'DockerSdk::Networks']]],
+  ['inetworkinfo_259',['INetworkInfo',['../interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html',1,'DockerSdk::Networks']]]
 ];

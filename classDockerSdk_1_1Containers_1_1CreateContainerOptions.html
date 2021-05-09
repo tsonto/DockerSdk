@@ -124,6 +124,9 @@ Properties</h2></td></tr>
 <tr class="memitem:abdf5e7483bf3fe79e21d34de564115ec"><td class="memItemLeft" align="right" valign="top">Dictionary&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abdf5e7483bf3fe79e21d34de564115ec">Labels</a> = new()<code> [get]</code></td></tr>
 <tr class="memdesc:abdf5e7483bf3fe79e21d34de564115ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a Dictionary&lt;TKey, TValue&gt; for setting labels on the container.  <a href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abdf5e7483bf3fe79e21d34de564115ec">More...</a><br /></td></tr>
 <tr class="separator:abdf5e7483bf3fe79e21d34de564115ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc21e0bf77cd3cf7f3744d8873982bf9"><td class="memItemLeft" align="right" valign="top">ISet&lt; NetworkReference &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abc21e0bf77cd3cf7f3744d8873982bf9">Networks</a> = new HashSet&lt;NetworkReference&gt;()<code> [get]</code></td></tr>
+<tr class="memdesc:abc21e0bf77cd3cf7f3744d8873982bf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the set of networks to attach to the container. In additiona to the networks mentioned here, Docker may also attach the built-in network named "bridge".  <a href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#abc21e0bf77cd3cf7f3744d8873982bf9">More...</a><br /></td></tr>
+<tr class="separator:abc21e0bf77cd3cf7f3744d8873982bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Settings for how to create a container and how it should behave. </p>
@@ -423,6 +426,30 @@ Properties</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets or sets the name to give to the container. If this is null, Docker will assign a random name. </p>
+
+</div>
+</div>
+<a id="abc21e0bf77cd3cf7f3744d8873982bf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc21e0bf77cd3cf7f3744d8873982bf9">&#9670;&nbsp;</a></span>Networks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ISet&lt;NetworkReference&gt; DockerSdk.Containers.CreateContainerOptions.Networks = new HashSet&lt;NetworkReference&gt;()</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the set of networks to attach to the container. In additiona to the networks mentioned here, Docker may also attach the built-in network named "bridge". </p>
 
 </div>
 </div>

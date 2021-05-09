@@ -1,6 +1,10 @@
 var searchData=
 [
-  ['registryaccess_251',['RegistryAccess',['../classDockerSdk_1_1Registries_1_1RegistryAccess.html',1,'DockerSdk::Registries']]],
-  ['registryauthexception_252',['RegistryAuthException',['../classDockerSdk_1_1Registries_1_1RegistryAuthException.html',1,'DockerSdk::Registries']]],
-  ['resourcenotfoundexception_253',['ResourceNotFoundException',['../classDockerSdk_1_1ResourceNotFoundException.html',1,'DockerSdk']]]
+  ['networkaccess_264',['NetworkAccess',['../classDockerSdk_1_1Networks_1_1NetworkAccess.html',1,'DockerSdk::Networks']]],
+  ['networkattachedevent_265',['NetworkAttachedEvent',['../classDockerSdk_1_1Networks_1_1Events_1_1NetworkAttachedEvent.html',1,'DockerSdk::Networks::Events']]],
+  ['networkcreatedevent_266',['NetworkCreatedEvent',['../classDockerSdk_1_1Networks_1_1Events_1_1NetworkCreatedEvent.html',1,'DockerSdk::Networks::Events']]],
+  ['networkdeletedevent_267',['NetworkDeletedEvent',['../classDockerSdk_1_1Networks_1_1Events_1_1NetworkDeletedEvent.html',1,'DockerSdk::Networks::Events']]],
+  ['networkdetachedevent_268',['NetworkDetachedEvent',['../classDockerSdk_1_1Networks_1_1Events_1_1NetworkDetachedEvent.html',1,'DockerSdk::Networks::Events']]],
+  ['networkevent_269',['NetworkEvent',['../classDockerSdk_1_1Networks_1_1Events_1_1NetworkEvent.html',1,'DockerSdk::Networks::Events']]],
+  ['networknotfoundexception_270',['NetworkNotFoundException',['../classDockerSdk_1_1Networks_1_1NetworkNotFoundException.html',1,'DockerSdk::Networks']]]
 ];

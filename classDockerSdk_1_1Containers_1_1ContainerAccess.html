@@ -248,6 +248,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null. </td></tr>
     <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">NetworkNotFoundException</td><td>One of the networks specified does not exist.</td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
     <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
@@ -357,6 +358,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
     <tr><td class="paramname">ArgumentException</td><td><em>image</em>  and/or <em>options</em>  are null. </td></tr>
     <tr><td class="paramname">ImageNotFoundLocallyException</td><td>The Docker daemon cannot find the image locally, and the <a class="el" href="classDockerSdk_1_1Containers_1_1CreateContainerOptions.html#aa0479f3d03c7e6a5a1564a1e0431b1b2" title="Gets or sets a value indicating whether to pull the image prior to creating the container,...">CreateContainerOptions.PullCondition</a> option is not set to pull it automatically. </td></tr>
     <tr><td class="paramname">ImageNotFoundRemotelyException</td><td>The Docker image does not exist, even remotely. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
+    <tr><td class="paramname">NetworkNotFoundException</td><td>One of the networks specified does not exist.</td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>image</em>  input is not well-formed. &ndash;or&ndash; The options specified a name for the image, but the name does not meet the expectations of a well-formed container name. </td></tr>
     <tr><td class="paramname">RegistryAuthException</td><td>The registry requires credentials that the client hasn't been given. (Only applies when pulling an image, which is not enabled by default.) </td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
@@ -916,6 +918,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
   <table class="exception">
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null.</td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
+    <tr><td class="paramname">NetworkNotFoundException</td><td>One of the networks specified during container creation does not exist.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
   </table>
   </dd>
@@ -964,6 +967,7 @@ starting"&ndash;just that the process has been started at all. Thus, for example
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1Containers_1_1ContainerNotFoundException.html" title="Indicates that no Docker container with the given name is known to the Docker daemon.">ContainerNotFoundException</a></td><td>The indicated container does not exist.</td></tr>
+    <tr><td class="paramname">NetworkNotFoundException</td><td>One of the networks specified during container creation does not exist.</td></tr>
     <tr><td class="paramname">System.Net.Http.HttpRequestException</td><td>The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation, or timeout. </td></tr>
     <tr><td class="paramname"><a class="el" href="classDockerSdk_1_1MalformedReferenceException.html" title="Indicates that the given string is not in the expected format. This exception applies to references t...">MalformedReferenceException</a></td><td>The <em>container</em>  input is not a well-formed container reference. </td></tr>
     <tr><td class="paramname">ArgumentException</td><td><em>container</em>  is null or empty.</td></tr>
