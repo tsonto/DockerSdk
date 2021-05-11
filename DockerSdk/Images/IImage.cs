@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Images.Events;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
 
@@ -11,7 +12,7 @@ namespace DockerSdk.Images
     /// Represents a Docker image, which is a read-only template for creating containers.
     /// </summary>
     /// <seealso cref="IImageInfo"/>
-    public interface IImage
+    public interface IImage : IObservable<ImageEvent>
     {
         /// <summary>
         /// Gets the image's full ID.

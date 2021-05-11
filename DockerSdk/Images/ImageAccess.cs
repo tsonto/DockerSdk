@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Images.Events;
 using DockerSdk.Registries;
 using Core = Docker.DotNet;
 using CoreModels = Docker.DotNet.Models;
@@ -12,7 +14,7 @@ namespace DockerSdk.Images
     /// <summary>
     /// Provides methods for interacting with Docker images.
     /// </summary>
-    public class ImageAccess
+    public class ImageAccess : IObservable<ImageEvent>
     {
         internal ImageAccess(DockerClient docker)
         {
@@ -247,6 +249,17 @@ namespace DockerSdk.Images
                 return null;
             return output;
         }
+
+        /// <summary>
+        /// Subscribes to events about images.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<ImageEvent> observer)
+            => _docker.OfType<ImageEvent>().Subscribe(observer);
 
         private class NoOpProgress : IProgress<CoreModels.JSONMessage>
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
+using DockerSdk.Images.Events;
 using DockerSdk.Networks.Events;
 using Message = Docker.DotNet.Models.Message;
 
@@ -61,6 +62,7 @@ namespace DockerSdk.Events
             {
                 "container" => ContainerEvent.Wrap(message),
                 "network" => NetworkEvent.Wrap(message),
+                "image" => ImageEvent.Wrap(message),
                 _ => null
             };
 
