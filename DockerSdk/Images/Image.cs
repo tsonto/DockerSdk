@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Images.Events;
 
 namespace DockerSdk.Images
 {
@@ -38,6 +40,17 @@ namespace DockerSdk.Images
         /// <inheritdoc/>
         public Task<IContainer> RunAsync(CreateContainerOptions options, CancellationToken ct = default)
             => _client.Containers.CreateAndStartAsync(Id, options, ct);
+
+        /// <summary>
+        /// Subscribes to events from this image.
+        /// </summary>
+        /// <param name="observer">An object to observe the events.</param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
+        /// resources.
+        /// </returns>
+        public IDisposable Subscribe(IObserver<ImageEvent> observer)
+            => _client.Images.Where((Func<ImageEvent, bool>)(ev => ev.ImageReference == Id)).Subscribe(observer);
 
         // TODO: PushAsync
         // TODO: RemoveAsync

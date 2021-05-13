@@ -2,7 +2,8 @@
 $ErrorActionPreference = 'Stop'
 
 # Defines the images to build, in the order that they should be built.
-# It's intentional that "empty" is not built here--that's used for building the emdot/docker-sdk:empty image on Dockerhub.
+# It's intentional that "empty" is not built here--that's used for building the emdot/docker-sdk:empty image on Dockerhub
+# and the empty.image file used with the local registries.
 $imageDefinitions = @(
     @{
         name = 'parent'
