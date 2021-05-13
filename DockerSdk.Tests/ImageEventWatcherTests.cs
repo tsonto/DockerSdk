@@ -91,11 +91,75 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
+        public async Task LifecycleTest_PushPullDelete()
+        {
+            using var cli = new DockerCli(toh);
+            using var client = await DockerClient.StartAsync();
+
+            ImageReference? imageRef = null;
+            try
+            {
+                var events = new List<ImageEvent>();
+                using var subscription = client.Images.Subscribe(e => events.Add(e));
+
+                // `Invoke` calls return when the CLI command has run, but the Docker operation may take a bit longer to
+                // complete. This local method waits until either the expected number of events have arrived or a
+                // certain amount of time has elapsed.
+                var maxWait = TimeSpan.FromSeconds(5);
+                async Task LogCountAsync(int count)
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    while (events!.Count < count)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(100));
+                        if (sw.Elapsed > maxWait)
+                            return;
+                    }
+                }
+
+                _ = cli.Invoke($"image load --input ./scripts/empty.image");
+                await LogCountAsync(1);
+                events.Should().HaveCount(1);
+                events[0].EventType.Should().Be(ImageEventType.Loaded);
+                imageRef = events[0].ImageReference;
+
+                _ = cli.Invoke($"image push localhost:4000/ddnt:empty");
+                await LogCountAsync(2);
+                events.Should().HaveCount(2);
+                events[1].ImageReference.ToString().Should().Be("localhost:4000/ddnt:empty");
+                events[1].EventType.Should().Be(ImageEventType.Pushed);
+                events[1].Should().BeOfType<ImagePushedEvent>();
+                (events[1] as ImagePushedEvent)!.Registry.ToString().Should().Be("localhost:4000");
+
+                _ = cli.Invoke($"image rm {imageRef}");
+                await LogCountAsync(5);
+                events.RemoveAll(ev => ev.EventType == ImageEventType.Untagged);
+                events.Should().HaveCount(3);
+                events[2].ImageReference.Should().Be(imageRef);
+                events[2].EventType.Should().Be(ImageEventType.Deleted);
+                events[2].Should().BeOfType<ImageDeletedEvent>();
+                (events[2] as ImageDeletedEvent)!.ImageId!.ToString().Should().Be(imageRef.ToString());
+
+                _ = cli.Invoke($"image pull localhost:4000/ddnt:empty");
+                await LogCountAsync(4);
+                events.Should().HaveCount(4);
+                events[3].ImageReference.ToString().Should().Be("localhost:4000/ddnt:empty");
+                events[3].EventType.Should().Be(ImageEventType.Pulled);
+                events[3].Should().BeOfType<ImagePulledEvent>();
+                (events[3] as ImagePulledEvent)!.Registry.ToString().Should().Be("localhost:4000");
+            }
+            finally
+            {
+                _ = cli.Invoke($"image rm {imageRef}", ignoreErrors: true);
+            }
+        }
+
+        [Fact]
         public async Task SubscribeAndUnsubscribe_DoesNotThrow()
         {
             using var client = await DockerClient.StartAsync();
 
-            using var subscription = client.Networks.Subscribe(e => { });
+            using var subscription = client.Images.Subscribe(e => { });
         }
     }
 }

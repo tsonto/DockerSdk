@@ -16,6 +16,9 @@ namespace DockerSdk.Images.Events
         {
         }
 
+        /// <summary>
+        /// Gets the image's full ID.
+        /// </summary>
         public ImageFullId? ImageId => ImageReference as ImageFullId;
     }
 }

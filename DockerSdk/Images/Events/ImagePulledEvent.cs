@@ -12,7 +12,14 @@ namespace DockerSdk.Images.Events
         {
         }
 
+        /// <summary>
+        /// Gets the image's full ID.
+        /// </summary>
         public ImageName ImageName => (ImageName)ImageReference;
-        public RegistryReference Registry => RegistryReference.Parse(ImageName);
+
+        /// <summary>
+        /// Gets the Docker registry that the image was pulled from.
+        /// </summary>
+        public RegistryReference Registry => RegistryAccess.GetRegistryName(ImageName);
     }
 }

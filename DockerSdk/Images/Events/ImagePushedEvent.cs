@@ -8,12 +8,19 @@ namespace DockerSdk.Images.Events
     /// </summary>
     public class ImagePushedEvent : ImageEvent
     {
-        internal ImagePushedEvent(Message message) : base(message, ImageEventType.Pulled)
+        internal ImagePushedEvent(Message message) : base(message, ImageEventType.Pushed)
         {
         }
 
+        /// <summary>
+        /// Gets the image's full ID.
+        /// </summary>
         public ImageName ImageName => (ImageName)ImageReference;
-        public RegistryReference Registry => RegistryReference.Parse(ImageName);
+
+        /// <summary>
+        /// Gets the Docker registry that the image was pushed to.
+        /// </summary>
+        public RegistryReference Registry => RegistryAccess.GetRegistryName(ImageName);
             
     }
 }
