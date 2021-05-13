@@ -77,6 +77,12 @@ $(function() {
 
 <p>Provides methods for interacting with Docker images.  
  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#details">More...</a></p>
+<div class="dynheader">
+Inheritance diagram for DockerSdk.Images.ImageAccess:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classDockerSdk_1_1Images_1_1ImageAccess.png" alt=""/>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -104,6 +110,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a87e4301eee1d8d777706f295b3fa9265"><td class="memItemLeft" align="right" valign="top">async Task&lt; <a class="el" href="interfaceDockerSdk_1_1Images_1_1IImage.html">IImage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1ImageAccess.html#a87e4301eee1d8d777706f295b3fa9265">PullAsync</a> (<a class="el" href="namespaceDockerSdk_1_1Images.html#acf63d34bd9d26a759a70005ab3a96944">ImageReference</a> image, CancellationToken ct=default)</td></tr>
 <tr class="memdesc:a87e4301eee1d8d777706f295b3fa9265"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the indicated image from its remote home.  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#a87e4301eee1d8d777706f295b3fa9265">More...</a><br /></td></tr>
 <tr class="separator:a87e4301eee1d8d777706f295b3fa9265"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae98f4b07abf064e470c3979ebd44f3ef"><td class="memItemLeft" align="right" valign="top">IDisposable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDockerSdk_1_1Images_1_1ImageAccess.html#ae98f4b07abf064e470c3979ebd44f3ef">Subscribe</a> (IObserver&lt; <a class="el" href="classDockerSdk_1_1Images_1_1Events_1_1ImageEvent.html">ImageEvent</a> &gt; observer)</td></tr>
+<tr class="memdesc:ae98f4b07abf064e470c3979ebd44f3ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subscribes to events about images.  <a href="classDockerSdk_1_1Images_1_1ImageAccess.html#ae98f4b07abf064e470c3979ebd44f3ef">More...</a><br /></td></tr>
+<tr class="separator:ae98f4b07abf064e470c3979ebd44f3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides methods for interacting with Docker images. </p>
@@ -485,6 +494,33 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="ae98f4b07abf064e470c3979ebd44f3ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae98f4b07abf064e470c3979ebd44f3ef">&#9670;&nbsp;</a></span>Subscribe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IDisposable DockerSdk.Images.ImageAccess.Subscribe </td>
+          <td>(</td>
+          <td class="paramtype">IObserver&lt; <a class="el" href="classDockerSdk_1_1Images_1_1Events_1_1ImageEvent.html">ImageEvent</a> &gt;&#160;</td>
+          <td class="paramname"><em>observer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Subscribes to events about images. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observer</td><td>An object to observe the events.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An IDisposable representing the subscription. Disposing this unsubscribes and releases resources. </dd></dl>
 
 </div>
 </div>

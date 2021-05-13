@@ -82,9 +82,10 @@ Inheritance diagram for DockerSdk.Events.Event:</div>
  <div class="center">
   <img src="classDockerSdk_1_1Events_1_1Event.png" usemap="#DockerSdk.Events.Event_map" alt=""/>
   <map id="DockerSdk.Events.Event_map" name="DockerSdk.Events.Event_map">
-<area href="interfaceDockerSdk_1_1Events_1_1IEventLowLevel.html" title="Represents an event emitted by the Docker daemon. This is similar to Event, but in a less-processed f..." alt="DockerSdk.Events.IEventLowLevel" shape="rect" coords="380,0,750,24"/>
+<area href="interfaceDockerSdk_1_1Events_1_1IEventLowLevel.html" title="Represents an event emitted by the Docker daemon. This is similar to Event, but in a less-processed f..." alt="DockerSdk.Events.IEventLowLevel" shape="rect" coords="760,0,1130,24"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerEvent.html" title="Represents an event emitted by the Docker daemon about a container." alt="DockerSdk.Containers.Events.ContainerEvent" shape="rect" coords="0,112,370,136"/>
-<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkEvent.html" title="Represents an event emitted by the Docker daemon about a network." alt="DockerSdk.Networks.Events.NetworkEvent" shape="rect" coords="760,112,1130,136"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageEvent.html" title="Represents an event emitted by the Docker daemon about a container." alt="DockerSdk.Images.Events.ImageEvent" shape="rect" coords="760,112,1130,136"/>
+<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkEvent.html" title="Represents an event emitted by the Docker daemon about a network." alt="DockerSdk.Networks.Events.NetworkEvent" shape="rect" coords="1520,112,1890,136"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerCreatedEvent.html" title="Represents a notification of the creation of a new container. It will be at the ContainerStatus...." alt="DockerSdk.Containers.Events.ContainerCreatedEvent" shape="rect" coords="380,168,750,192"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerDeletedEvent.html" title="Represents a notification that the container has been deleted." alt="DockerSdk.Containers.Events.ContainerDeletedEvent" shape="rect" coords="380,224,750,248"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerExitedEvent.html" title="Indicates that the container&#39;s main process has exited. This is a transition to the ContainerStatus...." alt="DockerSdk.Containers.Events.ContainerExitedEvent" shape="rect" coords="380,280,750,304"/>
@@ -94,10 +95,17 @@ Inheritance diagram for DockerSdk.Events.Event:</div>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerStartedEvent.html" title="Represents a notice that the container has begun its main process, transitioning to the ContainerStat..." alt="DockerSdk.Containers.Events.ContainerStartedEvent" shape="rect" coords="380,504,750,528"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerStopCompletedEvent.html" alt="DockerSdk.Containers.Events.ContainerStopCompletedEvent" shape="rect" coords="380,560,750,584"/>
 <area href="classDockerSdk_1_1Containers_1_1Events_1_1ContainerUnpausedEvent.html" alt="DockerSdk.Containers.Events.ContainerUnpausedEvent" shape="rect" coords="380,616,750,640"/>
-<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkAttachedEvent.html" title="Indicates that the network has been attached to a container." alt="DockerSdk.Networks.Events.NetworkAttachedEvent" shape="rect" coords="1140,168,1510,192"/>
-<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkCreatedEvent.html" title="Represents a notification of the creation of a new Docker network resource." alt="DockerSdk.Networks.Events.NetworkCreatedEvent" shape="rect" coords="1140,224,1510,248"/>
-<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkDeletedEvent.html" title="Represents a notification that the network has been deleted." alt="DockerSdk.Networks.Events.NetworkDeletedEvent" shape="rect" coords="1140,280,1510,304"/>
-<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkDetachedEvent.html" title="Indicates that the network has been detached from a container." alt="DockerSdk.Networks.Events.NetworkDetachedEvent" shape="rect" coords="1140,336,1510,360"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageDeletedEvent.html" title="Represents a notification of the deletion of an image." alt="DockerSdk.Images.Events.ImageDeletedEvent" shape="rect" coords="1140,168,1510,192"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageLoadedEvent.html" title="Represents a notification of an image being loaded from a file or stream." alt="DockerSdk.Images.Events.ImageLoadedEvent" shape="rect" coords="1140,224,1510,248"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImagePulledEvent.html" title="Represents a notification of the creation of a new image." alt="DockerSdk.Images.Events.ImagePulledEvent" shape="rect" coords="1140,280,1510,304"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImagePushedEvent.html" title="Represents a notification of a local image being pushed to a registry." alt="DockerSdk.Images.Events.ImagePushedEvent" shape="rect" coords="1140,336,1510,360"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageSavedEvent.html" title="Represents a notification of a local image being saved to a file or stream." alt="DockerSdk.Images.Events.ImageSavedEvent" shape="rect" coords="1140,392,1510,416"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageTaggedEvent.html" title="Represents a notification that a tag has been removed from a local image." alt="DockerSdk.Images.Events.ImageTaggedEvent" shape="rect" coords="1140,448,1510,472"/>
+<area href="classDockerSdk_1_1Images_1_1Events_1_1ImageUntaggedEvent.html" title="Represents a notification that a tag has been removed from a local image." alt="DockerSdk.Images.Events.ImageUntaggedEvent" shape="rect" coords="1140,504,1510,528"/>
+<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkAttachedEvent.html" title="Indicates that the network has been attached to a container." alt="DockerSdk.Networks.Events.NetworkAttachedEvent" shape="rect" coords="1900,168,2270,192"/>
+<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkCreatedEvent.html" title="Represents a notification of the creation of a new Docker network resource." alt="DockerSdk.Networks.Events.NetworkCreatedEvent" shape="rect" coords="1900,224,2270,248"/>
+<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkDeletedEvent.html" title="Represents a notification that the network has been deleted." alt="DockerSdk.Networks.Events.NetworkDeletedEvent" shape="rect" coords="1900,280,2270,304"/>
+<area href="classDockerSdk_1_1Networks_1_1Events_1_1NetworkDetachedEvent.html" title="Indicates that the network has been detached from a container." alt="DockerSdk.Networks.Events.NetworkDetachedEvent" shape="rect" coords="1900,336,2270,360"/>
   </map>
 </div></div>
 <table class="memberdecls">
