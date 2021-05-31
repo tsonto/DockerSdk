@@ -170,6 +170,9 @@ namespace DockerSdk.Tests
                 RedirectStandardOutput = true,
             };
 
+            // Write the command that we're running. This is helpful for troubleshooting.
+            Write(">> docker " + subcommand);
+
             // Start the process.
             Process? process;
             try
@@ -194,9 +197,6 @@ namespace DockerSdk.Tests
                 process.BeginOutputReadLine();
                 process.ErrorDataReceived += Process_ErrorDataReceived;
                 process.BeginErrorReadLine();
-
-                // Feed the command to PowerShell via stdin.
-                Write(">> docker " + subcommand);
 
                 // Wait for the process to end.
                 process.WaitForExit();
@@ -240,8 +240,8 @@ namespace DockerSdk.Tests
             return id;
         }
 
-        public void RemoveImageIfPresent(string name)
-            => Invoke($"image rm --force \"{name}\"", ignoreErrors: true);
+        public void RemoveImageIfPresent(string reference)
+            => Invoke($"image rm --force \"{reference}\"", ignoreErrors: true);
 
         public string Run(string image, string? containerName = null, string args = "")
         {

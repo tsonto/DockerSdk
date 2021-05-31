@@ -1,0 +1,157 @@
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using DockerSdk.Builders;
+using DockerSdk.Images;
+using FluentAssertions;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace DockerSdk.Tests
+{
+    [Collection("Common")]
+    public class BuilderTests
+    {
+        public BuilderTests(ITestOutputHelper toh)
+        {
+            this.toh = toh;
+        }
+
+        private readonly ITestOutputHelper toh;
+
+        [Fact]
+        public async Task BasicCase()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            ImageFullId? id = null;
+            try
+            {
+                // Set up the build.
+                MakeBareDockerfile(contextPath);
+                var bundle = await Bundle.FromFilesAsync(contextPath, Array.Empty<string>()).ConfigureAwait(false);
+                var uut = new Builder(client);
+
+                // Build. This is the code under test.
+                var actual = await uut.BuildAsync(bundle, new()).ConfigureAwait(false);
+
+                // Verify that it created an image.
+                actual.Should().NotBeNull();
+                id = actual.Id;
+            }
+            finally
+            {
+                // Clean up.
+                if (id is not null)
+                    cli.RemoveImageIfPresent(id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        [Fact]
+        public async Task BasicCase_WithContextFilesUsingAbsolutePath()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            ImageFullId? id = null;
+            try
+            {
+                // Set up the build.
+                var file1Path = Path.Combine(contextPath, "file1");
+                File.WriteAllText(file1Path, "example contents 1");
+                var file2Path = Path.Combine(contextPath, "file2");
+                File.WriteAllBytes(file2Path, new byte[] { 1, 2, 3, 4, 5, 6, 8 });
+                MakeSmallDockerfile(contextPath);
+                var bundle = await Bundle.FromFilesAsync(contextPath, new[] { file1Path, file2Path }).ConfigureAwait(false);
+                var uut = new Builder(client);
+
+                // Build. This is the code under test.
+                var actual = await uut.BuildAsync(bundle, new()).ConfigureAwait(false);
+
+                // Verify that it created an image.
+                actual.Should().NotBeNull();
+                id = actual.Id;
+
+                // Verify that the files were copied into the image.
+                var output = cli.Invoke($"run {id} /bin/sh -c \"ls -1 file*\"");
+                output.Should().BeEquivalentTo("file1", "file2");
+            }
+            finally
+            {
+                // Clean up.
+                if (id is not null)
+                    cli.RemoveImageIfPresent(id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        [Fact]
+        public async Task BasicCase_WithContextFilesUsingRelativePath()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            ImageFullId? id = null;
+            try
+            {
+                // Set up the build.
+                var file1Path = "file1";
+                File.WriteAllText(Path.Combine(contextPath, file1Path), "example contents 1");
+                var file2Path = "file2";
+                File.WriteAllBytes(Path.Combine(contextPath, file2Path), new byte[] { 1, 2, 3, 4, 5, 6, 8 });
+                MakeSmallDockerfile(contextPath);
+                var bundle = await Bundle.FromFilesAsync(contextPath, new[] { file1Path, file2Path }).ConfigureAwait(false);
+                var uut = new Builder(client);
+
+                // Build. This is the code under test.
+                var actual = await uut.BuildAsync(bundle, new()).ConfigureAwait(false);
+
+                // Verify that it created an image.
+                actual.Should().NotBeNull();
+                id = actual.Id;
+
+                // Verify that the files were copied into the image.
+                var output = cli.Invoke($"run {id} /bin/sh -c \"ls -1 file*\"");
+                output.Should().BeEquivalentTo("file1", "file2");
+            }
+            finally
+            {
+                // Clean up.
+                if (id is not null)
+                    cli.RemoveImageIfPresent(id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        private static void DeleteDir(string path)
+        {
+            try
+            {
+                Directory.Delete(path, recursive: true);
+            }
+            catch (DirectoryNotFoundException)
+            { }
+        }
+
+        private static void MakeBareDockerfile(string directory)
+        {
+            var path = Path.Combine(directory, "Dockerfile");
+            File.WriteAllText(path, "FROM scratch\r\nCOPY . .");
+        }
+
+        private static void MakeSmallDockerfile(string directory)
+        {
+            var path = Path.Combine(directory, "Dockerfile");
+            File.WriteAllText(path, "FROM busybox:1.33.1\r\nCOPY . .");
+        }
+
+        private static string MakeTempDirectory()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "DockerSdk.Tests", Guid.NewGuid().ToString());
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
+}
