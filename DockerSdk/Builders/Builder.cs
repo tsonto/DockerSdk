@@ -23,6 +23,11 @@ namespace DockerSdk.Builders
             var request = new CoreModels.ImageBuildParameters
             {
                 Dockerfile = bundle.DockerfilePath,
+                
+                Labels = options.Labels,
+                NoCache = !options.UseBuildCache,
+                Tags = options.Tags.Select(name => name.ToString()).ToList(),
+                Target = options.TargetBuildStage,
             };
 
             using var bundleReader = await bundle.OpenTarForReadAsync().ConfigureAwait(false);
