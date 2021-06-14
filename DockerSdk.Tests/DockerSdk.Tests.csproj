@@ -39,6 +39,7 @@
     <ItemGroup>
       <None Remove="scripts\definitions.ps1" />
       <None Remove="scripts\empty\testfile.txt" />
+      <None Remove="scripts\remote\Dockerfile" />
     </ItemGroup>
 
     <ItemGroup>

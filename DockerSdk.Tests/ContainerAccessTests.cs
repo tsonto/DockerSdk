@@ -256,22 +256,22 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+            cli.Invoke("image rm emdot/dockersdk:remote --force", ignoreErrors: true);
 
             IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions { PullCondition = PullImageCondition.IfMissing };
-                container = await client.Containers.CreateAsync("emdot/dockersdk:empty", options);
+                container = await client.Containers.CreateAsync("emdot/dockersdk:remote", options);
 
-                var result = cli.Invoke("image ls emdot/dockersdk:empty --quiet");
+                var result = cli.Invoke("image ls emdot/dockersdk:remote --quiet");
                 result.Length.Should().Be(1);
             }
             finally
             {
                 if (container is not null)
                     cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
-                cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+                cli.Invoke("image rm emdot/dockersdk:remote --force", ignoreErrors: true);
             }
         }
 
