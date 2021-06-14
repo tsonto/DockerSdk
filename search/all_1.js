@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['builtinnetworksfilter_15',['BuiltInNetworksFilter',['../classDockerSdk_1_1Networks_1_1ListNetworksOptions.html#a60b4ed06bb90c38d0190d57ce11f9301',1,'DockerSdk::Networks::ListNetworksOptions']]]
+  ['buildasync_15',['BuildAsync',['../classDockerSdk_1_1Builders_1_1Builder.html#ae21efdb66ec4fd47193735759e0b0db2',1,'DockerSdk.Builders.Builder.BuildAsync(IBundle bundle, BuildOptions options, CancellationToken ct=default)'],['../classDockerSdk_1_1Builders_1_1Builder.html#a49a58a0a7c1add27299f93c4c21f8fc6',1,'DockerSdk.Builders.Builder.BuildAsync(string contextPath, IEnumerable&lt; string &gt; filePaths, BuildOptions options, CancellationToken ct=default)'],['../classDockerSdk_1_1Builders_1_1Builder.html#a10a914b58397284ae0a935683b9bc706',1,'DockerSdk.Builders.Builder.BuildAsync(string contextPath, string dockerfilePath, IEnumerable&lt; string &gt; filePaths, BuildOptions options, CancellationToken ct=default)']]],
+  ['builder_16',['Builder',['../classDockerSdk_1_1Images_1_1ImageAccess.html#a1f05e3ab272035ca2bd50d4e169f12a0',1,'DockerSdk.Images.ImageAccess.Builder()'],['../classDockerSdk_1_1Builders_1_1Builder.html#a09325e5da4b20ea363b74a53a235a852',1,'DockerSdk.Builders.Builder.Builder()'],['../classDockerSdk_1_1Builders_1_1Builder.html',1,'DockerSdk.Builders.Builder']]],
+  ['buildoptions_17',['BuildOptions',['../classDockerSdk_1_1Builders_1_1BuildOptions.html',1,'DockerSdk::Builders']]],
+  ['builtinnetworksfilter_18',['BuiltInNetworksFilter',['../classDockerSdk_1_1Networks_1_1ListNetworksOptions.html#a60b4ed06bb90c38d0190d57ce11f9301',1,'DockerSdk::Networks::ListNetworksOptions']]]
 ];

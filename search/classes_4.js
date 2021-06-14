@@ -1,23 +1,4 @@
 var searchData=
 [
-  ['icontainer_264',['IContainer',['../interfaceDockerSdk_1_1Containers_1_1IContainer.html',1,'DockerSdk::Containers']]],
-  ['icontainerinfo_265',['IContainerInfo',['../interfaceDockerSdk_1_1Containers_1_1IContainerInfo.html',1,'DockerSdk::Containers']]],
-  ['ieventlowlevel_266',['IEventLowLevel',['../interfaceDockerSdk_1_1Events_1_1IEventLowLevel.html',1,'DockerSdk::Events']]],
-  ['iimage_267',['IImage',['../interfaceDockerSdk_1_1Images_1_1IImage.html',1,'DockerSdk::Images']]],
-  ['iimageinfo_268',['IImageInfo',['../interfaceDockerSdk_1_1Images_1_1IImageInfo.html',1,'DockerSdk::Images']]],
-  ['imageaccess_269',['ImageAccess',['../classDockerSdk_1_1Images_1_1ImageAccess.html',1,'DockerSdk::Images']]],
-  ['imagedeletedevent_270',['ImageDeletedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageDeletedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imageevent_271',['ImageEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imageloadedevent_272',['ImageLoadedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageLoadedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imagenotfoundexception_273',['ImageNotFoundException',['../classDockerSdk_1_1Images_1_1ImageNotFoundException.html',1,'DockerSdk::Images']]],
-  ['imagenotfoundlocallyexception_274',['ImageNotFoundLocallyException',['../classDockerSdk_1_1Images_1_1ImageNotFoundLocallyException.html',1,'DockerSdk::Images']]],
-  ['imagenotfoundremotelyexception_275',['ImageNotFoundRemotelyException',['../classDockerSdk_1_1Images_1_1ImageNotFoundRemotelyException.html',1,'DockerSdk::Images']]],
-  ['imagepulledevent_276',['ImagePulledEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImagePulledEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imagepushedevent_277',['ImagePushedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImagePushedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imagesavedevent_278',['ImageSavedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageSavedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imagetaggedevent_279',['ImageTaggedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageTaggedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['imageuntaggedevent_280',['ImageUntaggedEvent',['../classDockerSdk_1_1Images_1_1Events_1_1ImageUntaggedEvent.html',1,'DockerSdk::Images::Events']]],
-  ['inetwork_281',['INetwork',['../interfaceDockerSdk_1_1Networks_1_1INetwork.html',1,'DockerSdk::Networks']]],
-  ['inetworkendpoint_282',['INetworkEndpoint',['../interfaceDockerSdk_1_1Networks_1_1INetworkEndpoint.html',1,'DockerSdk::Networks']]],
-  ['inetworkinfo_283',['INetworkInfo',['../interfaceDockerSdk_1_1Networks_1_1INetworkInfo.html',1,'DockerSdk::Networks']]]
+  ['event_276',['Event',['../classDockerSdk_1_1Events_1_1Event.html',1,'DockerSdk::Events']]]
 ];
