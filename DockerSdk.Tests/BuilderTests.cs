@@ -126,6 +126,60 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
+        public async Task FilesMissingFromContext_ThrowsDockerImageBuildException()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            IImage? image = null;
+            try
+            {
+                // Set up the build.
+                MakeBareDockerfile(contextPath, "COPY does-not-exist does-not-exist");
+                var bundle = await Bundle.FromFilesAsync(contextPath, Array.Empty<string>()).ConfigureAwait(false);
+                var uut = new Builder(client);
+
+                // Build. This is the code under test.
+                await Assert.ThrowsAsync<DockerImageBuildException>(
+                    async () => image = await uut.BuildAsync(bundle, new()));
+            }
+            finally
+            {
+                // Clean up.
+                if (image?.Id is not null)
+                    cli.RemoveImageIfPresent(image.Id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        [Fact]
+        public async Task MalformedDockerfile_ThrowsDockerImageBuildException()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            IImage? image = null;
+            try
+            {
+                // Set up the build.
+                MakeBrokenDockerfile(contextPath);
+                var bundle = await Bundle.FromFilesAsync(contextPath, Array.Empty<string>()).ConfigureAwait(false);
+                var uut = new Builder(client);
+
+                // Build. This is the code under test.
+                await Assert.ThrowsAsync<DockerImageBuildException>(
+                    async () => image = await uut.BuildAsync(bundle, new()));
+            }
+            finally
+            {
+                // Clean up.
+                if (image?.Id is not null)
+                    cli.RemoveImageIfPresent(image.Id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        [Fact]
         public async Task BasicCase_WithLabels()
         {
             using var client = await DockerClient.StartAsync();
@@ -216,6 +270,18 @@ namespace DockerSdk.Tests
         {
             var path = Path.Combine(directory, "Dockerfile");
             File.WriteAllText(path, "FROM scratch\r\nCOPY . .");
+        }
+
+        private static void MakeBareDockerfile(string directory, string command)
+        {
+            var path = Path.Combine(directory, "Dockerfile");
+            File.WriteAllText(path, "FROM scratch\r\n" + command);
+        }
+
+        private static void MakeBrokenDockerfile(string directory)
+        {
+            var path = Path.Combine(directory, "Dockerfile");
+            File.WriteAllText(path, "@5RTEGRGQm$Q)#ERA(*GJ@#(@_!uI!@_$)%#^&(*^$%=%$^_&+%^$%)O#rKFVM VC\\IKRJGEIRPOgjSD{}:\"?><YUTHG,./F@`23");
         }
 
         private static void MakeSmallDockerfile(string directory)
