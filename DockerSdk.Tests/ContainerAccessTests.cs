@@ -256,22 +256,22 @@ namespace DockerSdk.Tests
             using var cli = new DockerCli(toh);
             using var client = await DockerClient.StartAsync();
 
-            cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+            cli.Invoke("image rm emdot/dockersdk:remote --force", ignoreErrors: true);
 
             IContainer? container = null;
             try
             {
                 var options = new CreateContainerOptions { PullCondition = PullImageCondition.IfMissing };
-                container = await client.Containers.CreateAsync("emdot/dockersdk:empty", options);
+                container = await client.Containers.CreateAsync("emdot/dockersdk:remote", options);
 
-                var result = cli.Invoke("image ls emdot/dockersdk:empty --quiet");
+                var result = cli.Invoke("image ls emdot/dockersdk:remote --quiet");
                 result.Length.Should().Be(1);
             }
             finally
             {
                 if (container is not null)
                     cli.Invoke("container rm --force " + container.Id, ignoreErrors: true);
-                cli.Invoke("image rm emdot/dockersdk:empty --force", ignoreErrors: true);
+                cli.Invoke("image rm emdot/dockersdk:remote --force", ignoreErrors: true);
             }
         }
 
@@ -424,7 +424,7 @@ namespace DockerSdk.Tests
             actual.RanOutOfMemory.Should().BeNull();
             actual.StartTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime);
             actual.State.Should().Be(ContainerStatus.Exited);
-            actual.StopTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.StartTime!.Value);
+            actual.StopTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime); // Don't check that StopTime >= StartTime, because I've observed that being false for this test, even according to `docker inspect`.
         }
 
         [Fact]

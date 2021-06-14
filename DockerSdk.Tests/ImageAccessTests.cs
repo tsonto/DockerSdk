@@ -9,27 +9,27 @@ using Xunit.Abstractions;
 
 namespace DockerSdk.Tests
 {
-    [Collection("Common")]
-    public class ImageAccessTests
-    {
-        public ImageAccessTests(ITestOutputHelper toh)
+        [Collection("Common")]
+        public class ImageAccessTests
         {
-            this.toh = toh;
-        }
+            public ImageAccessTests(ITestOutputHelper toh)
+            {
+                this.toh = toh;
+            }
 
-        private readonly ITestOutputHelper toh;
+            private readonly ITestOutputHelper toh;
 
-        [Fact]
-        public async Task GetAsync_ByFullId_ImageExists_Success()
-        {
-            using var client = await DockerClient.StartAsync();
-            using var cli = new DockerCli(toh);
-            string id = cli.GetImageId("ddnt:inspect-me-1");
+            [Fact]
+            public async Task GetAsync_ByFullId_ImageExists_Success()
+            {
+                using var client = await DockerClient.StartAsync();
+                using var cli = new DockerCli(toh);
+                string id = cli.GetImageId("ddnt:inspect-me-1");
 
-            IImage result = await client.Images.GetAsync(id);
+                IImage result = await client.Images.GetAsync(id);
 
-            result.Id.ToString().Should().Be(id);
-        }
+                result.Id.ToString().Should().Be(id);
+            }
 
         [Fact]
         public async Task GetAsync_ByName_ImageExists_Success()
