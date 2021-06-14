@@ -424,7 +424,7 @@ namespace DockerSdk.Tests
             actual.RanOutOfMemory.Should().BeNull();
             actual.StartTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime);
             actual.State.Should().Be(ContainerStatus.Exited);
-            actual.StopTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.StartTime!.Value);
+            actual.StopTime.Should().BeBefore(DateTimeOffset.UtcNow).And.BeAfter(actual.CreationTime); // Don't check that StopTime >= StartTime, because I've observed that being false for this test, even according to `docker inspect`.
         }
 
         [Fact]
