@@ -126,44 +126,6 @@ namespace DockerSdk.Tests
         }
 
         [Fact]
-        public async Task BasicCase_WithTags()
-        {
-            using var client = await DockerClient.StartAsync();
-            using var cli = new DockerCli(toh);
-            var contextPath = MakeTempDirectory();
-            ImageFullId? id = null;
-            try
-            {
-                // Set up the build.
-                MakeBareDockerfile(contextPath);
-                var bundle = await Bundle.FromFilesAsync(contextPath, Array.Empty<string>()).ConfigureAwait(false);
-                var uut = new Builder(client);
-                var config = new BuildOptions
-                {
-                     Tags = new [] { ImageName.Parse("ddnt:test-build-1"), ImageName.Parse("ddnt:test-build-2") },
-                };
-
-                // Build. This is the code under test.
-                var actual = await uut.BuildAsync(bundle, config).ConfigureAwait(false);
-
-                // Verify that it created an image.
-                actual.Should().NotBeNull();
-                id = actual.Id;
-
-                // Verify that it has the expected tags.
-                var output = cli.Invoke("image ls --filter=reference=ddnt:test-build-? -q");
-                output.Should().HaveCount(2);
-            }
-            finally
-            {
-                // Clean up.
-                if (id is not null)
-                    cli.RemoveImageIfPresent(id);
-                DeleteDir(contextPath);
-            }
-        }
-
-        [Fact]
         public async Task BasicCase_WithLabels()
         {
             using var client = await DockerClient.StartAsync();
@@ -192,6 +154,44 @@ namespace DockerSdk.Tests
                 var output = cli.Invoke($"image inspect {id} --format=\"{{{{json .Config.Labels}}}}\"");
                 output.Should().HaveCount(1);
                 output[0].Should().Be("{\"bird\":\"falcon\",\"mammal\":\"gopher\"}");
+            }
+            finally
+            {
+                // Clean up.
+                if (id is not null)
+                    cli.RemoveImageIfPresent(id);
+                DeleteDir(contextPath);
+            }
+        }
+
+        [Fact]
+        public async Task BasicCase_WithTags()
+        {
+            using var client = await DockerClient.StartAsync();
+            using var cli = new DockerCli(toh);
+            var contextPath = MakeTempDirectory();
+            ImageFullId? id = null;
+            try
+            {
+                // Set up the build.
+                MakeBareDockerfile(contextPath);
+                var bundle = await Bundle.FromFilesAsync(contextPath, Array.Empty<string>()).ConfigureAwait(false);
+                var uut = new Builder(client);
+                var config = new BuildOptions
+                {
+                    Tags = new[] { ImageName.Parse("ddnt:test-build-1"), ImageName.Parse("ddnt:test-build-2") },
+                };
+
+                // Build. This is the code under test.
+                var actual = await uut.BuildAsync(bundle, config).ConfigureAwait(false);
+
+                // Verify that it created an image.
+                actual.Should().NotBeNull();
+                id = actual.Id;
+
+                // Verify that it has the expected tags.
+                var output = cli.Invoke("image ls --filter=reference=ddnt:test-build-? -q");
+                output.Should().HaveCount(2);
             }
             finally
             {

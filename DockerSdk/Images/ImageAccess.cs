@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Builders;
 using DockerSdk.Images.Events;
 using DockerSdk.Registries;
 using Core = Docker.DotNet;
@@ -19,9 +20,16 @@ namespace DockerSdk.Images
         internal ImageAccess(DockerClient docker)
         {
             _docker = docker;
+            Builder = new Builder(docker);
         }
 
         private readonly DockerClient _docker;
+
+        /// <summary>
+        /// Gets a service for building Docker images.
+        /// </summary>
+        public Builder Builder { get; }
+
 
         // TODO: ExportAsync (docker image save)
 
