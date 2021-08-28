@@ -19,9 +19,9 @@ namespace DockerSdk.Tests
             subj.OnNext(3);
             list.Should().BeEmpty();
             open();
-            list.Should().BeEquivalentTo(3);
+            list.Should().BeEquivalentTo(new[] { 1 });
             subj.OnNext(5);
-            list.Should().BeEquivalentTo(3, 5);
+            list.Should().BeEquivalentTo(new[] { 3, 5 });
         }
 
         [Fact]

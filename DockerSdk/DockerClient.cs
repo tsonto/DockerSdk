@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Core;
 using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Networks;
@@ -16,7 +18,7 @@ namespace DockerSdk
     /// </summary>
     public class DockerClient : IDisposable, IObservable<Event>
     {
-        private DockerClient(Core.DockerClient core, ClientOptions options, Version negotiatedApiVersion)
+        private DockerClient(Comm core, ClientOptions options, Version negotiatedApiVersion)
         {
             // Start listening to events.
             EventListener = new EventListener(this);
@@ -59,7 +61,7 @@ namespace DockerSdk
         /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.
         /// </summary>
-        internal Core.IDockerClient Core { get; }
+        internal Comm Core { get; }
 
         internal ClientOptions Options { get; }
         internal readonly EventListener EventListener;
@@ -134,13 +136,14 @@ namespace DockerSdk
                 throw new ArgumentException("The daemon URL is required.", nameof(options));
 
             // First, establish a connection with the daemon.
-            Core.DockerClient core = options.ToCore().CreateClient();
+            Comm comm = options.ToCore().CreateClient();
 
             // Now figure out which API version to use. This will be the max API version that both sides support.
             CoreModels.VersionResponse versionInfo;
             try
             {
-                versionInfo = await core.System.GetVersionAsync(ct).ConfigureAwait(false);
+                var response = await comm.SendAsync(HttpMethod.Get, "version", null, token: ct).ConfigureAwait(false);
+                versionInfo = response.
             }
             catch (TimeoutException ex)
             {
@@ -149,13 +152,13 @@ namespace DockerSdk
             var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo, _libraryMaxApiVersion);
 
             // Replace the non-versioned core instance with a versioned instance.
-            core.Dispose();
-            core = options.ToCore().CreateClient(negotiatedApiVersion);
+            comm.Dispose();
+            comm = options.ToCore().CreateClient(negotiatedApiVersion);
 
             // Now remove the reference to the credentials so they can drop out of memory as soon as possible.
             options.Credentials = null;
 
-            return new DockerClient(core, options, negotiatedApiVersion);
+            return new DockerClient(comm, options, negotiatedApiVersion);
         }
 
         /// <summary>
