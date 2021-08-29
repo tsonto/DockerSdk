@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Networks.Events;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
 {
@@ -101,7 +101,7 @@ namespace DockerSdk.Networks
 
             try
             {
-                await client.Core.Networks.ConnectNetworkAsync(network, request, ct).ConfigureAwait(false);
+                await client.Comm.Networks.ConnectNetworkAsync(network, request, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using Newtonsoft.Json;
-using CoreModels = Docker.DotNet.Models;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Registries
 {

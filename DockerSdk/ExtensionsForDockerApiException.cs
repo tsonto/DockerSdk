@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-using Core = Docker.DotNet;
+using DockerSdk.Core;
 
 namespace DockerSdk
 {

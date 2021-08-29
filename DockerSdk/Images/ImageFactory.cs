@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Images
 {
@@ -76,7 +76,7 @@ namespace DockerSdk.Images
         {
             try
             {
-                return await client.Core.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
+                return await client.Comm.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

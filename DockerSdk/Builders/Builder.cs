@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
 
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Builders
 {
@@ -182,7 +182,7 @@ namespace DockerSdk.Builders
         {
             try
             {
-                return await client.Core.Images.BuildImageFromDockerfileAsync(bundleReader, request, ct).ConfigureAwait(false);
+                return await client.Comm.Images.BuildImageFromDockerfileAsync(bundleReader, request, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
 using DockerSdk.Networks;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Containers
 {
@@ -90,7 +90,7 @@ namespace DockerSdk.Containers
             CoreModels.ContainerInspectResponse response;
             try
             {
-                response = await docker.Core.Containers.InspectContainerAsync(reference, ct).ConfigureAwait(false);
+                response = await docker.Comm.Containers.InspectContainerAsync(reference, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

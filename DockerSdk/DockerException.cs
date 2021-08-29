@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using Core = Docker.DotNet;
+using DockerSdk.Core;
 
 namespace DockerSdk
 {

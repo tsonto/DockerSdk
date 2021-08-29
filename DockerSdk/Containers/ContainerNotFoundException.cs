@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using DockerSdk.Networks;
-using Core = Docker.DotNet;
+using DockerSdk.Core;
 
 namespace DockerSdk.Containers
 {

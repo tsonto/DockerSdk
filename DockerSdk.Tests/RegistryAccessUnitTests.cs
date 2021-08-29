@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Xunit;
 
-using CoreModels = Docker.DotNet.Models;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Tests
 {

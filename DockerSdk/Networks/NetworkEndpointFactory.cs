@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using DockerSdk.Containers;
-using CoreModels = Docker.DotNet.Models;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
 {

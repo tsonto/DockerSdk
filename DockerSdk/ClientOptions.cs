@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
-using Api = Docker.DotNet;
+using DockerSdk.Core;
 
 namespace DockerSdk
 {
@@ -20,7 +20,7 @@ namespace DockerSdk
         /// <summary>
         /// Gets or sets the credentials to use for connecting to the Docker daemon.
         /// </summary>
-        public Api.Credentials? Credentials { get; set; }
+        public Credentials? Credentials { get; set; }
 
         /// <summary>
         /// Gets or sets the Docker daemon URL to connect to. The default is localhost using a platform-appropriate
@@ -104,13 +104,9 @@ namespace DockerSdk
         /// Creates a client configuration object for use by the underlying .NET Docker API.
         /// </summary>
         /// <returns>An equivalent <see cref="Api.DockerClientConfiguration"/> object.</returns>
-        internal Api.DockerClientConfiguration ToCore()
+        internal DockerClientConfiguration ToCore()
             => new(DaemonUri, Credentials, DefaultTimeout);
 
-        private static Uri GetDefaultUri()
-        {
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            return isWindows ? new Uri("npipe://./pipe/docker_engine") : new Uri("unix:/var/run/docker.sock");
-        }
+        private static Uri GetDefaultUri() => DockerClientConfiguration.LocalDockerUri();
     }
 }

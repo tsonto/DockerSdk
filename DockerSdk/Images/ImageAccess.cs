@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using DockerSdk.Builders;
 using DockerSdk.Images.Events;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Images
 {
@@ -140,7 +140,7 @@ namespace DockerSdk.Images
             IList<CoreModels.ImagesListResponse> response;
             try
             {
-                response = await _docker.Core.Images.ListImagesAsync(request, ct).ConfigureAwait(false);
+                response = await _docker.Comm.Images.ListImagesAsync(request, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {
@@ -215,7 +215,7 @@ namespace DockerSdk.Images
             };
             try
             {
-                await _docker.Core.Images.CreateImageAsync(request, auth, new NoOpProgress(), ct).ConfigureAwait(false);
+                await _docker.Comm.Images.CreateImageAsync(request, auth, new NoOpProgress(), ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

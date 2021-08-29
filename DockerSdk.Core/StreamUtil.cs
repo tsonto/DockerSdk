@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace DockerSdk.Core.Models
 {
-    internal static class StreamUtil
+    public static class StreamUtil
     {
         private static readonly JsonSerializer jsonSerializer = new();
 
-        internal static async Task MonitorStreamAsync(Task<Stream> streamTask, Comm client, CancellationToken cancellationToken, IProgress<string> progress)
+        internal static async Task MonitorStreamAsync(Task<Stream> streamTask, Comm client, CancellationToken ct, IProgress<string> progress)
         {
             var tcs = new TaskCompletionSource<string>();
 
             using (var stream = await streamTask)
             using (var reader = new StreamReader(stream, new UTF8Encoding(false)))
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
+            using (ct.Register(() => tcs.TrySetCanceled(ct)))
             {
                 string line;
                 while ((line = await await Task.WhenAny(reader.ReadLineAsync()!, tcs.Task)) != null)
@@ -28,18 +28,22 @@ namespace DockerSdk.Core.Models
             }
         }
 
-        internal static async Task MonitorStreamForMessagesAsync<T>(Task<Stream> streamTask, Comm client, CancellationToken cancellationToken, IProgress<T> progress)
+        public static async Task MonitorStreamForMessagesAsync<T>(Task<Stream> streamTask, Comm client, CancellationToken ct, IProgress<T> progress)
         {
             var tcs = new TaskCompletionSource<bool>();
 
             using (var stream = await streamTask)
             using (var reader = new StreamReader(stream, new UTF8Encoding(false)))
             using (var jsonReader = new JsonTextReader(reader) { SupportMultipleContent = true })
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
+            using (ct.Register(() => tcs.TrySetCanceled(ct)))
             {
-                while (await await Task.WhenAny(jsonReader.ReadAsync(cancellationToken), tcs.Task))
+                while (true)
                 {
-                    var ev = await jsonSerializer.DeserializeAsync<T>(jsonReader, cancellationToken);
+                    var completedTask = await Task.WhenAny(jsonReader.ReadAsync(ct), tcs.Task).ConfigureAwait(false);
+                    if (!await completedTask) // ConfigureAwait not needed because the task has already resolved
+                        return;
+
+                    var ev = await jsonSerializer.DeserializeAsync<T>(jsonReader, ct);
                     progress.Report(ev!);
                 }
             }

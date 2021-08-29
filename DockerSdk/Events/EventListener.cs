@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Net.Http;
 using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
-using Message = Docker.DotNet.Models.Message;
+using DockerSdk.Core.Models;
+using Message = DockerSdk.Core.Models.Message;
 
 namespace DockerSdk.Events
 {
@@ -15,7 +17,17 @@ namespace DockerSdk.Events
 
             // Start the listener in the background, since it does not resolve until it's canceled.
             var progress = new Progress<Message>(Send);
-            _ = Task.Run(() => docker.Core.System.MonitorEventsAsync(new(), progress, cts.Token));
+            _ = Task.Run(async () =>
+            {
+                //docker.Comm.System.MonitorEventsAsync(new(), progress, cts.Token);
+                var streamTask = docker.Comm.StartStreamAsync(HttpMethod.Get, "events", ct: cts.Token);
+                await StreamUtil.MonitorStreamForMessagesAsync(
+                    streamTask,
+                    docker.Comm,
+                    cts.Token,
+                    progress).ConfigureAwait(false);
+            });
+
         }
 
         private readonly CancellationTokenSource cts;

@@ -6,8 +6,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Registries
 {
@@ -185,7 +185,7 @@ namespace DockerSdk.Registries
             try
             {
                 // Try to authenticate.
-                await _client.Core.System.AuthenticateAsync(authObject, ct).ConfigureAwait(false);
+                await _client.Comm.System.AuthenticateAsync(authObject, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

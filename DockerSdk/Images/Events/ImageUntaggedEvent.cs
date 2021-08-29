@@ -1,4 +1,4 @@
-﻿using Message = Docker.DotNet.Models.Message;
+﻿using Message = DockerSdk.Core.Models.Message;
 
 namespace DockerSdk.Images.Events
 {

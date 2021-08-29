@@ -20,7 +20,7 @@ namespace DockerSdk.Core
 		private readonly Version _requestedApiVersion;
 		private readonly TimeSpan _defaultTimeout;
 
-		public Comm(DockerClientConfiguration configuration, Version requestedApiVersion)
+		public Comm(DockerClientConfiguration configuration, Version? requestedApiVersion)
 		{
 			HttpMessageHandler handler = ManagedHandler.Create(configuration, out Uri uri);
 			_endpointBaseUri = uri;
@@ -54,23 +54,7 @@ namespace DockerSdk.Core
 		//	}
 		//}
 
-		internal async Task<Stream> MakeRequestForStreamAsync(
-			IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
-			HttpMethod method,
-			string path,
-			IDictionary<string, string>? query = null,
-			HttpContent? body = null,
-			IDictionary<string, string>? headers = null,
-			TimeSpan? timeout = null,
-			CancellationToken token = default)
-		{
-			var response = await PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, method, path, query, headers, body, token).ConfigureAwait(false);
-
-			await HandleIfErrorResponseAsync(response.StatusCode, response, errorHandlers);
-
-			return await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
-		}
-
+		
 		internal async Task<WriteClosableStream> MakeRequestForHijackedStreamAsync(
 			IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
 			HttpMethod method,
@@ -118,17 +102,30 @@ namespace DockerSdk.Core
 		public Task<HttpResponseMessage> SendAsync(
 			HttpMethod method,
 			string path,
-			IDictionary<string, string> query,
-			HttpContent content,
-			IDictionary<string, string> headers,
-			TimeSpan timeout,
-			CancellationToken token)
+			IDictionary<string, string>? query = null,
+			HttpContent? content = null,
+			IDictionary<string, string>? headers = null,
+			TimeSpan? timeout = null,
+			CancellationToken ct = default)
 		{
 			var request = PrepareRequest(method, path, query, headers, content);
-			return PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, request, token);
+			return PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, request, ct);
 		}
 
-		private Task<HttpResponseMessage> PrivateMakeRequestAsync(
+        public async Task<Stream> StartStreamAsync(
+            HttpMethod method,
+            string path,
+            IDictionary<string, string>? query = null,
+            HttpContent? body = null,
+            IDictionary<string, string>? headers = null,
+            TimeSpan? timeout = null,
+            CancellationToken ct = default)
+        {
+            var response = await PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, method, path, query, headers, body, ct).ConfigureAwait(false);
+            return await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+        }
+
+        private Task<HttpResponseMessage> PrivateMakeRequestAsync(
 			TimeSpan? timeout,
 			HttpCompletionOption completionOption,
 			HttpMethod method,

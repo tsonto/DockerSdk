@@ -1,6 +1,6 @@
 ﻿using DockerSdk.Events;
 using DockerSdk.Networks;
-using Message = Docker.DotNet.Models.Message;
+using Message = DockerSdk.Core.Models.Message;
 
 namespace DockerSdk.Networks.Events
 {

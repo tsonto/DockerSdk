@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
@@ -8,8 +10,9 @@ using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using Core = DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
+using NetworkAccess = DockerSdk.Networks.NetworkAccess;
 
 namespace DockerSdk
 {
@@ -23,7 +26,7 @@ namespace DockerSdk
             // Start listening to events.
             EventListener = new EventListener(this);
 
-            Core = core;
+            Comm = core;
             Options = options;
             ApiVersion = negotiatedApiVersion;
             Containers = new ContainerAccess(this);
@@ -61,7 +64,7 @@ namespace DockerSdk
         /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.
         /// </summary>
-        internal Comm Core { get; }
+        internal Comm Comm { get; }
 
         internal ClientOptions Options { get; }
         internal readonly EventListener EventListener;
@@ -136,24 +139,25 @@ namespace DockerSdk
                 throw new ArgumentException("The daemon URL is required.", nameof(options));
 
             // First, establish a connection with the daemon.
-            Comm comm = options.ToCore().CreateClient();
+            Comm comm = new Comm(options.ToCore(), null);
 
             // Now figure out which API version to use. This will be the max API version that both sides support.
-            CoreModels.VersionResponse versionInfo;
+            CoreModels.VersionResponse? versionInfo;
             try
             {
-                var response = await comm.SendAsync(HttpMethod.Get, "version", null, token: ct).ConfigureAwait(false);
-                versionInfo = response.
+                var response = await comm.SendAsync(HttpMethod.Get, "version", ct: ct).ConfigureAwait(false);
+                await response.ThrowIfNotStatusAsync(HttpStatusCode.OK).ConfigureAwait(false);
+                versionInfo = await response.DeserializeAsync<CoreModels.VersionResponse>(ct).ConfigureAwait(false);
             }
             catch (TimeoutException ex)
             {
                 throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUri}. This typically means that the daemon is not running.", ex);
             }
-            var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo, _libraryMaxApiVersion);
+            var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo!, _libraryMaxApiVersion);
 
             // Replace the non-versioned core instance with a versioned instance.
             comm.Dispose();
-            comm = options.ToCore().CreateClient(negotiatedApiVersion);
+            comm = new Comm(options.ToCore(), negotiatedApiVersion);
 
             // Now remove the reference to the credentials so they can drop out of memory as soon as possible.
             options.Credentials = null;
@@ -245,7 +249,7 @@ namespace DockerSdk
                 if (disposing)
                 {
                     EventListener.Dispose();
-                    Core?.Dispose();
+                    Comm?.Dispose();
                 }
 
                 _isDisposed = true;

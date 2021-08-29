@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Core = Docker.DotNet;
+using DockerSdk.Core;
 
 namespace DockerSdk.Networks
 {

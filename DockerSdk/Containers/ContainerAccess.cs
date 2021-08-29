@@ -12,8 +12,8 @@ using DockerSdk.Containers.Events;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Containers
 {
@@ -350,7 +350,7 @@ namespace DockerSdk.Containers
             CoreModels.CreateContainerResponse response;
             try
             {
-                response = await _docker.Core.Containers.CreateContainerAsync(request, ct).ConfigureAwait(false);
+                response = await _docker.Comm.Containers.CreateContainerAsync(request, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {
@@ -503,7 +503,7 @@ namespace DockerSdk.Containers
             IList<CoreModels.ContainerListResponse> response;
             try
             {
-                response = await _docker.Core.Containers.ListContainersAsync(request, ct).ConfigureAwait(false);
+                response = await _docker.Comm.Containers.ListContainersAsync(request, ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {
@@ -588,7 +588,7 @@ namespace DockerSdk.Containers
             bool alreadyRunning;
             try
             {
-                alreadyRunning = !await _docker.Core.Containers.StartContainerAsync(container, new(), ct).ConfigureAwait(false);
+                alreadyRunning = !await _docker.Comm.Containers.StartContainerAsync(container, new(), ct).ConfigureAwait(false);
             }
             catch (Core.DockerApiException ex)
             {

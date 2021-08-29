@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
 using DockerSdk.Images.Events;
 using DockerSdk.Networks.Events;
-using Message = Docker.DotNet.Models.Message;
+using Message = DockerSdk.Core.Models.Message;
 
 namespace DockerSdk.Events
 {
