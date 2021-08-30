@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Builders;
 
 namespace DockerSdk
 {
@@ -41,6 +42,9 @@ namespace DockerSdk
             await ThrowAsync(message).ConfigureAwait(false);
         }
 
+        public static RequestBuilder OnStatus(this HttpRequestMessage message)
+            => new(message);
+
         private class ErrorMessage
         {
             [JsonPropertyName("message")]
@@ -49,16 +53,8 @@ namespace DockerSdk
 
         private static async Task ThrowAsync(HttpResponseMessage message)
         {
-            string? errorFromBody;
-            try
-            {
-                var errorStructure = await DeserializeAsync<ErrorMessage>(message, default);
-                errorFromBody = errorStructure.Message;
-            }
-            catch
-            {
-                errorFromBody = null;
-            }
+            string errorFromBody;
+            errorFromBody = await DeserializerErrorMessage(message, errorFromBody);
 
             string MakeText(string s)
                 => string.IsNullOrEmpty(errorFromBody)
@@ -68,6 +64,7 @@ namespace DockerSdk
             var status = (int)message.StatusCode;
             Exception ex = message.StatusCode switch
             {
+                HttpStatusCode.BadRequest when errorFromBody.Contains("dockerfile parse error") => new DockerImageBuildException(MakeText("The build failed")),
                 HttpStatusCode.InternalServerError => new DockerDaemonException(MakeText("The daemon reported an internal error")),
                 _ => new DockerException(MakeText($"Unexpected response {status}")),
             };
@@ -76,6 +73,19 @@ namespace DockerSdk
             ex.Data["URL"] = message.RequestMessage?.RequestUri?.ToString();
 
             throw ex;
+        }
+
+        public static async Task<string> DeserializerErrorMessageAsync(this HttpResponseMessage message)
+        {
+            try
+            {
+                var errorStructure = await DeserializeAsync<ErrorMessage>(message, default);
+                return errorStructure.Message ?? "";
+            }
+            catch
+            {
+                return "";
+            }
         }
     }
 }

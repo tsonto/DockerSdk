@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DockerSdk.Core.Models
 {
-    public static class StreamUtil
+    internal static class StreamUtil
     {
         private static readonly JsonSerializer jsonSerializer = new();
 
@@ -28,7 +28,7 @@ namespace DockerSdk.Core.Models
             }
         }
 
-        public static async Task MonitorStreamForMessagesAsync<T>(Task<Stream> streamTask, Comm client, CancellationToken ct, IProgress<T> progress)
+        internal static async Task MonitorStreamForMessagesAsync<T>(Task<Stream> streamTask, Comm client, CancellationToken ct, IProgress<T> progress)
         {
             var tcs = new TaskCompletionSource<bool>();
 

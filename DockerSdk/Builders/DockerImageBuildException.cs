@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.Serialization;
 
 namespace DockerSdk.Builders
@@ -34,6 +36,12 @@ namespace DockerSdk.Builders
         /// </summary>
         protected DockerImageBuildException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+        }
+
+        internal static void Check(HttpResponseMessage response)
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest && ex.Message.Contains("dockerfile parse error"))
+                throw new DockerImageBuildException("The build failed: " + ex.ReadJsonMessage(), ex);
         }
     }
 }

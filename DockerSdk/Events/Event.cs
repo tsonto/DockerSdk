@@ -48,7 +48,8 @@ namespace DockerSdk.Events
         /// </remarks>
         public DateTimeOffset Timestamp { get; }
 
-        internal Task Delivered => delivery.Task;
+        // internal Task Delivered => delivery.Task;
+
         private readonly TaskCompletionSource delivery;
         private readonly Message raw;
 
@@ -66,7 +67,7 @@ namespace DockerSdk.Events
                 _ => null
             };
 
-        internal void MarkDelivered() => delivery.TrySetResult();
+        // internal void MarkDelivered() => delivery.TrySetResult();
 
         private static DateTimeOffset MakeTimestamp(long seconds, long nanoseconds)
             => DateTimeOffset.FromUnixTimeSeconds(seconds).AddSeconds(nanoseconds / 1e9);

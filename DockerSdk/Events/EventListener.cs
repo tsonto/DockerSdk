@@ -1,78 +1,58 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Core;
 using DockerSdk.Core.Models;
 using Message = DockerSdk.Core.Models.Message;
 
 namespace DockerSdk.Events
 {
-    internal sealed class EventListener : ObservableBase<Event>, IDisposable
+    internal sealed class EventListener : IDisposable
     {
-        public EventListener(DockerClient docker)
+        public EventListener(Comm comm)
         {
-            cts = new CancellationTokenSource();
-
-            // Start the listener in the background, since it does not resolve until it's canceled.
-            var progress = new Progress<Message>(Send);
-            _ = Task.Run(async () =>
-            {
-                //docker.Comm.System.MonitorEventsAsync(new(), progress, cts.Token);
-                var streamTask = docker.Comm.StartStreamAsync(HttpMethod.Get, "events", ct: cts.Token);
-                await StreamUtil.MonitorStreamForMessagesAsync(
-                    streamTask,
-                    docker.Comm,
-                    cts.Token,
-                    progress).ConfigureAwait(false);
-            });
-
+            this.comm = comm;
         }
 
-        private readonly CancellationTokenSource cts;
+        internal async Task StartAsync(CancellationToken ct)
+        {
+            var observable = await comm.Build(HttpMethod.Get, "events")
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAndStreamResults<Message>(ct).ConfigureAwait(false);
 
-        private readonly ConcurrentDictionary<RunOnDispose, IObserver<Event>> observers = new();
+            var connectable = observable
+                .Select(message => Event.Wrap(message))
+                .NotNull()
+                .Publish();
+
+            eventDisposable = connectable.Connect(); // make it a hot observable
+            eventObservable = connectable;
+        }
+
+        private readonly Comm comm;
+        private IDisposable? eventDisposable;
+        private IObservable<Event>? eventObservable;
 
         public void Dispose()
         {
-            // Stop the monitor.
-            cts.Cancel();
+            eventDisposable?.Dispose();
         }
 
-        /// <inheritdoc/>
-        protected override IDisposable SubscribeCore(IObserver<Event> observer)
+        public IDisposable Subscribe(IObserver<Event> observer)
         {
-            var disposer = new RunOnDispose();
-            observers.TryAdd(disposer, observer);
-            disposer.Action = () => observers.TryRemove(disposer, out _);
-            return disposer;
-        }
+            if (eventObservable == null)
+                throw new InvalidOperationException("Must call StartAsync before subscribing.");
 
-        private void Send(Message message)
-        {
-            // Try to convert the message into an event. If we don't recognize it, we just drop it.
-            var @event = Event.Wrap(message);
-            if (@event is null)
-                return;
-
-            // Notify observers.
-            foreach (var observer in observers.Values)
-                observer.OnNext(@event);
-
-            // Now that observers have been notified, mark the message as delivered.
-            @event.MarkDelivered();
-
-            //// Now that observers have been notified, evaluate the watches. They will automatically remove themselves
-            //// when they're satisfied or canceled.
-            //foreach (var watch in watches.Values)
-            //    watch.Test(@event);
-        }
-
-        private sealed record RunOnDispose : IDisposable
-        {
-            public Action? Action { get; set; }
-            public void Dispose() => Action?.Invoke();
+            return eventObservable.Subscribe(observer);
         }
     }
 }

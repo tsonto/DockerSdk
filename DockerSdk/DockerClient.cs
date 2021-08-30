@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Core;
 using DockerSdk.Events;
 using DockerSdk.Images;
-using DockerSdk.Networks;
 using DockerSdk.Registries;
-using Core = DockerSdk.Core;
 using CoreModels = DockerSdk.Core.Models;
 using NetworkAccess = DockerSdk.Networks.NetworkAccess;
+using Version = System.Version;
 
 namespace DockerSdk
 {
@@ -21,10 +19,9 @@ namespace DockerSdk
     /// </summary>
     public class DockerClient : IDisposable, IObservable<Event>
     {
-        private DockerClient(Comm core, ClientOptions options, Version negotiatedApiVersion)
+        private DockerClient(Comm core, ClientOptions options, Version negotiatedApiVersion, EventListener listener)
         {
-            // Start listening to events.
-            EventListener = new EventListener(this);
+            EventListener = listener;
 
             Comm = core;
             Options = options;
@@ -162,19 +159,12 @@ namespace DockerSdk
             // Now remove the reference to the credentials so they can drop out of memory as soon as possible.
             options.Credentials = null;
 
-            return new DockerClient(comm, options, negotiatedApiVersion);
-        }
+            // Listen for events.
+            var listener = new EventListener(comm);
+            await listener.StartAsync(ct).ConfigureAwait(false);
 
-        /// <summary>
-        /// Subscribes to events from the Docker daemon.
-        /// </summary>
-        /// <param name="observer">An object to observe the events.</param>
-        /// <returns>
-        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
-        /// resources.
-        /// </returns>
-        public IDisposable Subscribe(IObserver<Event> observer)
-            => EventListener.Subscribe(observer);
+            return new DockerClient(comm, options, negotiatedApiVersion, listener);
+        }
 
         /// <summary>
         /// Determines which API version to use for communications between the SDK and the Docker daemon, or throws an
@@ -229,6 +219,8 @@ namespace DockerSdk
                 throw new NotSupportedException($"This feature has not been available since API version v{maxVersion}. You are currently using API version v{version.ToString(2)}.");
         }
 
+        internal RequestBuilder BuildRequest(HttpMethod method, string path) => new RequestBuilder(Comm, method, path);
+
         #region IDisposable
 
         /// <inheritdoc/>
@@ -257,5 +249,8 @@ namespace DockerSdk
         }
 
         #endregion IDisposable
+
+        public IDisposable Subscribe(IObserver<Event> observer)
+            => EventListener.Subscribe(observer);
     }
 }
