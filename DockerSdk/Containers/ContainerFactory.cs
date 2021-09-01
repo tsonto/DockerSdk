@@ -10,6 +10,7 @@ using DockerSdk.Core;
 using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Net;
+using DockerSdk.Containers.Dto;
 
 namespace DockerSdk.Containers
 {
@@ -17,17 +18,17 @@ namespace DockerSdk.Containers
     {
         internal static async Task<IContainer> LoadAsync(DockerClient docker, ContainerReference reference, CancellationToken ct)
         {
-            CoreModels.ContainerInspectResponse raw = await LoadCoreAsync(docker, reference, ct).ConfigureAwait(false);
+            ContainerInspectResponse raw = await LoadCoreAsync(docker, reference, ct).ConfigureAwait(false);
 
-            return new Container(docker, new ContainerFullId(raw.ID));
+            return new Container(docker, new ContainerFullId(raw.Id));
         }
 
         internal static async Task<IContainerInfo> LoadInfoAsync(DockerClient docker, ContainerReference reference, CancellationToken ct)
         {
-            CoreModels.ContainerInspectResponse raw = await LoadCoreAsync(docker, reference, ct).ConfigureAwait(false);
+            ContainerInspectResponse raw = await LoadCoreAsync(docker, reference, ct).ConfigureAwait(false);
 
             // Get values for the constructor.
-            var id = new ContainerFullId(raw.ID);
+            var id = new ContainerFullId(raw.Id);
             var name = new ContainerName(raw.Name);
             var image = new Image(docker, new ImageFullId(raw.Image));
 
@@ -48,7 +49,7 @@ namespace DockerSdk.Containers
             var networks = endpointsByNetworkName.Select(kvp => kvp.Value).Select(ep => ep.Network).ToImmutableArray();
 
             // Build the network sandbox.
-            var sandbox = new NetworkSandbox(raw.NetworkSettings.SandboxID, raw.NetworkSettings.SandboxKey);
+            var sandbox = new NetworkSandbox(raw.NetworkSettings.SandboxId, raw.NetworkSettings.SandboxKey);
 
             // Create the container object
             var output = new ContainerInfo(docker, id, name, image)
@@ -63,7 +64,7 @@ namespace DockerSdk.Containers
                 IsRunningOrPaused = isRunningOrPaused,
                 Labels = raw.Config.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                 MainProcessId = isRunningOrPaused ? raw.State.Pid : null,
-                RanOutOfMemory = state == ContainerStatus.Dead ? raw.State.OOMKilled : null,
+                RanOutOfMemory = state == ContainerStatus.Dead ? raw.State.OomKilled : null,
                 State = state,
                 StartTime = ConvertDate(raw.State.StartedAt),
                 StopTime = ConvertDate(raw.State.FinishedAt),
@@ -76,7 +77,7 @@ namespace DockerSdk.Containers
             return output;
         }
 
-        private static DateTimeOffset? ConvertDate(string input)
+        private static DateTimeOffset? ConvertDate(string? input)
         {
             if (string.IsNullOrEmpty(input))
                 return null;
@@ -86,10 +87,10 @@ namespace DockerSdk.Containers
             return parsed;
         }
 
-        private static Task<CoreModels.ContainerInspectResponse> LoadCoreAsync(DockerClient docker, ContainerReference reference, CancellationToken ct) 
+        private static Task<ContainerInspectResponse> LoadCoreAsync(DockerClient docker, ContainerReference reference, CancellationToken ct) 
             => docker.BuildRequest(HttpMethod.Get, $"containers/{reference}/json")
                 .AcceptStatus(HttpStatusCode.OK)
                 .RejectStatus(HttpStatusCode.NotFound, _ => new ContainerNotFoundException($"No container with name or ID \"{reference}\" exists."))
-                .SendAsync<CoreModels.ContainerInspectResponse>(ct);
+                .SendAsync<ContainerInspectResponse>(ct);
     }
 }

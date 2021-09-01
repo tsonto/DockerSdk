@@ -1,4 +1,5 @@
 ﻿using System;
+using DockerSdk.Daemon;
 using FluentAssertions;
 using Xunit;
 using CoreModels = DockerSdk.Core.Models;
@@ -11,10 +12,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_DaemonRangeEngulfsSdkRange_ReturnsSdkMax()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.11",
-                APIVersion = "1.91",
+                MinimumApiVersion = "1.11",
+                ApiVersion = "1.91",
             };
             var libMin = new Version("1.31");
             var libMax = new Version("1.71");
@@ -27,10 +28,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_ExactlyOneVersionEach_SameVersion_ReturnsThatVersion()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.23",
-                APIVersion = "1.23",
+                MinimumApiVersion = "1.23",
+                ApiVersion = "1.23",
             };
             var libMin = new Version("1.23");
             var libMax = new Version("1.23");
@@ -43,10 +44,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_NoOverlap_DaemonHigher_Throws()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.71",
-                APIVersion = "1.91",
+                MinimumApiVersion = "1.71",
+                ApiVersion = "1.91",
             };
             var libMin = new Version("1.11");
             var libMax = new Version("1.31");
@@ -60,10 +61,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_NoOverlap_SdkHigher_Throws()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.11",
-                APIVersion = "1.31",
+                MinimumApiVersion = "1.11",
+                ApiVersion = "1.31",
             };
             var libMin = new Version("1.71");
             var libMax = new Version("1.91");
@@ -77,10 +78,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_Overlap_DaemonHigher_ReturnsSdkMax()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.31",
-                APIVersion = "1.91",
+                MinimumApiVersion = "1.31",
+                ApiVersion = "1.91",
             };
             var libMin = new Version("1.11");
             var libMax = new Version("1.71");
@@ -93,10 +94,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_Overlap_SdkHigher_ReturnsDaemonMax()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.11",
-                APIVersion = "1.71",
+                MinimumApiVersion = "1.11",
+                ApiVersion = "1.71",
             };
             var libMin = new Version("1.31");
             var libMax = new Version("1.91");
@@ -109,10 +110,10 @@ namespace DockerSdk.Tests
         [Fact]
         public void DetermineVersionToUse_SdkRangeEngulfsDaemonRange_ReturnsDaemonMax()
         {
-            var input = new CoreModels.VersionResponse
+            var input = new VersionResponse
             {
-                MinAPIVersion = "1.31",
-                APIVersion = "1.71",
+                MinimumApiVersion = "1.31",
+                ApiVersion = "1.71",
             };
             var libMin = new Version("1.11");
             var libMax = new Version("1.91");

@@ -113,7 +113,7 @@ namespace DockerSdk.Networks
             filters.Set("name", NameFilter);
 
             var builder = new QueryStringBuilder();
-            builder.Set("filter", filters.Build());
+            builder.Set("filters", filters.Build());
             return builder.Build();
         }
     }

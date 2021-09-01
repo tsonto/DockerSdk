@@ -19,7 +19,6 @@ namespace DockerSdk.Events
             SubjectType = type;
             Timestamp = MakeTimestamp(message.Time, message.TimeNano);
             raw = message;
-            delivery = new TaskCompletionSource();
         }
 
         /// <summary>
@@ -50,7 +49,6 @@ namespace DockerSdk.Events
 
         // internal Task Delivered => delivery.Task;
 
-        private readonly TaskCompletionSource delivery;
         private readonly Message raw;
 
         /// <summary>
@@ -66,8 +64,6 @@ namespace DockerSdk.Events
                 "image" => ImageEvent.Wrap(message),
                 _ => null
             };
-
-        // internal void MarkDelivered() => delivery.TrySetResult();
 
         private static DateTimeOffset MakeTimestamp(long seconds, long nanoseconds)
             => DateTimeOffset.FromUnixTimeSeconds(seconds).AddSeconds(nanoseconds / 1e9);

@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Core;
+using DockerSdk.Core.Models;
+using DockerSdk.Daemon;
 using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Registries;
@@ -139,12 +141,12 @@ namespace DockerSdk
             Comm comm = new Comm(options.ToCore(), null);
 
             // Now figure out which API version to use. This will be the max API version that both sides support.
-            CoreModels.VersionResponse? versionInfo;
+            VersionResponse? versionInfo;
             try
             {
                 var response = await comm.SendAsync(HttpMethod.Get, "version", ct: ct).ConfigureAwait(false);
                 await response.ThrowIfNotStatusAsync(HttpStatusCode.OK).ConfigureAwait(false);
-                versionInfo = await response.DeserializeAsync<CoreModels.VersionResponse>(ct).ConfigureAwait(false);
+                versionInfo = await response.DeserializeAsync<VersionResponse>(ct).ConfigureAwait(false);
             }
             catch (TimeoutException ex)
             {
@@ -177,19 +179,19 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// There's no overlap between what the two sides can accept.
         /// </exception>
-        internal static Version DetermineVersionToUse(Version libraryMin, CoreModels.VersionResponse daemonInfo, Version libraryMax)
+        internal static Version DetermineVersionToUse(Version libraryMin, VersionResponse daemonInfo, Version libraryMax)
         {
             // Watch out for daemons that are so old that they don't even report APIVersion.
-            if (string.IsNullOrEmpty(daemonInfo.APIVersion))
+            if (string.IsNullOrEmpty(daemonInfo.ApiVersion))
                 throw new DockerVersionException($"The daemon did not report its supported API version, which likely means that it is extremely old. The SDK only supports API versions down to v{libraryMin.ToString(2)}.");
 
             // Check that we support the daemon's max API version.
-            var daemonMaxVersion = new Version(daemonInfo.APIVersion);
+            var daemonMaxVersion = new Version(daemonInfo.ApiVersion);
             if (daemonMaxVersion < libraryMin)
                 throw new DockerVersionException($"Version mismatch: The Docker daemon only supports API versions up to v{daemonMaxVersion.ToString(2)}, and the Docker SDK library only supports API versions down to v{libraryMin.ToString(2)}.");
 
             // Check the daemon's min API version.
-            var daemonMinVersion = new Version(daemonInfo.MinAPIVersion);
+            var daemonMinVersion = new Version(daemonInfo.MinimumApiVersion);
             if (daemonMinVersion > libraryMax)
                 throw new DockerVersionException($"Version mismatch: The Docker daemon supports API versions v{daemonMinVersion.ToString(2)} through v{daemonMaxVersion.ToString(2)}, and the Docker SDK library supports API versions v{libraryMin.ToString(2)} through v{libraryMax.ToString(2)}.");
 

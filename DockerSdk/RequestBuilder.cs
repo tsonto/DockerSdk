@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -38,9 +39,9 @@ namespace DockerSdk
         private readonly HttpMethod method;
         private readonly string path;
         private HttpContent? content;
-        private List<Action<HttpStatusCode, string>> errorChecks = new();
-        private List<HttpStatusCode> allowedStatusCodes = new() { HttpStatusCode.OK };
-        private IDictionary<string, string>? headers;
+        private readonly List<Action<HttpStatusCode, string>> errorChecks = new();
+        private readonly List<HttpStatusCode> allowedStatusCodes = new() { HttpStatusCode.OK };
+        private IDictionary<string, string>? requestHeaders;
         private TimeSpan? timeout;
         private string? parameters;
 
@@ -96,14 +97,23 @@ namespace DockerSdk
         //    return this;
         //}
 
-        public RequestBuilder WithBody(Stream stream)
+        public RequestBuilder WithBody(Stream stream, Dictionary<string, string>? headers = null)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
             if (this.content != null)
                 throw new InvalidOperationException("The request content has already been set.");
             this.content = new StreamContent(stream);
+            AddHeaders(this.content.Headers, headers);
             return this;
+        }
+
+        private void AddHeaders(HttpHeaders headers, Dictionary<string, string>? dict)
+        {
+            if (dict == null)
+                return;
+            foreach (var kvp in dict)
+                headers.Add(kvp.Key, kvp.Value);
         }
 
         public RequestBuilder WithBody(HttpContent content)
@@ -116,29 +126,30 @@ namespace DockerSdk
             return this;
         }
 
-        public RequestBuilder WithJsonBody(object body, JsonSerializerOptions? serializerOptions = null)
+        public RequestBuilder WithJsonBody(object body, JsonSerializerOptions? serializerOptions = null, Dictionary<string, string>? headers = null)
         {
             if (body is null)
                 throw new ArgumentNullException(nameof(body));
             if (this.content != null)
                 throw new InvalidOperationException("The request content has already been set.");
             this.content = JsonContent.Create(body, body.GetType(), options: serializerOptions);
+            AddHeaders(content.Headers, headers);
             return this;
         }
 
-        public RequestBuilder WithHeaders(IReadOnlyDictionary<string, string>? headers)
+        public RequestBuilder WithRequestHeaders(IReadOnlyDictionary<string, string>? headers)
         {
             if (headers == null)
                 return this;
 
-            if (this.headers == null)
+            if (this.requestHeaders == null)
             {
-                this.headers = new Dictionary<string, string>(headers);
+                this.requestHeaders = new Dictionary<string, string>(headers);
             }
             else
             {
                 foreach (var pair in headers)
-                    this.headers[pair.Key] = pair.Value;
+                    this.requestHeaders[pair.Key] = pair.Value;
             }
 
             return this;
@@ -151,7 +162,7 @@ namespace DockerSdk
             {
                 ["X-Registry-Auth"] = value,
             };
-            return WithHeaders(dict);
+            return WithRequestHeaders(dict);
         }
 
         public RequestBuilder WithTimeout(TimeSpan? timeout)
@@ -165,7 +176,7 @@ namespace DockerSdk
 
         private async Task<HttpResponseMessage> SendAsync(HttpCompletionOption completionOption, CancellationToken ct)
         {
-            var response = await comm.SendAsync(method, path, parameters, content, headers, timeout, ct).ConfigureAwait(false);
+            var response = await comm.SendAsync(method, path, parameters, content, requestHeaders, completionOption, timeout, ct).ConfigureAwait(false);
 
 
             if (!allowedStatusCodes.Contains(response.StatusCode))
@@ -222,9 +233,7 @@ namespace DockerSdk
         public async Task<IObservable<T>> SendAndStreamResults<T>(JsonSerializerOptions serializerOptions, CancellationToken ct)
         {
             var response = await SendAsync(HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-            return CreateStream<T>(response, serializerOptions)
-                .SubscribeOn(ThreadPoolScheduler.Instance)
-                .ObserveOn(ThreadPoolScheduler.Instance);
+            return CreateStream<T>(response, serializerOptions);
         }
 
         private IObservable<T> CreateStream<T>(HttpResponseMessage response, JsonSerializerOptions serializerOptions)
@@ -264,8 +273,14 @@ namespace DockerSdk
 
                     return () =>
                     {
-                        cts.Dispose();
-                        task.Wait();
+                        try
+                        {
+                            cts.Dispose();
+                            task.Wait();
+                        }
+                        catch (ObjectDisposedException) { }
+                        catch (OperationCanceledException) { }
+                        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is ObjectDisposedException or OperationCanceledException)) { }
                     };
                 });
         }

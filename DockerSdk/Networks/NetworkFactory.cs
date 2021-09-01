@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
@@ -16,15 +17,15 @@ namespace DockerSdk.Networks
     {
         internal static async Task<INetwork> LoadAsync(DockerClient client, NetworkReference reference, CancellationToken ct)
         {
-            CoreModels.NetworkResponse raw = await LoadCoreAsync(client, reference, ct).ConfigureAwait(false);
-            return new Network(client, new NetworkFullId(raw.ID));
+            NetworkResponse raw = await LoadCoreAsync(client, reference, ct).ConfigureAwait(false);
+            return new Network(client, new NetworkFullId(raw.Id));
         }
 
         internal static async Task<INetworkInfo> LoadInfoAsync(DockerClient client, NetworkReference reference, CancellationToken ct)
         {
-            CoreModels.NetworkResponse raw = await LoadCoreAsync(client, reference, ct).ConfigureAwait(false);
+            NetworkResponse raw = await LoadCoreAsync(client, reference, ct).ConfigureAwait(false);
 
-            var id = new NetworkFullId(raw.ID);
+            var id = new NetworkFullId(raw.Id);
             var network = new Network(client, id);
             var name = new NetworkName(raw.Name);
 
@@ -47,15 +48,15 @@ namespace DockerSdk.Networks
                 Endpoints = endpoints,
                 EndpointsByContainerName = endpointsByContainerName,
                 NetworkDriverName = raw.Driver,
-                IpamDriverName = raw.IPAM.Driver,
-                IpamDriverOptions = raw.IPAM.Options.ToImmutableDictionary(),
+                IpamDriverName = raw.Ipam.Driver,
+                IpamDriverOptions = raw.Ipam?.Options?.ToImmutableDictionary() ?? ImmutableDictionary<string,string>.Empty,
                 IsAttachable = raw.Attachable,
                 IsIngress = raw.Ingress,
                 IsInternalOnly = raw.Internal,
                 IsIPv6Enabled = raw.EnableIPv6,
-                Labels = raw.Labels.ToImmutableDictionary(),
-                NetworkDriverOptions = raw.Options.ToImmutableDictionary(),
-                Pools = raw.IPAM.Config.Select(MakePool).ToArray(),
+                Labels = raw.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                NetworkDriverOptions = raw.Options?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                Pools = raw.Ipam?.Config?.Select(MakePool).ToArray() ?? Array.Empty<NetworkPool>(),
                 Scope = GetScope(raw.Scope),
             };
 
@@ -78,9 +79,9 @@ namespace DockerSdk.Networks
                 .RejectStatus(HttpStatusCode.NotFound, _ => new NetworkNotFoundException($"No network \"{reference}\" exists."))
                 .SendAsync<NetworkResponse>(ct);
 
-        private static NetworkPool MakePool(CoreModels.IPAMConfig raw)
+        private static NetworkPool MakePool(IpamConfig raw)
         {
-            var subnet = IPSubnet.Parse(raw.Subnet);
+            var subnet = IPSubnet.Parse(raw.Subnet!);
 
             IPAddress? gateway = null;
             if (!string.IsNullOrEmpty(raw.Gateway))
@@ -91,8 +92,8 @@ namespace DockerSdk.Networks
                 range = IPSubnet.Parse(raw.IPRange);
 
             IReadOnlyDictionary<string, IPAddress> auxAddresses;
-            if (raw.AuxAddress is not null)
-                auxAddresses = raw.AuxAddress.SelectValues(str => IPAddress.Parse(str)).ToImmutableDictionary();
+            if (raw.AuxiliaryAddresses is not null)
+                auxAddresses = raw.AuxiliaryAddresses.SelectValues(str => IPAddress.Parse(str)).ToImmutableDictionary();
             else
                 auxAddresses = ImmutableDictionary<string, IPAddress>.Empty;
 

@@ -3,7 +3,7 @@ using System.Net;
 using DockerSdk.Containers;
 using FluentAssertions;
 using Xunit;
-using CoreBinding = DockerSdk.Core.Models.PortBinding;
+using CoreBinding = DockerSdk.Networks.Dto.PortBinding;
 
 namespace DockerSdk.Tests
 {

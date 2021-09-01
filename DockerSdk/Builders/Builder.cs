@@ -52,7 +52,7 @@ namespace DockerSdk.Builders
             using Stream bundleReader = await bundle.OpenTarForReadAsync().ConfigureAwait(false);
 
             var queryParameters = options.ToQueryParameters(bundle.DockerfilePath);
-            var headers = new Dictionary<string, string>
+            var contentHeaders = new Dictionary<string, string>
             {
                 ["Content-Type"] = "application/x-tar",
                 // TODO: X-Registry-Config
@@ -61,8 +61,7 @@ namespace DockerSdk.Builders
             // Send the request to the daemon.
             var response = await client.BuildRequest(HttpMethod.Post, "build")
                 .WithParameters(queryParameters)
-                .WithBody(bundleReader)
-                .WithHeaders(headers)
+                .WithBody(bundleReader, contentHeaders)
                 .RejectStatus(HttpStatusCode.BadRequest, "dockerfile parse error", err => new DockerImageBuildException($"The build failed: {err}"))
                 .SendAndStreamResults<ImageBuildMessage>(ct).ConfigureAwait(false);
 
@@ -89,6 +88,9 @@ namespace DockerSdk.Builders
         {
             [JsonPropertyName("aux")]
             public ImageBuildMessageAux? Aux { get; set; }
+
+            [JsonPropertyName("stream")]
+            public string? Stream { get; set; }
         }
 
         private class ImageBuildMessageAux
@@ -175,15 +177,15 @@ namespace DockerSdk.Builders
             return await BuildAsync(bundle, options, ct).ConfigureAwait(false);
         }
 
-        private static JsonElement[] ReadMessages(Stream imageStream)
-        {
-            using var progressReader = new StreamReader(imageStream);
-            var lines = progressReader.ReadToEnd();
-            return lines.Split('\n')
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(line => JsonSerializer.Deserialize<JsonElement>(line))
-                .ToArray(); // must force the enumerable to resolve before progressReader is disposed
-        }
+        //private static JsonElement[] ReadMessages(Stream imageStream)
+        //{
+        //    using var progressReader = new StreamReader(imageStream);
+        //    var lines = progressReader.ReadToEnd();
+        //    return lines.Split('\n')
+        //        .Where(line => !string.IsNullOrWhiteSpace(line))
+        //        .Select(line => JsonSerializer.Deserialize<JsonElement>(line))
+        //        .ToArray(); // must force the enumerable to resolve before progressReader is disposed
+        //}
 
         //private async Task<Stream> RunAsync(CoreModels.ImageBuildParameters request, Stream bundleReader, CancellationToken ct)
         //{

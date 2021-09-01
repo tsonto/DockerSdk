@@ -150,7 +150,7 @@ namespace DockerSdk.Networks
 
             // Convert the response into network objects.
             return response
-                .Select(net => new Network(client, new NetworkFullId(net.ID)))
+                .Select(net => new Network(client, new NetworkFullId(net.Id)))
                 .ToArray();
         }
     }

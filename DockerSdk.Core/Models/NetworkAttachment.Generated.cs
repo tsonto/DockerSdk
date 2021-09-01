@@ -1,15 +1,15 @@
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿//using System.Collections.Generic;
+//using System.Runtime.Serialization;
 
-namespace DockerSdk.Core.Models
-{
-    [DataContract]
-    public class NetworkAttachment // (swarm.NetworkAttachment)
-    {
-        [DataMember(Name = "Network", EmitDefaultValue = false)]
-        public Network Network { get; set; }
+//namespace DockerSdk.Core.Models
+//{
+//    [DataContract]
+//    public class NetworkAttachment // (swarm.NetworkAttachment)
+//    {
+//        [DataMember(Name = "Network", EmitDefaultValue = false)]
+//        public Network Network { get; set; }
 
-        [DataMember(Name = "Addresses", EmitDefaultValue = false)]
-        public IList<string> Addresses { get; set; }
-    }
-}
+//        [DataMember(Name = "Addresses", EmitDefaultValue = false)]
+//        public IList<string> Addresses { get; set; }
+//    }
+//}

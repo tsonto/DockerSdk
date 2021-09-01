@@ -16,6 +16,7 @@ using DockerSdk.Core;
 using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using DockerSdk.Core.Models;
+using DockerSdk.Containers.Dto;
 
 namespace DockerSdk.Containers
 {
@@ -468,7 +469,7 @@ namespace DockerSdk.Containers
                 .SendAsync<ContainerListResponse[]>(ct);
 
             return response
-                .Select(r => new Container(_docker, new(r.ID)))
+                .Select(r => new Container(_docker, new(r.Id)))
                 .ToImmutableArray();
         }
 

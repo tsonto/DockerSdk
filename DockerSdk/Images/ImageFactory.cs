@@ -5,9 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
-using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
+using DockerSdk.Images.Dto;
 
 namespace DockerSdk.Images
 {
@@ -20,7 +18,7 @@ namespace DockerSdk.Images
 
             var raw = await LoadCoreAsync(client, image, ct).ConfigureAwait(false);
 
-            var id = new ImageFullId(raw.ID);
+            var id = new ImageFullId(raw.Id);
             return new Image(client, id);
         }
 
@@ -42,8 +40,8 @@ namespace DockerSdk.Images
 
             var raw = await LoadCoreAsync(client, image, ct).ConfigureAwait(false);
 
-            var id = new ImageFullId(raw.ID);
-            var osType = Enum.Parse<GuestOsType>(raw.Os, true);
+            var id = new ImageFullId(raw.Id);
+            var osType = Enum.Parse<GuestOsType>(raw.OS, true);
             var parent = string.IsNullOrEmpty(raw.Parent)
                 ? null
                 : new Image(client, new ImageFullId(raw.Parent));
@@ -74,10 +72,10 @@ namespace DockerSdk.Images
                 _ => "/"
             };
 
-        private static Task<CoreModels.ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct) 
+        private static Task<ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct)
             => client.BuildRequest(HttpMethod.Get, $"images/{image}/json")
                 .RejectStatus(HttpStatusCode.NotFound, _ => new ImageNotFoundLocallyException($"Image {image} does not exist locally."))
                 .AcceptStatus(HttpStatusCode.OK)
-                .SendAsync<CoreModels.ImageInspectResponse>(ct);
+                .SendAsync<ImageInspectResponse>(ct);
     }
 }
