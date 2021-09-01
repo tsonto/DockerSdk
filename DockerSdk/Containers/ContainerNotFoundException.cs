@@ -44,19 +44,19 @@ namespace DockerSdk.Containers
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        internal static bool TryWrap(Core.DockerApiException ex, ContainerReference container, [NotNullWhen(returnValue: true)] out DockerException? wrapper)
-        {
-            if (ex is Core.DockerContainerNotFoundException)
-            {
-                wrapper = Wrap(ex, container);
-                return true;
-            }
+        //internal static bool TryWrap(Core.DockerApiException ex, ContainerReference container, [NotNullWhen(returnValue: true)] out DockerException? wrapper)
+        //{
+        //    if (ex is Core.DockerContainerNotFoundException)
+        //    {
+        //        wrapper = Wrap(ex, container);
+        //        return true;
+        //    }
 
-            wrapper = null;
-            return false;
-        }
+        //    wrapper = null;
+        //    return false;
+        //}
 
-        internal static ContainerNotFoundException Wrap(Core.DockerApiException ex, ContainerReference container)
-            => new($"No container \"{container}\" exists.", ex);
+        //internal static ContainerNotFoundException Wrap(Core.DockerApiException ex, ContainerReference container)
+        //    => new($"No container \"{container}\" exists.", ex);
     }
 }

@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using DockerSdk.Containers;
+using DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
 {
@@ -29,5 +33,18 @@ namespace DockerSdk.Networks
         /// supports IPv6, Docker will automatically assign an IPv6 address from the network's range.
         /// </summary>
         public IPAddress? IPv6Address { get; set; }
+
+        internal NetworkConnectParameters ToBodyObject(ContainerReference container)
+            => new NetworkConnectParameters
+            {
+                Container = container,
+                EndpointConfig = new EndpointSettings
+                {
+                    Aliases = ContainerAliases.ToArray(),
+                    DriverOpts = DriverOptions,
+                    IPAddress = IPv4Address?.ToString(),
+                    GlobalIPv6Address = IPv6Address?.ToString(),
+                },
+            };
     }
 }

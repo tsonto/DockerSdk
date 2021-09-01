@@ -4,13 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Core;
+using DockerSdk.Core.Models;
+using DockerSdk.Networks;
 
 namespace DockerSdk
 {
@@ -33,13 +37,12 @@ namespace DockerSdk
         private readonly Comm comm;
         private readonly HttpMethod method;
         private readonly string path;
-        private static readonly List<HttpStatusCode> defaultAllowedStatusCodes = new int[] { 200, 201, 202, 204 }.Select(code => (HttpStatusCode)code).ToList();
-        private QueryParameters? parameters;
         private HttpContent? content;
         private List<Action<HttpStatusCode, string>> errorChecks = new();
-        private List<HttpStatusCode> allowedStatusCodes = new();
+        private List<HttpStatusCode> allowedStatusCodes = new() { HttpStatusCode.OK };
         private IDictionary<string, string>? headers;
         private TimeSpan? timeout;
+        private string? parameters;
 
         public RequestBuilder RejectStatus(HttpStatusCode status, Func<string, Exception> makeException)
             => RejectStatus((s, e) => s == status, makeException);
@@ -66,17 +69,32 @@ namespace DockerSdk
             return this;
         }
 
-        public RequestBuilder WithParameters(QueryParameters? parameters)
+        //public RequestBuilder WithParameter(string key, string? value)
+        //{
+        //    if (value == null)
+        //        return this;
+        //    this.parameters ??= new();
+        //    parameters.Add(key, value);
+        //    return this;
+        //}
+
+        public RequestBuilder WithParameters(string parameters)
         {
-            if (parameters == null)
-                return this;
-            
-            if (this.parameters == null)
-                this.parameters = parameters;
-            else
-                this.parameters.AddRange(parameters);
+            this.parameters = parameters;
             return this;
         }
+
+        //public RequestBuilder WithParameters(QueryParameters? parameters)
+        //{
+        //    if (parameters == null)
+        //        return this;
+
+        //    if (this.parameters == null)
+        //        this.parameters = parameters;
+        //    else
+        //        this.parameters.AddRange(parameters);
+        //    return this;
+        //}
 
         public RequestBuilder WithBody(Stream stream)
         {
@@ -98,6 +116,16 @@ namespace DockerSdk
             return this;
         }
 
+        public RequestBuilder WithJsonBody(object body, JsonSerializerOptions? serializerOptions = null)
+        {
+            if (body is null)
+                throw new ArgumentNullException(nameof(body));
+            if (this.content != null)
+                throw new InvalidOperationException("The request content has already been set.");
+            this.content = JsonContent.Create(body, body.GetType(), options: serializerOptions);
+            return this;
+        }
+
         public RequestBuilder WithHeaders(IReadOnlyDictionary<string, string>? headers)
         {
             if (headers == null)
@@ -116,6 +144,16 @@ namespace DockerSdk
             return this;
         }
 
+        public RequestBuilder WithAuthHeader(AuthConfig auth)
+        {
+            var value = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(auth)).Replace("/", "_").Replace("+", "-"); // base64-url
+            var dict = new Dictionary<string, string>
+            {
+                ["X-Registry-Auth"] = value,
+            };
+            return WithHeaders(dict);
+        }
+
         public RequestBuilder WithTimeout(TimeSpan? timeout)
         {
             this.timeout = timeout;
@@ -125,12 +163,10 @@ namespace DockerSdk
         public Task<HttpResponseMessage> SendAsync(CancellationToken ct)
             => SendAsync(HttpCompletionOption.ResponseContentRead, ct);
 
-        private  async Task<HttpResponseMessage> SendAsync(HttpCompletionOption completionOption, CancellationToken ct)
+        private async Task<HttpResponseMessage> SendAsync(HttpCompletionOption completionOption, CancellationToken ct)
         {
-            var response = await comm.SendAsync(method, path, parameters, content, headers, timeout, completionOption, ct).ConfigureAwait(false);
+            var response = await comm.SendAsync(method, path, parameters, content, headers, timeout, ct).ConfigureAwait(false);
 
-            if (!allowedStatusCodes.Any())
-                allowedStatusCodes = defaultAllowedStatusCodes;
 
             if (!allowedStatusCodes.Contains(response.StatusCode))
                 await ThrowAsync(response).ConfigureAwait(false);
@@ -148,10 +184,12 @@ namespace DockerSdk
         {
             try
             {
-                var error = await response.DeserializerErrorMessageAsync().ConfigureAwait(false);
+                var error = await response.DeserializeErrorMessageAsync().ConfigureAwait(false);
                 foreach (var check in errorChecks)
                     check(response.StatusCode, error);
 
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw CreateResourceNotFoundException(error);
                 if (response.StatusCode == HttpStatusCode.InternalServerError)
                     throw new DockerDaemonException($"The Docker daemon reported an internal error: {error}");
 
@@ -164,6 +202,18 @@ namespace DockerSdk
                 ex.Data["Http.Status"] = response.StatusCode;
                 throw;
             }
+        }
+
+        private ResourceNotFoundException CreateResourceNotFoundException(string error)
+        {
+            var match = Regex.Match(error, "\"message\":\"network (.*) not found\"");
+            if (match.Success)
+            {
+                var network = match.Groups[0].Value;
+                return new NetworkNotFoundException($"No network with the name or ID \"{network}\" exists.");
+            }
+
+            return new ResourceNotFoundException(error);
         }
 
         public Task<IObservable<T>> SendAndStreamResults<T>(CancellationToken ct)
@@ -219,6 +269,5 @@ namespace DockerSdk
                     };
                 });
         }
-
     }
 }

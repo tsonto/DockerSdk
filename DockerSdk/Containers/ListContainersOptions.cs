@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using DockerSdk.Core;
 
 namespace DockerSdk.Containers
 {
@@ -80,5 +82,25 @@ namespace DockerSdk.Containers
         /// are returned to the caller.
         /// </remarks>
         public ContainerStatus? StatusFilter { get; set; }
+
+        internal string ToQueryParameters()
+        {
+            var labels = LabelValueFilters.Select(kvp => $"{kvp.Key}={kvp.Value}").Concat(LabelExistsFilters);
+
+            var filters = new QueryStringBuilder.StringStringBool();
+            filters.Set("ancestor", AncestorFilter);
+            filters.Set("exited", ExitCodeFilter);
+            filters.Set("label", labels);
+            filters.Set("name", NameFilter);
+            filters.Set("status", StatusFilter?.ToString().ToLowerInvariant());
+            // Note: This is not all available filters. As of 4/2021, these other filters exist but are not implemented
+            // here: before, expose, health, id, isolation, is-task, network, publish, since, volume.
+
+            var builder = new QueryStringBuilder();
+            builder.Set("all", !OnlyRunningContainers, false);
+            builder.Set("filters", filters);
+            builder.Set("limit", MaxResults);
+            return builder.Build();
+        }
     }
 }

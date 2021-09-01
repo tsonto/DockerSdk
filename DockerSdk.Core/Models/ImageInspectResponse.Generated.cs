@@ -29,7 +29,7 @@ namespace DockerSdk.Core.Models
         public string Container { get; set; }
 
         [DataMember(Name = "ContainerConfig", EmitDefaultValue = false)]
-        public Config ContainerConfig { get; set; }
+        public ContainerConfig ContainerConfig { get; set; }
 
         [DataMember(Name = "DockerVersion", EmitDefaultValue = false)]
         public string DockerVersion { get; set; }
@@ -38,7 +38,7 @@ namespace DockerSdk.Core.Models
         public string Author { get; set; }
 
         [DataMember(Name = "Config", EmitDefaultValue = false)]
-        public Config Config { get; set; }
+        public ContainerConfig Config { get; set; }
 
         [DataMember(Name = "Architecture", EmitDefaultValue = false)]
         public string Architecture { get; set; }

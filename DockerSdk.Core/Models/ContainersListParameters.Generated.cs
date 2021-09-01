@@ -1,9 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace DockerSdk.Core.Models
 {
-    [DataContract]
     public class ContainersListParameters // (main.ContainersListParameters)
     {
         [QueryStringParameter("size", false)]

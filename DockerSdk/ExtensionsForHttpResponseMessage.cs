@@ -42,9 +42,6 @@ namespace DockerSdk
             await ThrowAsync(message).ConfigureAwait(false);
         }
 
-        public static RequestBuilder OnStatus(this HttpRequestMessage message)
-            => new(message);
-
         private class ErrorMessage
         {
             [JsonPropertyName("message")]
@@ -54,7 +51,7 @@ namespace DockerSdk
         private static async Task ThrowAsync(HttpResponseMessage message)
         {
             string errorFromBody;
-            errorFromBody = await DeserializerErrorMessage(message, errorFromBody);
+            errorFromBody = await DeserializeErrorMessageAsync(message);
 
             string MakeText(string s)
                 => string.IsNullOrEmpty(errorFromBody)
@@ -75,7 +72,7 @@ namespace DockerSdk
             throw ex;
         }
 
-        public static async Task<string> DeserializerErrorMessageAsync(this HttpResponseMessage message)
+        public static async Task<string> DeserializeErrorMessageAsync(this HttpResponseMessage message)
         {
             try
             {

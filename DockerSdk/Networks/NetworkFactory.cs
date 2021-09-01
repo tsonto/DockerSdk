@@ -2,10 +2,12 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Core;
+using DockerSdk.Core.Models;
 using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
@@ -71,19 +73,10 @@ namespace DockerSdk.Networks
             };
         }
 
-        private static async Task<CoreModels.NetworkResponse> LoadCoreAsync(DockerClient client, NetworkReference reference, CancellationToken ct)
-        {
-            try
-            {
-                return await client.Comm.Networks.InspectNetworkAsync(reference, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (NetworkNotFoundException.TryWrap(ex, reference, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
-        }
+        private static Task<NetworkResponse> LoadCoreAsync(DockerClient client, NetworkReference reference, CancellationToken ct) 
+            => client.BuildRequest(HttpMethod.Get, $"networks/{reference}")
+                .RejectStatus(HttpStatusCode.NotFound, _ => new NetworkNotFoundException($"No network \"{reference}\" exists."))
+                .SendAsync<NetworkResponse>(ct);
 
         private static NetworkPool MakePool(CoreModels.IPAMConfig raw)
         {

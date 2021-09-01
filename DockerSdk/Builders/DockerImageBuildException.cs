@@ -37,11 +37,5 @@ namespace DockerSdk.Builders
         protected DockerImageBuildException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
-
-        internal static void Check(HttpResponseMessage response)
-        {
-            if (response.StatusCode == HttpStatusCode.BadRequest && ex.Message.Contains("dockerfile parse error"))
-                throw new DockerImageBuildException("The build failed: " + ex.ReadJsonMessage(), ex);
-        }
     }
 }

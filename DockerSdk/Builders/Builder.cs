@@ -51,7 +51,7 @@ namespace DockerSdk.Builders
             // Get a stream for reading the TAR archive.
             using Stream bundleReader = await bundle.OpenTarForReadAsync().ConfigureAwait(false);
 
-            var queryParameters = CreateQueryParameters(bundle.DockerfilePath, options);
+            var queryParameters = options.ToQueryParameters(bundle.DockerfilePath);
             var headers = new Dictionary<string, string>
             {
                 ["Content-Type"] = "application/x-tar",
@@ -95,30 +95,6 @@ namespace DockerSdk.Builders
         {
             [JsonPropertyName("ID")]
             public string? ImageId { get; set; }
-        }
-
-        private QueryParameters CreateQueryParameters(string? dockerfilePath, BuildOptions? options)
-        {
-            var qp = new QueryParameters();
-
-            if (!string.IsNullOrEmpty(dockerfilePath))
-                qp.Add("dockerfile", dockerfilePath);
-
-            options ??= new();
-
-            if (options.Labels.Any())
-                qp.Add("labels", JsonSerializer.Serialize(options.Labels));
-
-            if (!options.UseBuildCache)
-                qp.Add("nocache", "true");
-
-            foreach (var tag in options.Tags)
-                qp.Add("t", tag.ToString());
-
-            if (!string.IsNullOrEmpty(options.TargetBuildStage))
-                qp.Add("target", options.TargetBuildStage);
-
-            return qp;
         }
 
         /// <summary>

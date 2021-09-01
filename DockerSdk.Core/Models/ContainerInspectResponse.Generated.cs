@@ -114,7 +114,7 @@ namespace DockerSdk.Core.Models
         public IList<MountPoint> Mounts { get; set; }
 
         [DataMember(Name = "Config", EmitDefaultValue = false)]
-        public Config Config { get; set; }
+        public ContainerConfig Config { get; set; }
 
         [DataMember(Name = "NetworkSettings", EmitDefaultValue = false)]
         public NetworkSettings NetworkSettings { get; set; }

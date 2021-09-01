@@ -8,7 +8,7 @@ namespace DockerSdk.Images
     /// Indicates that the Docker daemon could not find the indicated image where it was looking.
     /// </summary>
     [Serializable]
-    public abstract class ImageNotFoundException : ResourceNotFoundException
+    public class ImageNotFoundException : ResourceNotFoundException
     {
         /// <summary>
         /// Creates an instance of the <see cref="ImageNotFoundException"/> class.
@@ -43,15 +43,15 @@ namespace DockerSdk.Images
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        internal static bool TryWrap(Core.DockerApiException ex, ImageReference image, [NotNullWhen(returnValue: true)] out DockerException? wrapped)
-        {
-            if (ImageNotFoundRemotelyException.TryWrap(ex, image, out wrapped))
-                return true;
-            if (ImageNotFoundLocallyException.TryWrap(ex, image, out wrapped))
-                return true;
+        //internal static bool TryWrap(Core.DockerApiException ex, ImageReference image, [NotNullWhen(returnValue: true)] out DockerException? wrapped)
+        //{
+        //    if (ImageNotFoundRemotelyException.TryWrap(ex, image, out wrapped))
+        //        return true;
+        //    if (ImageNotFoundLocallyException.TryWrap(ex, image, out wrapped))
+        //        return true;
 
-            wrapped = null;
-            return false;
-        }
+        //    wrapped = null;
+        //    return false;
+        //}
     }
 }

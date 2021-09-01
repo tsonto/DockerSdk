@@ -65,7 +65,7 @@ namespace DockerSdk.Core
             IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
             HttpMethod method,
             string path,
-            QueryParameters? query = null,
+            string? query = null,
             HttpContent? body = null,
             IDictionary<string, string>? headers = null,
             CancellationToken cancellationToken = default)
@@ -84,7 +84,7 @@ namespace DockerSdk.Core
             IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
             HttpMethod method,
             string path,
-            QueryParameters? query,
+            string? query,
             CancellationToken token)
         {
             var response = await PrivateMakeRequestAsync(Timeout.InfiniteTimeSpan, HttpCompletionOption.ResponseHeadersRead, method, path, query, null, null, token);
@@ -99,7 +99,7 @@ namespace DockerSdk.Core
         internal Task<HttpResponseMessage> MakeRequestForRawResponseAsync(
             HttpMethod method,
             string path,
-            QueryParameters? query,
+            string? query,
             HttpContent body,
             IDictionary<string, string> headers,
             CancellationToken token)
@@ -108,22 +108,35 @@ namespace DockerSdk.Core
         public Task<HttpResponseMessage> SendAsync(
             HttpMethod method,
             string path,
-            QueryParameters? query = null,
+            string? query = null,
             HttpContent? content = null,
             IDictionary<string, string>? headers = null,
             TimeSpan? timeout = null,
-            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead,
             CancellationToken ct = default)
         {
             var request = PrepareRequest(method, path, query, headers, content);
             return PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, request, ct);
         }
 
+        internal Task<HttpResponseMessage> SendAsync(
+            HttpMethod method,
+            string path,
+            string? query = null,
+            HttpContent? content = null,
+            IDictionary<string, string>? headers = null,
+            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead,
+            TimeSpan? timeout = null,
+            CancellationToken ct = default)
+        {
+            var request = PrepareRequest(method, path, query, headers, content);
+            return PrivateMakeRequestAsync(timeout, completionOption, request, ct);
+        }
+
         public async Task<T> SendAndDeserializeAsync<T>(
             HttpMethod method,
             string path,
             Func<HttpResponseMessage, Task>? checkResponseAsync,
-            QueryParameters? query = null,
+            string? query = null,
             HttpContent? content = null,
             IDictionary<string, string>? headers = null,
             TimeSpan? timeout = null,
@@ -151,7 +164,7 @@ namespace DockerSdk.Core
             HttpCompletionOption completionOption,
             HttpMethod method,
             string path,
-            QueryParameters? query,
+            string? query,
             IDictionary<string, string>? headers,
             HttpContent? data,
             CancellationToken cancellationToken)
@@ -216,7 +229,7 @@ namespace DockerSdk.Core
             }
         }
 
-        private HttpRequestMessage PrepareRequest(HttpMethod method, string path, QueryParameters? query, IDictionary<string, string>? headers, HttpContent? content)
+        private HttpRequestMessage PrepareRequest(HttpMethod method, string path, string? query, IDictionary<string, string>? headers, HttpContent? content)
         {
             var request = new HttpRequestMessage
             {
@@ -236,25 +249,18 @@ namespace DockerSdk.Core
             return request;
         }
 
-        private Uri BuildUri(string path, QueryParameters? query)
+        private Uri BuildUri(string path, string? query)
         {
             var builder = new UriBuilder(_endpointBaseUri);
 
             if (this._requestedApiVersion != null)
-            {
                 builder.Path += $"v{this._requestedApiVersion}/";
-            }
 
             if (!string.IsNullOrEmpty(path))
-            {
                 builder.Path += path;
-            }
 
-            if (query != null && query.Any())
-            {
-                var queryPairs = query.Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}");
-                builder.Query = string.Join("&", queryPairs);
-            }
+            if (!string.IsNullOrEmpty(query))
+                builder.Query = query;
 
             return builder.Uri;
         }

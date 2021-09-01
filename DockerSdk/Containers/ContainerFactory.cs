@@ -8,6 +8,8 @@ using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Core;
 using CoreModels = DockerSdk.Core.Models;
+using System.Net.Http;
+using System.Net;
 
 namespace DockerSdk.Containers
 {
@@ -59,7 +61,7 @@ namespace DockerSdk.Containers
                 IsPaused = state == ContainerStatus.Paused,
                 IsRunning = state == ContainerStatus.Running,
                 IsRunningOrPaused = isRunningOrPaused,
-                Labels = raw.Config.Labels.ToImmutableDictionary(),
+                Labels = raw.Config.Labels?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                 MainProcessId = isRunningOrPaused ? raw.State.Pid : null,
                 RanOutOfMemory = state == ContainerStatus.Dead ? raw.State.OOMKilled : null,
                 State = state,
@@ -84,22 +86,10 @@ namespace DockerSdk.Containers
             return parsed;
         }
 
-        private static async Task<CoreModels.ContainerInspectResponse> LoadCoreAsync(DockerClient docker, ContainerReference reference, CancellationToken ct)
-        {
-            // Call the Docker API to load the resource.
-            CoreModels.ContainerInspectResponse response;
-            try
-            {
-                response = await docker.Comm.Containers.InspectContainerAsync(reference, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ContainerNotFoundException.TryWrap(ex, reference, out var cnfEx))
-                    throw cnfEx;
-                throw DockerException.Wrap(ex);
-            }
-
-            return response;
-        }
+        private static Task<CoreModels.ContainerInspectResponse> LoadCoreAsync(DockerClient docker, ContainerReference reference, CancellationToken ct) 
+            => docker.BuildRequest(HttpMethod.Get, $"containers/{reference}/json")
+                .AcceptStatus(HttpStatusCode.OK)
+                .RejectStatus(HttpStatusCode.NotFound, _ => new ContainerNotFoundException($"No container with name or ID \"{reference}\" exists."))
+                .SendAsync<CoreModels.ContainerInspectResponse>(ct);
     }
 }

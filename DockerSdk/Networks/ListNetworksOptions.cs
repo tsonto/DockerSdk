@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DockerSdk.Core;
 
 namespace DockerSdk.Networks
 {
@@ -73,5 +76,45 @@ namespace DockerSdk.Networks
         /// be returned. The default is null, which means to not filter by scope.
         /// </summary>
         public NetworkScope? ScopeFilter { get; set; }
+
+        internal string ToQueryString()
+        {
+            var dangling = DanglingNetworksFilter switch
+            {
+                true => "true",
+                false => "false",
+                null => null,
+            };
+
+            var type = BuiltInNetworksFilter switch
+            {
+                true => "builtin",
+                false => "custom",
+                null => null,
+            };
+
+            var scope = ScopeFilter switch
+            {
+                NetworkScope.Local => "local",
+                NetworkScope.Swarm => "swarm",
+                null => null,
+                _ => throw new NotImplementedException($"Scope type {ScopeFilter} is not supported for filtering networks.")
+            };
+
+            var labels = LabelValueFilters.Select(kvp => $"{kvp.Key}={kvp.Value}").Concat(LabelExistsFilters);
+
+            var filters = new QueryStringBuilder.StringStringBool();
+            filters.Set("dangling", dangling);
+            filters.Set("type", type);
+            filters.Set("scope", scope);
+            filters.Set("label", labels);
+            filters.Set("driver", DriverFilter);
+            filters.Set("id", IdFilter);
+            filters.Set("name", NameFilter);
+
+            var builder = new QueryStringBuilder();
+            builder.Set("filter", filters.Build());
+            return builder.Build();
+        }
     }
 }

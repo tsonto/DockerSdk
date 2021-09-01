@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -72,18 +74,10 @@ namespace DockerSdk.Images
                 _ => "/"
             };
 
-        private static async Task<CoreModels.ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct)
-        {
-            try
-            {
-                return await client.Comm.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ImageNotFoundLocallyException.TryWrap(ex, image, out var wrapped))
-                    throw wrapped;
-                throw DockerException.Wrap(ex);
-            }
-        }
+        private static Task<CoreModels.ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct) 
+            => client.BuildRequest(HttpMethod.Get, $"images/{image}/json")
+                .RejectStatus(HttpStatusCode.NotFound, _ => new ImageNotFoundLocallyException($"Image {image} does not exist locally."))
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAsync<CoreModels.ImageInspectResponse>(ct);
     }
 }

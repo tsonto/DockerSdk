@@ -43,7 +43,7 @@ namespace DockerSdk.Core.Models
                     if (!await completedTask) // ConfigureAwait not needed because the task has already resolved
                         return;
 
-                    var ev = await jsonSerializer.DeserializeAsync<T>(jsonReader, ct);
+                    var ev = jsonSerializer.Deserialize<T>(jsonReader);
                     progress.Report(ev!);
                 }
             }

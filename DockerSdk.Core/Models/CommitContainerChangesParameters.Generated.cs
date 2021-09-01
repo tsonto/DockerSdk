@@ -28,6 +28,6 @@ namespace DockerSdk.Core.Models
         public bool? Pause { get; set; }
 
         [DataMember(Name = "Config", EmitDefaultValue = false)]
-        public Config Config { get; set; }
+        public ContainerConfig Config { get; set; }
     }
 }

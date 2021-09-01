@@ -39,7 +39,7 @@ namespace DockerSdk.Registries
         private static CoreModels.AuthConfig Decode(string codedForm)
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(codedForm));
-            return JsonConvert.DeserializeObject<CoreModels.AuthConfig>(json);
+            return JsonConvert.DeserializeObject<CoreModels.AuthConfig>(json)!;
         }
 
         /// <summary>

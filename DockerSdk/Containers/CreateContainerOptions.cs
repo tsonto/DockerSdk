@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using DockerSdk.Core;
 using DockerSdk.Images;
 using DockerSdk.Networks;
+using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Containers
 {
@@ -143,5 +148,93 @@ namespace DockerSdk.Containers
 
         // NOTE: Not adding ExposedPorts because I don't see a use case for it. (Note that exposing ports is different
         // than publishing ports, which is done via PortBindings.)
+
+        internal string ToQueryString()
+        {
+            var builder = new QueryStringBuilder();
+            builder.Set("name", Name);
+            return builder.Build();
+        }
+
+        internal CoreModels.CreateContainerParameters ToBodyObject(string image)
+            => new CoreModels.CreateContainerParameters
+            {
+                Image = image,
+                Hostname = Hostname,
+                Domainname = DomainName,
+                User = User,
+                HostConfig = new CoreModels.HostConfig
+                {
+                    PortBindings = MakePortBindings(PortBindings),
+                    Isolation = IsolationTech,
+                    AutoRemove = ExitAction == ContainerExitAction.Remove,
+                    RestartPolicy = ExitAction switch
+                    {
+                        ContainerExitAction.Restart => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.Always },
+                        ContainerExitAction.RestartUnlessStopped => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.UnlessStopped },
+                        ContainerExitAction.RestartOnFailure => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.OnFailure, MaximumRetryCount = MaximumRetriesCount ?? 3 },
+                        _ => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.No }
+                    },
+                },
+                Entrypoint = Entrypoint,
+                Cmd = Command,
+                Env = MakeEnvironmentVariables(EnvironmentVariables),
+                NetworkDisabled = DisableNetworking,
+                Labels = Labels,
+                NetworkingConfig = MakeNetworkConfigs(Networks),
+            };
+
+        internal static IDictionary<string, IList<CoreModels.PortBinding>> MakePortBindings(IEnumerable<PortBinding> portBindings)
+        {
+            return (from binding in portBindings
+                    let key = GetKey(binding)
+                    group binding.HostEndpoint by key into g
+                    let hostParts = FormatEndpoints(g)
+                    select new KeyValuePair<string, IList<CoreModels.PortBinding>>(g.Key, hostParts))
+                   .ToDictionary();
+
+            string GetKey(PortBinding binding)
+                => binding.ContainerPort.ToStringI()
+                + binding.Transport switch
+                {
+                    TransportType.Udp => "/udp",
+                    TransportType.Tcp => "/tcp",
+                    _ => ""
+                };
+
+            CoreModels.PortBinding[] FormatEndpoints(IEnumerable<IPEndPoint> endpoints)
+                => endpoints.Select(FormatEndpoint).ToArray();
+
+            CoreModels.PortBinding FormatEndpoint(IPEndPoint endpoint)
+                => new()
+                {
+                    HostIP = endpoint.Address.ToString(),
+                    HostPort = endpoint.Port.ToStringI(),
+                };
+        }
+
+        private IList<string> MakeEnvironmentVariables(Dictionary<string, string?> environmentVariables)
+        {
+            if (environmentVariables.Keys.Any(k => k.Contains('=')))
+                throw new ArgumentException("Environment variable names must not contain equal signs.");
+
+            return environmentVariables
+                   .Select(Convert)
+                   .ToArray();
+
+            static string Convert(KeyValuePair<string, string?> kvp) => kvp.Value is null ? kvp.Key : $"{kvp.Key}={kvp.Value}";
+        }
+
+        private CoreModels.NetworkingConfig? MakeNetworkConfigs(IEnumerable<NetworkReference> networks)
+        {
+            if (!networks.Any())
+                return null;
+            var x = networks.ToDictionary(net => net.ToString(), net => new CoreModels.EndpointSettings());
+            return new CoreModels.NetworkingConfig
+            {
+                EndpointsConfig = x,
+            };
+
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace DockerSdk.Networks
     /// Indicates that no Docker network with the given name is known to the Docker daemon.
     /// </summary>
     [Serializable]
-    public class NetworkNotFoundException : DockerException
+    public class NetworkNotFoundException : ResourceNotFoundException
     {
         /// <summary>
         /// Creates an instance of the <see cref="NetworkNotFoundException"/> class.
@@ -41,20 +41,5 @@ namespace DockerSdk.Networks
         protected NetworkNotFoundException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        internal static bool TryWrap(Core.DockerApiException ex, NetworkReference network, [NotNullWhen(returnValue: true)] out DockerException? wrapper)
-        {
-            if (ex is Core.DockerNetworkNotFoundException)
-            {
-                wrapper = Wrap(ex, network);
-                return true;
-            }
-
-            wrapper = null;
-            return false;
-        }
-
-        internal static NetworkNotFoundException Wrap(Core.DockerApiException ex, NetworkReference network)
-            => new($"No network with the name or ID \"{network}\" exists.", ex);
     }
 }
