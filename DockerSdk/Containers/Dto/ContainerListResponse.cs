@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using DockerSdk.JsonConverters;
 using DockerSdk.Networks.Dto;
 using DockerSdk.Volumes.Dto;
 
@@ -20,6 +21,7 @@ namespace DockerSdk.Containers.Dto
 
         public string? Command { get; set; }
 
+        [JsonConverter(typeof(UnixEpochConverter))]
         public DateTimeOffset? Created { get; set; }
 
         public IList<Port>? Ports { get; set; }

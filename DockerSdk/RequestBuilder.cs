@@ -39,10 +39,6 @@ namespace DockerSdk
         private readonly JsonSerializerOptions jsonOptions = new()
         {
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-            Converters =
-            {
-                new UnixEpochConverter(),
-            }
         };
 
         private readonly Comm comm;
@@ -251,46 +247,52 @@ namespace DockerSdk
             return Observable.Create<T>(
                 observer =>
                 {
-                    using CancellationTokenSource cts = new();
+                    // The following objects are disposed when the observable is disposed.
+                    CancellationTokenSource cts = new();
+                    Stream? stream = null;
+                    StreamReader? reader = null;
+
                     var task = Task.Run(async () =>
                     {
-                        using var stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false);
-                        using var reader = new StreamReader(stream, Encoding.UTF8);
-                        try
+                        stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false);
+                        reader = new StreamReader(stream, Encoding.UTF8);
+                        while (!cts.IsCancellationRequested)
                         {
-                            while (!cts.IsCancellationRequested)
+                            string? line = await reader.ReadLineAsync().ConfigureAwait(false);
+                            if (line == null)
                             {
-                                string? line = await reader.ReadLineAsync().ConfigureAwait(false);
-                                if (line == null)
-                                {
-                                    observer.OnCompleted();
-                                    return;
-                                }
-
-                                T? item = JsonSerializer.Deserialize<T>(line, serializerOptions ?? jsonOptions);
-                                if (item == null) // TODO: and T is not nullable
-                                {
-                                    observer.OnError(new InvalidOperationException("Unexpected null item in HTTP stream."));
-                                    return;
-                                }
-
-                                observer.OnNext(item);
+                                observer.OnCompleted();
+                                return;
                             }
+
+                            T? item = JsonSerializer.Deserialize<T>(line, serializerOptions ?? jsonOptions);
+                            if (item == null) // TODO: and T is not nullable
+                            {
+                                observer.OnError(new InvalidOperationException("Unexpected null item in HTTP stream."));
+                                return;
+                            }
+
+                            observer.OnNext(item);
                         }
-                        catch (ObjectDisposedException) { }
-                        catch (OperationCanceledException) { }
                     });
 
                     return () =>
                     {
+                        cts.Cancel();
+                        reader?.Dispose();
+                        stream?.Dispose();
+
+                        // Wait for the task to complete, to ensure that we surface any relevant exceptions.
                         try
                         {
-                            cts.Dispose();
                             task.Wait();
                         }
                         catch (ObjectDisposedException) { }
                         catch (OperationCanceledException) { }
                         catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is ObjectDisposedException or OperationCanceledException)) { }
+
+                        cts.Dispose();
+                        response.Dispose();
                     };
                 });
         }

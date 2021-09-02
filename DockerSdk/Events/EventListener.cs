@@ -30,6 +30,7 @@ namespace DockerSdk.Events
                 .SendAndStreamResults<Message>(ct).ConfigureAwait(false);
 
             var connectable = observable
+                .ObserveOn(ThreadPoolScheduler.Instance)
                 .Select(message => Event.Wrap(message))
                 .NotNull()
                 .Publish();

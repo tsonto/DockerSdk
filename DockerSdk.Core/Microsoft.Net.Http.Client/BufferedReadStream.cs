@@ -204,7 +204,10 @@ namespace Microsoft.Net.Http.Client
 
                 if (_bufferCount == 0)
                 {
-                    throw new IOException("Unexpected end of stream");
+                    if (_disposed)
+                        throw new ObjectDisposedException(nameof(BufferedReadStream));
+                    else
+                        throw new IOException("Unexpected end of stream");
                 }
             }
         }
