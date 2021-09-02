@@ -201,19 +201,33 @@ namespace DockerSdk
         {
             try
             {
+                // Run the provided checks.
                 var error = await response.DeserializeErrorMessageAsync().ConfigureAwait(false);
                 foreach (var check in errorChecks)
                     check(response.StatusCode, error);
 
+                // Use a specific exception for uncaught 404s.
                 if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    // Try to use the most specific exception we can.
+                    var match = Regex.Match(error, "^network (.*) not found$");
+                    if (match.Success)
+                        throw new NetworkNotFoundException($"No network with name or ID \"{match.Groups[1].Value}\" exists.");
+                    
+                    // Use the "any" exception.
                     throw CreateResourceNotFoundException(error);
+                }
+
+                // Use a specific exception for uncaught 500s.
                 if (response.StatusCode == HttpStatusCode.InternalServerError)
                     throw new DockerDaemonException($"The Docker daemon reported an internal error: {error}");
 
+                // Use a general exception for everything else.
                 throw new DockerException($"The request received unexpected response code {(int)response.StatusCode}: {error}");
             }
             catch (Exception ex)
             {
+                // Augment the exception.
                 ex.Data["Http.Method"] = method;
                 ex.Data["Http.Path"] = path;
                 ex.Data["Http.Status"] = response.StatusCode;

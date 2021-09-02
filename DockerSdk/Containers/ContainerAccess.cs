@@ -331,10 +331,10 @@ namespace DockerSdk.Containers
                 .ConfigureAwait(false);
 
             // Now that we have the ID, start processing events to look for it.
-            id = response.ID;
+            id = response.Id;
             open();
 
-            var output = new Container(_docker, new ContainerFullId(response.ID));
+            var output = new Container(_docker, new ContainerFullId(response.Id));
 
             // Don't leave the method until we have acknowledgement that the operation has completed.
             await found.Task.ConfigureAwait(false);
