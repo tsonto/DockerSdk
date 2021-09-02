@@ -1,18 +1,9 @@
 ﻿using Microsoft.Net.Http.Client;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace DockerSdk.Core
 {
@@ -142,7 +133,7 @@ namespace DockerSdk.Core
         //    return result;
         //}
 
-        
+
 
         //private Task<HttpResponseMessage> PrivateMakeRequestAsync(
         //    TimeSpan? timeout,
@@ -256,5 +247,5 @@ namespace DockerSdk.Core
         }
     }
 
-    internal delegate void ApiResponseErrorHandlingDelegate(HttpStatusCode statusCode, string? responseBody);
+    //internal delegate void ApiResponseErrorHandlingDelegate(HttpStatusCode statusCode, string? responseBody);
 }

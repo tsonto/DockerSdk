@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Core;
 using DockerSdk.Core.Models;
+using DockerSdk.JsonConverters;
 using DockerSdk.Networks;
 
 namespace DockerSdk
@@ -34,6 +35,15 @@ namespace DockerSdk
             this.method = method;
             this.path = path;
         }
+
+        private readonly JsonSerializerOptions jsonOptions = new()
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new UnixEpochConverter(),
+            }
+        };
 
         private readonly Comm comm;
         private readonly HttpMethod method;
@@ -132,7 +142,7 @@ namespace DockerSdk
                 throw new ArgumentNullException(nameof(body));
             if (this.content != null)
                 throw new InvalidOperationException("The request content has already been set.");
-            this.content = JsonContent.Create(body, body.GetType(), options: serializerOptions);
+            this.content = JsonContent.Create(body, body.GetType(), options: serializerOptions ?? jsonOptions);
             AddHeaders(content.Headers, headers);
             return this;
         }
@@ -188,7 +198,7 @@ namespace DockerSdk
         public async Task<T> SendAsync<T>(CancellationToken ct)
         {
             var response = await SendAsync(HttpCompletionOption.ResponseContentRead, ct).ConfigureAwait(false);
-            return await response.DeserializeAsync<T>(ct).ConfigureAwait(false);
+            return await response.DeserializeAsync<T>(jsonOptions, ct).ConfigureAwait(false);
         }
 
         private async Task ThrowAsync(HttpResponseMessage response)
@@ -228,15 +238,15 @@ namespace DockerSdk
         }
 
         public Task<IObservable<T>> SendAndStreamResults<T>(CancellationToken ct)
-            => SendAndStreamResults<T>(new(), ct);
+            => SendAndStreamResults<T>(null, ct);
 
-        public async Task<IObservable<T>> SendAndStreamResults<T>(JsonSerializerOptions serializerOptions, CancellationToken ct)
+        public async Task<IObservable<T>> SendAndStreamResults<T>(JsonSerializerOptions? serializerOptions, CancellationToken ct)
         {
             var response = await SendAsync(HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
             return CreateStream<T>(response, serializerOptions);
         }
 
-        private IObservable<T> CreateStream<T>(HttpResponseMessage response, JsonSerializerOptions serializerOptions)
+        private IObservable<T> CreateStream<T>(HttpResponseMessage response, JsonSerializerOptions? serializerOptions)
         {
             return Observable.Create<T>(
                 observer =>
@@ -257,7 +267,7 @@ namespace DockerSdk
                                     return;
                                 }
 
-                                T? item = JsonSerializer.Deserialize<T>(line, serializerOptions);
+                                T? item = JsonSerializer.Deserialize<T>(line, serializerOptions ?? jsonOptions);
                                 if (item == null) // TODO: and T is not nullable
                                 {
                                     observer.OnError(new InvalidOperationException("Unexpected null item in HTTP stream."));

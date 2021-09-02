@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace DockerSdk.Containers.Dto
 {

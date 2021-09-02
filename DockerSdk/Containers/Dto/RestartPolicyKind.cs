@@ -1,23 +1,15 @@
-﻿
+﻿using System.Text.Json.Serialization;
+using DockerSdk.JsonConverters;
+
 namespace DockerSdk.Containers.Dto
 {
-    using System.Runtime.Serialization;
-
+    [JsonConverter(typeof(RestartPolicyKindConverter))]
     internal enum RestartPolicyKind
     {
-        [EnumMember(Value = "")]
         Undefined,
-
-        [EnumMember(Value = "no")]
         No,
-
-        [EnumMember(Value = "always")]
         Always,
-
-        [EnumMember(Value = "on-failure")]
         OnFailure,
-
-        [EnumMember(Value = "unless-stopped")]
         UnlessStopped
     }
 }
