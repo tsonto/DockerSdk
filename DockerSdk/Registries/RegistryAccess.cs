@@ -184,15 +184,19 @@ namespace DockerSdk.Registries
             if (!isInCache)
                 authObject = new AuthConfig { ServerAddress = registry };
 
-            var response = await _client.BuildRequest(HttpMethod.Post, "auth")
-                .WithJsonBody(authObject!)
-                .AcceptStatus(HttpStatusCode.NoContent) // 200 means that it generated an identity token; 204 means that it didn't
-                .RejectStatus(HttpStatusCode.NotFound, "access to the resource is denied", _ => new RegistryAuthException($"Authorization to registry {registry} failed: denied.")) // This happens when we attempt to access an image on a private registry without the credentials.
-                .RejectStatus(HttpStatusCode.Unauthorized, _ => new RegistryAuthException($"Authorization to registry {registry} failed: unauthorized."))
-                .RejectStatus(HttpStatusCode.InternalServerError, "401 Unauthorized", _ => new RegistryAuthException($"Authorization to registry {registry} failed: unauthorized."))
-                .RejectStatus(HttpStatusCode.InternalServerError, "no basic auth credentials", _ => new RegistryAuthException($"Authorization to registry {registry} failed: expected basic auth credentials.")) // This happens when we attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token.
-                .SendAsync<AuthResponse>(ct)
-                .ConfigureAwait(false);
+            AuthResponse response;
+            try // TODO: ideally we shouldn't use a try/catch for this
+            {
+                response = await _client.BuildRequest(HttpMethod.Post, "auth")
+                    .WithJsonBody(authObject!)
+                    .AcceptStatus(HttpStatusCode.NoContent) // 200 means that it generated an identity token; 204 means that it didn't
+                    .SendAsync<AuthResponse>(ct)
+                    .ConfigureAwait(false);
+            }
+            catch(RegistryAuthException)
+            {
+                return false;
+            }
 
             // If we're given an auth token, clear username/pass and start using that instead.
             if (!string.IsNullOrEmpty(response.IdentityToken))

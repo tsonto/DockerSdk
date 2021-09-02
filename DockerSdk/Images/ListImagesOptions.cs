@@ -92,7 +92,7 @@ namespace DockerSdk.Images
             var filters = new QueryStringBuilder.StringStringBool();
             filters.Set("dangling", dangling);
             filters.Set("label", labels);
-            filters.Set("references", ReferencePatternFilters);
+            filters.Set("reference", ReferencePatternFilters);
 
             var builder = new QueryStringBuilder();
             builder.Set("all", !HideIntermediateImages, false);

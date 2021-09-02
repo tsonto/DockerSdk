@@ -11,6 +11,7 @@ using DockerSdk.Core;
 using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Net;
+using DockerSdk.Images.Dto;
 
 namespace DockerSdk.Images
 {
@@ -136,10 +137,10 @@ namespace DockerSdk.Images
             var response = await _docker.BuildRequest(HttpMethod.Get, "images/json")
                 .WithParameters(options.ToQueryString())
                 .AcceptStatus(HttpStatusCode.OK)
-                .SendAsync<CoreModels.ImagesListResponse[]>(ct)
+                .SendAsync<ImagesListResponse[]>(ct)
                 .ConfigureAwait(false);
 
-            return response.Select(raw => new Image(_docker, new ImageFullId(raw.ID))).ToArray();
+            return response.Select(raw => new Image(_docker, new ImageFullId(raw.Id))).ToArray();
         }
 
         /// <summary>
@@ -235,13 +236,6 @@ namespace DockerSdk.Images
         /// </returns>
         public IDisposable Subscribe(IObserver<ImageEvent> observer)
             => _docker.OfType<ImageEvent>().Subscribe(observer);
-
-        private class NoOpProgress : IProgress<CoreModels.JSONMessage>
-        {
-            public void Report(CoreModels.JSONMessage value)
-            {
-            }
-        }
 
         // TODO: PushAsync
 

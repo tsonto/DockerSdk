@@ -17,6 +17,7 @@ using DockerSdk.Core;
 using DockerSdk.Core.Models;
 using DockerSdk.JsonConverters;
 using DockerSdk.Networks;
+using DockerSdk.Registries;
 
 namespace DockerSdk
 {
@@ -201,25 +202,38 @@ namespace DockerSdk
         {
             try
             {
-                // Run the provided checks.
                 var error = await response.DeserializeErrorMessageAsync().ConfigureAwait(false);
-                foreach (var check in errorChecks)
-                    check(response.StatusCode, error);
+                var status = response.StatusCode;
 
-                // Use a specific exception for uncaught 404s.
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                // Under some conditions the daemon will report a misleading HTTP status code. For the purposes of error checking,
+                // correct for that.
+                if (status == HttpStatusCode.NotFound && error.Contains("access to the resource is denied")) // attempt to access an image on a private registry without the credentials
+                    status = HttpStatusCode.Unauthorized;
+                else if (status == HttpStatusCode.InternalServerError && error.Contains("401 Unauthorized"))
+                    status = HttpStatusCode.Unauthorized;
+                else if (status == HttpStatusCode.InternalServerError && error.Contains("no basic auth credentials")) // attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token
+                    status = HttpStatusCode.Unauthorized;
+
+                // Run the checks provided by the caller.
+                foreach (var check in errorChecks)
+                    check(status, error);
+
+                // Use RegistryAuthException for unhandled 401s.
+                if (status == HttpStatusCode.Unauthorized)
+                    throw new RegistryAuthException($"Authorization to the registry failed: {error}");
+
+                // Use ResourceNotFoundException (or a subclass) for unhandled 404s.
+                if (status == HttpStatusCode.NotFound)
                 {
-                    // Try to use the most specific exception we can.
                     var match = Regex.Match(error, "^network (.*) not found$");
                     if (match.Success)
                         throw new NetworkNotFoundException($"No network with name or ID \"{match.Groups[1].Value}\" exists.");
                     
-                    // Use the "any" exception.
                     throw CreateResourceNotFoundException(error);
                 }
 
-                // Use a specific exception for uncaught 500s.
-                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                // Use DockerDaemonException for unhandled 500s.
+                if (status == HttpStatusCode.InternalServerError)
                     throw new DockerDaemonException($"The Docker daemon reported an internal error: {error}");
 
                 // Use a general exception for everything else.
