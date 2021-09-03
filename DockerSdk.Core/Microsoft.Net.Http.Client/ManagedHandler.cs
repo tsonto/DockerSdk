@@ -77,7 +77,12 @@ namespace Microsoft.Net.Http.Client
             do
             {
                 retry = false;
+
+                // Send the request.
                 response = await ProcessRequestAsync(request, cancellationToken);
+
+                // If the response has a redirection status code, it meets the configured redirection criteria, and we
+                // haven't exceeded the max redirections limit, update the request to the new location and try again.
                 if (redirectCount < MaxAutomaticRedirects && IsAllowedRedirectResponse(request, response))
                 {
                     redirectCount++;
@@ -89,6 +94,7 @@ namespace Microsoft.Net.Http.Client
             return response;
 		}
 
+        // TODO: rename method or move mutations out
 		private bool IsAllowedRedirectResponse(HttpRequestMessage request, HttpResponseMessage response)
 		{
 			// Are redirects enabled?
@@ -191,6 +197,7 @@ namespace Microsoft.Net.Http.Client
 			return await connection.SendAsync(request, cancellationToken);
 		}
 
+        // Copies data URL information from the request's URL to the request's Properties dictionary.
 		// Data comes from either the request.RequestUri or from the request.Properties
 		private static void ProcessUrl(HttpRequestMessage request)
 		{
@@ -203,6 +210,7 @@ namespace Microsoft.Net.Http.Client
 					throw new InvalidOperationException("Missing URL scheme");
 			}
 
+            // If we don't already have the URL scheme saved, save it now.
 			string? scheme = request.GetSchemeProperty();
 			if (string.IsNullOrWhiteSpace(scheme))
 			{
@@ -210,11 +218,12 @@ namespace Microsoft.Net.Http.Client
 				scheme = request.RequestUri.Scheme;
 				request.SetSchemeProperty(scheme);
 			}
-			if (!(request.IsHttp() || request.IsHttps()))
-			{
-				throw new InvalidOperationException("Only HTTP or HTTPS are supported, not " + request.RequestUri.Scheme);
-			}
 
+            // Only accept HTTP/HTTPS.
+			if (!request.IsHttp() && !request.IsHttps())
+				throw new InvalidOperationException("Only HTTP or HTTPS are supported, not " + request.RequestUri.Scheme);
+
+            // If we don't already have the host saved, save it now.
 			string? host = request.GetHostProperty();
 			if (string.IsNullOrWhiteSpace(host))
 			{
@@ -223,6 +232,7 @@ namespace Microsoft.Net.Http.Client
 				request.SetHostProperty(host);
 			}
 
+            // TODO: ???
 			string? connectionHost = request.GetConnectionHostProperty();
 			if (string.IsNullOrWhiteSpace(connectionHost))
 			{
@@ -237,7 +247,8 @@ namespace Microsoft.Net.Http.Client
 				request.SetPortProperty(port);
 			}
 
-			int? connectionPort = request.GetConnectionPortProperty();
+            // TODO: ???
+            int? connectionPort = request.GetConnectionPortProperty();
 			if (!connectionPort.HasValue)
 			{
 				request.SetConnectionPortProperty(port);
@@ -258,6 +269,10 @@ namespace Microsoft.Net.Http.Client
 			}
 		}
 
+        /// <summary>
+        /// Sets the request's Host header, if it hasn't already been set.
+        /// </summary>
+        /// <param name="request"></param>
 		private static void ProcessHostHeader(HttpRequestMessage request)
 		{
 			if (string.IsNullOrWhiteSpace(request.Headers.Host))
@@ -283,8 +298,8 @@ namespace Microsoft.Net.Http.Client
 			string host = request.GetHostProperty()!;
 			int port = request.GetPortProperty()!.Value;
 			string pathAndQuery = request.GetPathAndQueryProperty()!;
-			string? addressLine = request.GetAddressLineProperty();
 
+			string? addressLine = request.GetAddressLineProperty();
 			if (string.IsNullOrEmpty(addressLine))
 			{
 				request.SetAddressLineProperty(pathAndQuery);
@@ -297,11 +312,12 @@ namespace Microsoft.Net.Http.Client
 					return ProxyMode.None;
 				}
 			}
-			catch (System.PlatformNotSupportedException)
+			catch (PlatformNotSupportedException)
 			{
 				return ProxyMode.None;
 			}
 
+            // Get the proxy URL for the desired destination. If the result is null, we don't need a proxy.
 			var proxyUri = Proxy.GetProxy(request.RequestUri);
 			if (proxyUri == null)
 			{
@@ -312,13 +328,14 @@ namespace Microsoft.Net.Http.Client
 			{
 				if (string.IsNullOrEmpty(addressLine))
 				{
-					addressLine = scheme + "://" + host + ":" + port + pathAndQuery;
+					addressLine = $"{scheme}://{host}:{port}{pathAndQuery}";
 					request.SetAddressLineProperty(addressLine);
 				}
 				request.SetConnectionHostProperty(proxyUri.DnsSafeHost);
 				request.SetConnectionPortProperty(proxyUri.Port);
 				return ProxyMode.Http;
 			}
+
 			// Tunneling generates a completely seperate request, don't alter the original, just the connection address.
 			request.SetConnectionHostProperty(proxyUri.DnsSafeHost);
 			request.SetConnectionPortProperty(proxyUri.Port);
@@ -376,11 +393,11 @@ namespace Microsoft.Net.Http.Client
 			connectRequest.SetAddressLineProperty(authority);
 			connectRequest.Headers.Host = authority;
 
-			HttpConnection connection = new HttpConnection(new BufferedReadStream(transport, null));
+			var connection = new HttpConnection(new BufferedReadStream(transport, null));
 			HttpResponseMessage connectResponse;
 			try
 			{
-				connectResponse = await connection.SendAsync(connectRequest, cancellationToken);
+                connectResponse = await connection.SendAsync(connectRequest, cancellationToken);
 				// TODO:? await connectResponse.Content.LoadIntoBufferAsync(); // Drain any body
 				// There's no danger of accidently consuming real response data because the real request hasn't been sent yet.
 			}
@@ -391,7 +408,7 @@ namespace Microsoft.Net.Http.Client
 			}
 
 			// Listen for a response. Any 2XX is considered success, anything else is considered a failure.
-			if ((int)connectResponse.StatusCode < 200 || 300 <= (int)connectResponse.StatusCode)
+			if ((int)connectResponse.StatusCode is < 200 or >= 300)
 			{
 				transport.Dispose();
 				throw new HttpRequestException("Failed to negotiate the proxy tunnel: " + connectResponse.ToString());

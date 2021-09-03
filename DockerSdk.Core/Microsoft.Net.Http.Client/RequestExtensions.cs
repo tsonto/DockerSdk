@@ -45,21 +45,25 @@ namespace Microsoft.Net.Http.Client
             request.SetProperty("url.Port", port);
         }
 
+        // The host, after considering the proxy
         public static string? GetConnectionHostProperty(this HttpRequestMessage request)
         {
             return request.GetProperty<string>("url.ConnectionHost");
         }
 
+        // The host, after considering the proxy
         public static void SetConnectionHostProperty(this HttpRequestMessage request, string? host)
         {
             request.SetProperty("url.ConnectionHost", host);
         }
 
+        // The port, after considering the proxy
         public static int? GetConnectionPortProperty(this HttpRequestMessage request)
         {
             return request.GetProperty<int?>("url.ConnectionPort");
         }
 
+        // The port, after considering the proxy
         public static void SetConnectionPortProperty(this HttpRequestMessage request, int? port)
         {
             request.SetProperty("url.ConnectionPort", port);
@@ -80,6 +84,7 @@ namespace Microsoft.Net.Http.Client
             return request.GetProperty<string>("url.AddressLine");
         }
 
+        // TODO: what is this? sometimes set to $"{scheme}://{host}:{port}{pathAndQuery}", other times to pathAndQuery, other times {host}:{port}. is it the part of the HTTP request's first line immediately after the verb?
         public static void SetAddressLineProperty(this HttpRequestMessage request, string? addressLine)
         {
             request.SetProperty("url.AddressLine", addressLine);
