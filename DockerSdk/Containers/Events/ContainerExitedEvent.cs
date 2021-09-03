@@ -1,4 +1,4 @@
-﻿using Message = DockerSdk.Core.Models.Message;
+﻿using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Containers.Events
 {
@@ -12,7 +12,7 @@ namespace DockerSdk.Containers.Events
     {
         internal ContainerExitedEvent(Message message) : base(message, ContainerEventType.Exited)
         {
-            if (message.Actor.Attributes.TryGetValue("exitCode", out string? exitCodeString))
+            if (message.Actor!.Attributes.TryGetValue("exitCode", out string? exitCodeString))
                 if (int.TryParse(exitCodeString, out int exitCodeNumber))
                     ExitCode = exitCodeNumber;
         }

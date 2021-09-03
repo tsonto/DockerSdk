@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
 using DockerSdk.Images.Events;
 using DockerSdk.Networks.Events;
-using Message = DockerSdk.Core.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Events
 {
@@ -30,7 +30,7 @@ namespace DockerSdk.Events
         IReadOnlyDictionary<string, string> IEventLowLevel.ActorDetails => raw.Actor.Attributes.ToImmutableDictionary();
 
         /// <inheritdoc/>
-        string IEventLowLevel.ActorId => raw.Actor.ID;
+        string IEventLowLevel.ActorId => raw.Actor.Id;
 
         /// <inheritdoc/>
         public EventSubjectType SubjectType { get; }

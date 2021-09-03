@@ -1,4 +1,4 @@
-﻿using DockerSdk.Core.Models;
+﻿using DockerSdk.Events.Dto;
 using DockerSdk.Containers;
 
 namespace DockerSdk.Networks.Events
@@ -10,7 +10,7 @@ namespace DockerSdk.Networks.Events
     {
         internal NetworkDetachedEvent(Message message) : base(message, NetworkEventType.Detached)
         {
-            string containerIdString = message.Actor.Attributes["container"];
+            string containerIdString = message.Actor!.Attributes!["container"];
             ContainerId = ContainerFullId.Parse(containerIdString);
         }
 

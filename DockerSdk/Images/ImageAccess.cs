@@ -8,7 +8,6 @@ using DockerSdk.Builders;
 using DockerSdk.Images.Events;
 using DockerSdk.Registries;
 using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Net;
 using DockerSdk.Images.Dto;

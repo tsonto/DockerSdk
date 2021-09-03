@@ -1,6 +1,6 @@
 ﻿using DockerSdk.Events;
 using DockerSdk.Networks;
-using Message = DockerSdk.Core.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Networks.Events
 {
@@ -13,7 +13,7 @@ namespace DockerSdk.Networks.Events
             : base(message, EventSubjectType.Network)
         {
             EventType = eventType;
-            NetworkId = new NetworkFullId(message.Actor.ID);
+            NetworkId = new NetworkFullId(message.Actor!.Id);
 
             if (message.Actor.Attributes.TryGetValue("name", out var nameString))
                 if (NetworkName.TryParse(nameString, out var name))

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Networks.Events;
-using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Net;
 

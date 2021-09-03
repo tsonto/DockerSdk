@@ -13,9 +13,7 @@ using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
 using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
-using DockerSdk.Core.Models;
 using DockerSdk.Containers.Dto;
 
 namespace DockerSdk.Containers

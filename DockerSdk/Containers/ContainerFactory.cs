@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Net;
 using DockerSdk.Containers.Dto;

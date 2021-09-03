@@ -7,7 +7,6 @@ using DockerSdk.Core;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Networks.Dto;
-using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Containers
 {

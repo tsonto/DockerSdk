@@ -11,8 +11,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Core;
-using DockerSdk.Core.Models;
-using Message = DockerSdk.Core.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Events
 {

@@ -6,10 +6,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
-using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
-using DockerSdk.Core.Models;
+using DockerSdk.Registries.Dto;
 
 namespace DockerSdk.Registries
 {
@@ -308,7 +306,7 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="registry">The name of the registry to retrieve information about.</param>
         /// <param name="authObject"></param>
-        internal bool TryGetAuthObject(string registry, [NotNullWhen(returnValue: true)] out CoreModels.AuthConfig? authObject)
+        internal bool TryGetAuthObject(string registry, [NotNullWhen(returnValue: true)] out AuthConfig? authObject)
         {
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
             {

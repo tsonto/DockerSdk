@@ -1,4 +1,4 @@
-﻿using Message = DockerSdk.Core.Models.Message;
+﻿using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Containers.Events
 {

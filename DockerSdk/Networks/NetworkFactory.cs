@@ -7,9 +7,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
-using DockerSdk.Core;
-using DockerSdk.Core.Models;
-using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
 {

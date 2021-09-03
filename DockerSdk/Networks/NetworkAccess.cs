@@ -5,10 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Networks.Events;
-using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
-using DockerSdk.Core.Models;
 
 namespace DockerSdk.Networks
 {

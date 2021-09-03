@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using DockerSdk.Containers;
-using DockerSdk.Core.Models;
 using DockerSdk.Networks.Dto;
 
 namespace DockerSdk.Networks

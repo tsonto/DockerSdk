@@ -1,4 +1,4 @@
-﻿using DockerSdk.Core.Models;
+﻿using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Networks.Events
 {

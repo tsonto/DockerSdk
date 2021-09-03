@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using DockerSdk.Images;
 
 using DockerSdk.Core;
-using CoreModels = DockerSdk.Core.Models;
 using System.Net.Http;
 using System.Text.Json.Serialization;
 using System.Reactive.Linq;

@@ -5,12 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Core;
-using DockerSdk.Core.Models;
 using DockerSdk.Daemon;
 using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Registries;
-using CoreModels = DockerSdk.Core.Models;
 using NetworkAccess = DockerSdk.Networks.NetworkAccess;
 using Version = System.Version;
 

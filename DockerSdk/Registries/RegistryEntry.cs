@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
+using DockerSdk.Registries.Dto;
 using Newtonsoft.Json;
-using CoreModels = DockerSdk.Core.Models;
 
 namespace DockerSdk.Registries
 {
@@ -13,13 +13,13 @@ namespace DockerSdk.Registries
         public RegistryEntry(RegistryReference server)
         {
             Server = server;
-            encodedAuthData = Encode(new CoreModels.AuthConfig());
+            encodedAuthData = Encode(new AuthConfig());
         }
 
         /// <summary>
         /// Gets or sets the auth object that the core API uses for authentication.
         /// </summary>
-        public CoreModels.AuthConfig AuthObject
+        public AuthConfig AuthObject
         {
             get => Decode(encodedAuthData);
             set => encodedAuthData = Encode(value);
@@ -36,10 +36,10 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="codedForm">An obsfucated, serialized form of the given auth details.</param>
         /// <returns>An object holding the auth details.</returns>
-        private static CoreModels.AuthConfig Decode(string codedForm)
+        private static AuthConfig Decode(string codedForm)
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(codedForm));
-            return JsonConvert.DeserializeObject<CoreModels.AuthConfig>(json)!;
+            return JsonConvert.DeserializeObject<AuthConfig>(json)!;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="auth">An object holding the auth details.</param>
         /// <returns>An obsfucated, serialized form of the given auth details.</returns>
-        private static string Encode(CoreModels.AuthConfig auth)
+        private static string Encode(AuthConfig auth)
         {
             var json = JsonConvert.SerializeObject(auth);
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
