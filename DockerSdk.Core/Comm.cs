@@ -27,73 +27,6 @@ namespace DockerSdk.Core
             _defaultTimeout = configuration.DefaultTimeout;
         }
 
-        //internal async Task<DockerApiResponse> MakeRequestAsync(
-        //	IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
-        //	HttpMethod method,
-        //	string path,
-        //	IQueryString queryString,
-        //	IRequestContent body,
-        //	IDictionary<string, string> headers,
-        //	TimeSpan? timeout = null,
-        //	CancellationToken token = default)
-        //{
-        //	timeout = timeout ?? this.DefaultTimeout;
-        //	var response = await PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseContentRead, method, path, queryString, headers, body, token).ConfigureAwait(false);
-        //	using (response)
-        //	{
-        //		await HandleIfErrorResponseAsync(response.StatusCode, response, errorHandlers);
-
-        //		var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        //		return new DockerApiResponse(response.StatusCode, responseBody);
-        //	}
-        //}
-
-
-        //internal async Task<WriteClosableStream> MakeRequestForHijackedStreamAsync(
-        //    IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
-        //    HttpMethod method,
-        //    string path,
-        //    string? query = null,
-        //    HttpContent? body = null,
-        //    IDictionary<string, string>? headers = null,
-        //    CancellationToken cancellationToken = default)
-        //{
-        //    var response = await PrivateMakeRequestAsync(Timeout.InfiniteTimeSpan, HttpCompletionOption.ResponseHeadersRead, method, path, query, headers, body, cancellationToken).ConfigureAwait(false);
-
-        //    await HandleIfErrorResponseAsync(response.StatusCode, response, errorHandlers);
-
-        //    if (response.Content is not HttpConnectionResponseContent content)
-        //        throw new NotSupportedException("message handler does not support hijacked streams");
-
-        //    return content.HijackStream();
-        //}
-
-        //internal async Task<DockerApiStreamedResponse> MakeRequestForStreamedResponseAsync(
-        //    IEnumerable<ApiResponseErrorHandlingDelegate> errorHandlers,
-        //    HttpMethod method,
-        //    string path,
-        //    string? query,
-        //    CancellationToken token)
-        //{
-        //    var response = await PrivateMakeRequestAsync(Timeout.InfiniteTimeSpan, HttpCompletionOption.ResponseHeadersRead, method, path, query, null, null, token);
-
-        //    await HandleIfErrorResponseAsync(response.StatusCode, response, errorHandlers);
-
-        //    var body = await response.Content.ReadAsStreamAsync(token);
-
-        //    return new DockerApiStreamedResponse(response.StatusCode, body, response.Headers);
-        //}
-
-        //internal Task<HttpResponseMessage> MakeRequestForRawResponseAsync(
-        //    HttpMethod method,
-        //    string path,
-        //    string? query,
-        //    HttpContent body,
-        //    IDictionary<string, string> headers,
-        //    CancellationToken token)
-        //    => PrivateMakeRequestAsync(Timeout.InfiniteTimeSpan, HttpCompletionOption.ResponseHeadersRead, method, path, query, headers, body, token);
-
         public Task<HttpResponseMessage> SendAsync(
             HttpMethod method,
             string path,
@@ -107,47 +40,6 @@ namespace DockerSdk.Core
             var request = PrepareRequest(method, path, query, headers, content);
             return PrivateMakeRequestAsync(timeout, completionOption, request, ct);
         }
-
-        //public async Task<T> SendAndDeserializeAsync<T>(
-        //    HttpMethod method,
-        //    string path,
-        //    Func<HttpResponseMessage, Task>? checkResponseAsync,
-        //    string? query = null,
-        //    HttpContent? content = null,
-        //    IDictionary<string, string>? headers = null,
-        //    TimeSpan? timeout = null,
-        //    JsonSerializerOptions? serializerOptions = null,
-        //    CancellationToken ct = default)
-        //{
-        //    var request = PrepareRequest(method, path, query, headers, content);
-        //    var response = await PrivateMakeRequestAsync(timeout, HttpCompletionOption.ResponseHeadersRead, request, ct).ConfigureAwait(false);
-        //    if (checkResponseAsync != null)
-        //        await checkResponseAsync(response).ConfigureAwait(false);
-
-        //    var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
-        //    serializerOptions ??= _defaultSerializerOptions;
-        //    var result = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(stream, serializerOptions, ct).ConfigureAwait(false);
-        //    if (result == null) // TODO: and T is not nullable
-        //        throw new InvalidOperationException();
-
-        //    return result;
-        //}
-
-
-
-        //private Task<HttpResponseMessage> PrivateMakeRequestAsync(
-        //    TimeSpan? timeout,
-        //    HttpCompletionOption completionOption,
-        //    HttpMethod method,
-        //    string path,
-        //    string? query,
-        //    IDictionary<string, string>? headers,
-        //    HttpContent? data,
-        //    CancellationToken cancellationToken)
-        //{
-        //    var request = PrepareRequest(method, path, query, headers, data);
-        //    return PrivateMakeRequestAsync(timeout, completionOption, request, cancellationToken);
-        //}
 
         private async Task<HttpResponseMessage> PrivateMakeRequestAsync(
             TimeSpan? timeout,
@@ -174,36 +66,6 @@ namespace DockerSdk.Core
                 }
             }
         }
-
-        //private static async Task HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable<ApiResponseErrorHandlingDelegate> handlers)
-        //{
-        //    bool isErrorResponse = statusCode < HttpStatusCode.OK || statusCode >= HttpStatusCode.BadRequest;
-
-        //    string? responseBody = null;
-
-        //    if (isErrorResponse)
-        //    {
-        //        // If it is not an error response, we do not read the response body because the caller may wish to consume it.
-        //        // If it is an error response, we do because there is nothing else going to be done with it anyway and
-        //        // we want to report the response body in the error message as it contains potentially useful info.
-        //        responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        //    }
-
-        //    // If no customer handlers just default the response.
-        //    if (handlers != null)
-        //    {
-        //        foreach (var handler in handlers)
-        //        {
-        //            handler(statusCode, responseBody);
-        //        }
-        //    }
-
-        //    // No custom handler was fired. Default the response for generic success/failures.
-        //    if (isErrorResponse)
-        //    {
-        //        throw new DockerApiException(statusCode, responseBody);
-        //    }
-        //}
 
         private HttpRequestMessage PrepareRequest(HttpMethod method, string path, string? query, IDictionary<string, string>? headers, HttpContent? content)
         {
@@ -246,6 +108,4 @@ namespace DockerSdk.Core
             _client.Dispose();
         }
     }
-
-    //internal delegate void ApiResponseErrorHandlingDelegate(HttpStatusCode statusCode, string? responseBody);
 }
