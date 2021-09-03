@@ -112,7 +112,7 @@ namespace DockerSdk
         /// </exception>
         /// <exception cref="ArgumentException">The URL is <see langword="null"/>.</exception>
         public static Task<DockerClient> StartAsync(Uri daemonUrl, CancellationToken ct = default)
-            => StartAsync(new ClientOptions { DaemonUri = daemonUrl }, ct);
+            => StartAsync(new ClientOptions { DaemonUrl = daemonUrl }, ct);
 
         /// <summary>
         /// Creates a new Docker client and connects it to a Docker daemon.
@@ -134,11 +134,14 @@ namespace DockerSdk
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            if (options.DaemonUri is null)
+            if (options.DaemonUrl is null)
                 throw new ArgumentException("The daemon URL is required.", nameof(options));
 
+            // Make a defensive copy of the options.
+            options = options with { };
+
             // First, establish a connection with the daemon.
-            Comm comm = new Comm(options.ToCore(), null);
+            Comm comm = new Comm(options, null);
 
             // Now figure out which API version to use. This will be the max API version that both sides support.
             VersionResponse? versionInfo;
@@ -150,13 +153,13 @@ namespace DockerSdk
             }
             catch (TimeoutException ex)
             {
-                throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUri}. This typically means that the daemon is not running.", ex);
+                throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUrl}. This typically means that the daemon is not running.", ex);
             }
             var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo!, _libraryMaxApiVersion);
 
             // Replace the non-versioned core instance with a versioned instance.
             comm.Dispose();
-            comm = new Comm(options.ToCore(), negotiatedApiVersion);
+            comm = new Comm(options, negotiatedApiVersion);
 
             // Now remove the reference to the credentials so they can drop out of memory as soon as possible.
             options.Credentials = null;

@@ -10,36 +10,30 @@ namespace DockerSdk
     /// Specifies where to find a Docker daemon and how the SDK should connect to it.
     /// </summary>
     /// <seealso cref="DockerClient"/>
-    public class ClientOptions
+    public sealed record ClientOptions : CommOptions
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientOptions"/> class using the standard daemon URL.
+        /// </summary>
+        public ClientOptions() : this(GetDefaultUri()) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientOptions"/> class using the provided daemon URL.
+        /// </summary>
+        /// <param name="daemonUrl"></param>
+        public ClientOptions(Uri daemonUrl) : base(daemonUrl) { }
+
         /// <summary>
         /// Gets or sets the set of certificates to use when communicating with the daemon.
         /// </summary>
         public X509Certificate2Collection Certificates { get; set; } = new X509Certificate2Collection();
 
         /// <summary>
-        /// Gets or sets the credentials to use for connecting to the Docker daemon.
-        /// </summary>
-        public Credentials? Credentials { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Docker daemon URL to connect to. The default is localhost using a platform-appropriate
-        /// transport.
-        /// </summary>
-        public Uri DaemonUri { get; set; } = GetDefaultUri();
-
-        /// <summary>
-        /// Gets or sets how long the SDK should wait for responses to messages it sends to the Docker daemon.
-        /// </summary>
-        /// <remarks>Some SDK methods override this value.</remarks>
-        public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(60);
-
-        /// <summary>
         /// Gets or sets a value indicating whether to use <a
         /// href="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</a> for communications with the daemon.
         /// Defaults to <see langword="true"/>.
         /// </summary>
-        public bool UseTls { get; set; } = true;
+        public bool UseTls { get; set; } = true;    // TODO: how does this relate to Credentials.IsTlsCredentials() ?
 
         /// <summary>
         /// Generates a <see cref="ClientOptions"/> object based on the local machine's <a
@@ -48,13 +42,13 @@ namespace DockerSdk
         /// <returns>The generated <see cref="ClientOptions"/>.</returns>
         /// <remarks>
         /// If any of the relevant environment variables are not set, the <see cref="ClientOptions"/> object will use
-        /// the default value for its corresponding property. Note that the default for <see cref="DaemonUri"/>/
-        /// <c>DOCKER_HOST</c> is not valid for connecting to a Docker daemon. <br/> This method uses the following
-        /// environment variables:
+        /// the default value for its corresponding property. Note that the default for <see
+        /// cref="CommOptions.DaemonUrl"/>/ <c>DOCKER_HOST</c> is not valid for connecting to a Docker daemon. <br/>
+        /// This method uses the following environment variables:
         /// <list type="bullet">
         /// <item>
-        /// <c>DOCKER_HOST</c>: The URL for the Docker daemon to connect to. Corresponds to the <see cref="DaemonUri"/>
-        /// property.
+        /// <c>DOCKER_HOST</c>: The URL for the Docker daemon to connect to. Corresponds to the <see
+        /// cref="CommOptions.DaemonUrl"/> property.
         /// </item>
         /// <item>
         /// <c>DOCKER_CERT_PATH</c>: A filesystem path to read certificates from. Corresponds to the <see
@@ -66,19 +60,19 @@ namespace DockerSdk
         /// </item>
         /// <item>
         /// <c>COMPOSER_HTTP_TIMEOUT</c>: The communications timeout to use, in seconds. Corresponds to the <see
-        /// cref="DefaultTimeout"/> property.
+        /// cref="CommOptions.DefaultTimeout"/> property.
         /// </item>
         /// </list>
         /// </remarks>
         public static ClientOptions FromEnvironment()
         {
-            var output = new ClientOptions();
+            ClientOptions output;
 
             var daemonUriString = Environment.GetEnvironmentVariable("DOCKER_HOST");
             if (!string.IsNullOrEmpty(daemonUriString) && Uri.TryCreate(daemonUriString, UriKind.Absolute, out Uri? daemonUri))
-            {
-                output.DaemonUri = daemonUri;
-            }
+                output = new ClientOptions(daemonUri);
+            else
+                output = new ClientOptions(GetDefaultUri());
 
             var certPath = Environment.GetEnvironmentVariable("DOCKER_CERT_PATH");
             if (!string.IsNullOrEmpty(certPath) && Directory.Exists(certPath))
@@ -100,13 +94,10 @@ namespace DockerSdk
             return output;
         }
 
-        /// <summary>
-        /// Creates a client configuration object for use by the underlying .NET Docker API.
-        /// </summary>
-        /// <returns>An equivalent <see cref="Api.DockerClientConfiguration"/> object.</returns>
-        internal DockerClientConfiguration ToCore()
-            => new(DaemonUri, Credentials, DefaultTimeout);
-
-        private static Uri GetDefaultUri() => DockerClientConfiguration.LocalDockerUri();
+        private static Uri GetDefaultUri()
+        {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            return isWindows ? new Uri("npipe://./pipe/docker_engine") : new Uri("unix:/var/run/docker.sock");
+        }
     }
 }

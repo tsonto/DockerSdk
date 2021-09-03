@@ -9,7 +9,7 @@ namespace DockerSdk.Core
 {
     public sealed class Comm : IDisposable
     {
-        public Comm(DockerClientConfiguration configuration, Version? apiVersion)
+        public Comm(CommOptions configuration, Version? apiVersion)
         {
             HttpMessageHandler handler = ManagedHandler.Create(configuration, out Uri uri);
             endpointBaseUri = uri;

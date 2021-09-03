@@ -416,15 +416,15 @@ namespace Microsoft.Net.Http.Client
 		}
 
 		//
-		internal static HttpMessageHandler Create(DockerClientConfiguration configuration, out Uri uri)
+		internal static HttpMessageHandler Create(CommOptions configuration, out Uri uri)
 		{
 			var innerHandler = CreateCore(configuration, out uri);
 			return configuration.Credentials.GetHandler(innerHandler);
 		}
 
-		internal static ManagedHandler CreateCore(DockerClientConfiguration configuration, out Uri uri)
+		internal static ManagedHandler CreateCore(CommOptions configuration, out Uri uri)
 		{
-			uri = configuration.EndpointBaseUri;
+			uri = configuration.DaemonUrl;
 
 			switch (uri.Scheme.ToLowerInvariant())
 			{
@@ -449,7 +449,7 @@ namespace Microsoft.Net.Http.Client
 					return CreateUnixSocketHandler(ref uri);
 
 				default:
-					throw new Exception($"Unknown URL scheme {configuration.EndpointBaseUri.Scheme}");
+					throw new Exception($"Unknown URL scheme {configuration.DaemonUrl.Scheme}");
 			}
 		}
 
@@ -466,7 +466,7 @@ namespace Microsoft.Net.Http.Client
 		}
 
 		[SupportedOSPlatform("windows")]
-		private static ManagedHandler CreateNamedPipeHandler(DockerClientConfiguration configuration, ref Uri uri)
+		private static ManagedHandler CreateNamedPipeHandler(CommOptions configuration, ref Uri uri)
 		{
 			if (configuration.Credentials.IsTlsCredentials())
 			{
@@ -476,7 +476,7 @@ namespace Microsoft.Net.Http.Client
 			var segments = uri.Segments;
 			if (segments.Length != 3 || !segments[1].Equals("pipe/", StringComparison.OrdinalIgnoreCase))
 			{
-				throw new ArgumentException($"{configuration.EndpointBaseUri} is not a valid npipe URI");
+				throw new ArgumentException($"{configuration.DaemonUrl} is not a valid npipe URI");
 			}
 
 			var serverName = uri.Host;
@@ -491,7 +491,7 @@ namespace Microsoft.Net.Http.Client
 			uri = new UriBuilder("http", pipeName).Uri;
 			return new ManagedHandler(async (host, port, cancellationToken) =>
 			{
-				int timeout = (int)configuration.NamedPipeConnectTimeout.TotalMilliseconds;
+				int timeout = (int)configuration.DefaultTimeout.TotalMilliseconds;
 				var stream = new NamedPipeClientStream(serverName, pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 				var dockerStream = new DockerPipeStream(stream);
 
