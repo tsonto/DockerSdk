@@ -20,8 +20,17 @@ using DockerSdk.Registries.Dto;
 
 namespace DockerSdk
 {
+    /// <summary>
+    /// Builder for constructing a message handler for sending an HTTP request.
+    /// </summary>
     public class RequestBuilder
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequestBuilder"/> type.
+        /// </summary>
+        /// <param name="comm">The object responsible for the actual sending and recieving.</param>
+        /// <param name="method">The HTTP method (fka verb) to use for the request.</param>
+        /// <param name="path">The URL to send the request to, relative to the Docker daemon's API root.</param>
         public RequestBuilder(Comm comm, HttpMethod method, string path)
         {
             if (comm is null)
@@ -36,30 +45,80 @@ namespace DockerSdk
             this.path = path;
         }
 
+        private readonly List<HttpStatusCode> allowedStatusCodes = new() { HttpStatusCode.OK };
+
+        private readonly Comm comm;
+
+        private readonly List<Action<HttpStatusCode, string>> errorChecks = new();
+
         private readonly JsonSerializerOptions jsonOptions = new()
         {
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
         };
 
-        private readonly Comm comm;
         private readonly HttpMethod method;
         private readonly string path;
         private HttpContent? content;
-        private readonly List<Action<HttpStatusCode, string>> errorChecks = new();
-        private readonly List<HttpStatusCode> allowedStatusCodes = new() { HttpStatusCode.OK };
+        private string? parameters;
         private IDictionary<string, string>? requestHeaders;
         private TimeSpan? timeout;
-        private string? parameters;
 
+        /// <summary>
+        /// Indicates that a given status code is acceptable, and should not throw an exception.
+        /// </summary>
+        /// <param name="status">The status code to allow.</param>
+        /// <returns>The same builder, for method chaining.</returns>
+        /// <remarks>
+        /// By default, only 200-OK is allowed, and any other 2xx code throws an "unexpected status" exception.
+        /// </remarks>
+        public RequestBuilder AcceptStatus(HttpStatusCode status)
+        {
+            allowedStatusCodes.Add(status);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies what exception to throw if the response matches the given conditions.
+        /// </summary>
+        /// <param name="status">An HTTP status code that the response must match.</param>
+        /// <param name="makeException">Method to create the exception given the message's error text.</param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder RejectStatus(HttpStatusCode status, Func<string, Exception> makeException)
             => RejectStatus((s, e) => s == status, makeException);
 
+        /// <summary>
+        /// Specifies what exception to throw if the response matches the given conditions.
+        /// </summary>
+        /// <param name="status">An HTTP status code that the response must match.</param>
+        /// <param name="contains">
+        /// Text that the error message must contain for the response to be a match. This is compared
+        /// case-insensitively.
+        /// </param>
+        /// <param name="makeException">Method to create the exception given the message's error text.</param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder RejectStatus(HttpStatusCode status, string contains, Func<string, Exception> makeException)
             => RejectStatus((s, e) => s == status && e.Contains(contains), makeException);
 
+        /// <summary>
+        /// Specifies what exception to throw if the response matches the given conditions.
+        /// </summary>
+        /// <param name="status">An HTTP status code that the response must match.</param>
+        /// <param name="errorMatches">
+        /// A condtion on the error text that must be true for the response to be a match.
+        /// </param>
+        /// <param name="makeException">Method to create the exception given the message's error text.</param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder RejectStatus(HttpStatusCode status, Func<string, bool> errorMatches, Func<string, Exception> makeException)
             => RejectStatus((s, e) => s == status && errorMatches(e), makeException);
 
+        /// <summary>
+        /// Specifies what exception to throw if the response matches the given conditions.
+        /// </summary>
+        /// <param name="matches">
+        /// A condition for whether the response is a match. The inputs are the response code and the error message.
+        /// </param>
+        /// <param name="makeException">Method to create the exception given the message's error text.</param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder RejectStatus(Func<HttpStatusCode, string, bool> matches, Func<string, Exception> makeException)
         {
             errorChecks.Add((status, error) =>
@@ -70,39 +129,66 @@ namespace DockerSdk
             return this;
         }
 
-        public RequestBuilder AcceptStatus(HttpStatusCode status)
+        /// <summary>
+        /// Sends the message, processes the response for errors, and channels the streamed response through an
+        /// observable.
+        /// </summary>
+        /// <param name="ct">Allows cancelling the operation.</param>
+        /// <returns>An observable that emits the streamed objects as they arrive.</returns>
+        public Task<IObservable<T>> SendAndStreamResults<T>(CancellationToken ct)
+            => SendAndStreamResults<T>(null, ct);
+
+        /// <summary>
+        /// Sends the message, processes the response for errors, and channels the streamed response through an
+        /// observable.
+        /// </summary>
+        /// <param name="ct">Allows cancelling the operation.</param>
+        /// <param name="serializerOptions">Options for deserializing the streamed objects.</param>
+        /// <returns>An observable that emits the streamed objects as they arrive.</returns>
+        public async Task<IObservable<T>> SendAndStreamResults<T>(JsonSerializerOptions? serializerOptions, CancellationToken ct)
         {
-            allowedStatusCodes.Add(status);
-            return this;
+            var response = await SendAsync(HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+            return CreateStream<T>(response, serializerOptions);
         }
 
-        //public RequestBuilder WithParameter(string key, string? value)
-        //{
-        //    if (value == null)
-        //        return this;
-        //    this.parameters ??= new();
-        //    parameters.Add(key, value);
-        //    return this;
-        //}
+        /// <summary>
+        /// Sends the message and processes the response for errors.
+        /// </summary>
+        /// <param name="ct">Allows cancelling the operation.</param>
+        /// <returns>The HTTP response object.</returns>
+        public Task<HttpResponseMessage> SendAsync(CancellationToken ct)
+            => SendAsync(HttpCompletionOption.ResponseContentRead, ct);
 
-        public RequestBuilder WithParameters(string parameters)
+        /// <summary>
+        /// Sends the message, processes the response for errors, and deserializes the response body.
+        /// </summary>
+        /// <param name="ct">Allows cancelling the operation.</param>
+        /// <returns>The deserialized response body.</returns>
+        public async Task<T> SendAsync<T>(CancellationToken ct)
         {
-            this.parameters = parameters;
-            return this;
+            var response = await SendAsync(HttpCompletionOption.ResponseContentRead, ct).ConfigureAwait(false);
+            return await response.DeserializeAsync<T>(jsonOptions, ct).ConfigureAwait(false);
         }
 
-        //public RequestBuilder WithParameters(QueryParameters? parameters)
-        //{
-        //    if (parameters == null)
-        //        return this;
+        /// <summary>
+        /// </summary>
+        /// <param name="auth"></param>
+        /// <returns>The same builder, for method chaining.</returns>
+        public RequestBuilder WithAuthHeader(AuthConfig auth)
+        {
+            var value = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(auth)).Replace("/", "_").Replace("+", "-"); // base64-url
+            var dict = new Dictionary<string, string>
+            {
+                ["X-Registry-Auth"] = value,
+            };
+            return WithRequestHeaders(dict);
+        }
 
-        //    if (this.parameters == null)
-        //        this.parameters = parameters;
-        //    else
-        //        this.parameters.AddRange(parameters);
-        //    return this;
-        //}
-
+        /// <summary>
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="headers"></param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder WithBody(Stream stream, Dictionary<string, string>? headers = null)
         {
             if (stream is null)
@@ -114,14 +200,10 @@ namespace DockerSdk
             return this;
         }
 
-        private void AddHeaders(HttpHeaders headers, Dictionary<string, string>? dict)
-        {
-            if (dict == null)
-                return;
-            foreach (var kvp in dict)
-                headers.Add(kvp.Key, kvp.Value);
-        }
-
+        /// <summary>
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder WithBody(HttpContent content)
         {
             if (content is null)
@@ -132,6 +214,12 @@ namespace DockerSdk
             return this;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="serializerOptions"></param>
+        /// <param name="headers"></param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder WithJsonBody(object body, JsonSerializerOptions? serializerOptions = null, Dictionary<string, string>? headers = null)
         {
             if (body is null)
@@ -143,6 +231,21 @@ namespace DockerSdk
             return this;
         }
 
+        /// <summary>
+        /// Sets the query parameters string to use when sending the request.
+        /// </summary>
+        /// <param name="parameters">The query string, which must already be percent-encodeded.</param>
+        /// <returns>The same builder, for method chaining.</returns>
+        public RequestBuilder WithParameters(string parameters)
+        {
+            this.parameters = parameters;
+            return this;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="headers"></param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder WithRequestHeaders(IReadOnlyDictionary<string, string>? headers)
         {
             if (headers == null)
@@ -161,91 +264,22 @@ namespace DockerSdk
             return this;
         }
 
-        public RequestBuilder WithAuthHeader(AuthConfig auth)
-        {
-            var value = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(auth)).Replace("/", "_").Replace("+", "-"); // base64-url
-            var dict = new Dictionary<string, string>
-            {
-                ["X-Registry-Auth"] = value,
-            };
-            return WithRequestHeaders(dict);
-        }
-
+        /// <summary>
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns>The same builder, for method chaining.</returns>
         public RequestBuilder WithTimeout(TimeSpan? timeout)
         {
             this.timeout = timeout;
             return this;
         }
 
-        public Task<HttpResponseMessage> SendAsync(CancellationToken ct)
-            => SendAsync(HttpCompletionOption.ResponseContentRead, ct);
-
-        private async Task<HttpResponseMessage> SendAsync(HttpCompletionOption completionOption, CancellationToken ct)
+        private void AddHeaders(HttpHeaders headers, Dictionary<string, string>? dict)
         {
-            var response = await comm.SendAsync(method, path, parameters, content, requestHeaders, completionOption, timeout, ct).ConfigureAwait(false);
-
-
-            if (!allowedStatusCodes.Contains(response.StatusCode))
-                await ThrowAsync(response).ConfigureAwait(false);
-
-            return response;
-        }
-
-        public async Task<T> SendAsync<T>(CancellationToken ct)
-        {
-            var response = await SendAsync(HttpCompletionOption.ResponseContentRead, ct).ConfigureAwait(false);
-            return await response.DeserializeAsync<T>(jsonOptions, ct).ConfigureAwait(false);
-        }
-
-        private async Task ThrowAsync(HttpResponseMessage response)
-        {
-            try
-            {
-                var error = await response.DeserializeErrorMessageAsync().ConfigureAwait(false);
-                var status = response.StatusCode;
-
-                // Under some conditions the daemon will report a misleading HTTP status code. For the purposes of error checking,
-                // correct for that.
-                if (status == HttpStatusCode.NotFound && error.Contains("access to the resource is denied")) // attempt to access an image on a private registry without the credentials
-                    status = HttpStatusCode.Unauthorized;
-                else if (status == HttpStatusCode.InternalServerError && error.Contains("401 Unauthorized"))
-                    status = HttpStatusCode.Unauthorized;
-                else if (status == HttpStatusCode.InternalServerError && error.Contains("no basic auth credentials")) // attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token
-                    status = HttpStatusCode.Unauthorized;
-
-                // Run the checks provided by the caller.
-                foreach (var check in errorChecks)
-                    check(status, error);
-
-                // Use RegistryAuthException for unhandled 401s.
-                if (status == HttpStatusCode.Unauthorized)
-                    throw new RegistryAuthException($"Authorization to the registry failed: {error}");
-
-                // Use ResourceNotFoundException (or a subclass) for unhandled 404s.
-                if (status == HttpStatusCode.NotFound)
-                {
-                    var match = Regex.Match(error, "^network (.*) not found$");
-                    if (match.Success)
-                        throw new NetworkNotFoundException($"No network with name or ID \"{match.Groups[1].Value}\" exists.");
-                    
-                    throw CreateResourceNotFoundException(error);
-                }
-
-                // Use DockerDaemonException for unhandled 500s.
-                if (status == HttpStatusCode.InternalServerError)
-                    throw new DockerDaemonException($"The Docker daemon reported an internal error: {error}");
-
-                // Use a general exception for everything else.
-                throw new DockerException($"The request received unexpected response code {(int)response.StatusCode}: {error}");
-            }
-            catch (Exception ex)
-            {
-                // Augment the exception.
-                ex.Data["Http.Method"] = method;
-                ex.Data["Http.Path"] = path;
-                ex.Data["Http.Status"] = response.StatusCode;
-                throw;
-            }
+            if (dict == null)
+                return;
+            foreach (var kvp in dict)
+                headers.Add(kvp.Key, kvp.Value);
         }
 
         private ResourceNotFoundException CreateResourceNotFoundException(string error)
@@ -258,15 +292,6 @@ namespace DockerSdk
             }
 
             return new ResourceNotFoundException(error);
-        }
-
-        public Task<IObservable<T>> SendAndStreamResults<T>(CancellationToken ct)
-            => SendAndStreamResults<T>(null, ct);
-
-        public async Task<IObservable<T>> SendAndStreamResults<T>(JsonSerializerOptions? serializerOptions, CancellationToken ct)
-        {
-            var response = await SendAsync(HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-            return CreateStream<T>(response, serializerOptions);
         }
 
         private IObservable<T> CreateStream<T>(HttpResponseMessage response, JsonSerializerOptions? serializerOptions)
@@ -303,6 +328,7 @@ namespace DockerSdk
                         }
                     });
 
+                    // Set the actions to take when the subscriber unsubscribes.
                     return () =>
                     {
                         cts.Cancel();
@@ -322,6 +348,67 @@ namespace DockerSdk
                         response.Dispose();
                     };
                 });
+        }
+
+        private async Task<HttpResponseMessage> SendAsync(HttpCompletionOption completionOption, CancellationToken ct)
+        {
+            var response = await comm.SendAsync(method, path, parameters, content, requestHeaders, completionOption, timeout, ct).ConfigureAwait(false);
+
+            if (!allowedStatusCodes.Contains(response.StatusCode))
+                await ThrowAsync(response).ConfigureAwait(false);
+
+            return response;
+        }
+
+        private async Task ThrowAsync(HttpResponseMessage response)
+        {
+            try
+            {
+                var error = await response.DeserializeErrorMessageAsync().ConfigureAwait(false);
+                var status = response.StatusCode;
+
+                // Under some conditions the daemon will report a misleading HTTP status code. For the purposes of error
+                // checking, correct for that.
+                if (status == HttpStatusCode.NotFound && error.Contains("access to the resource is denied")) // attempt to access an image on a private registry without the credentials
+                    status = HttpStatusCode.Unauthorized;
+                else if (status == HttpStatusCode.InternalServerError && error.Contains("401 Unauthorized"))
+                    status = HttpStatusCode.Unauthorized;
+                else if (status == HttpStatusCode.InternalServerError && error.Contains("no basic auth credentials")) // attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token
+                    status = HttpStatusCode.Unauthorized;
+
+                // Run the checks provided by the caller.
+                foreach (var check in errorChecks)
+                    check(status, error);
+
+                // Use RegistryAuthException for unhandled 401s.
+                if (status == HttpStatusCode.Unauthorized)
+                    throw new RegistryAuthException($"Authorization to the registry failed: {error}");
+
+                // Use ResourceNotFoundException (or a subclass) for unhandled 404s.
+                if (status == HttpStatusCode.NotFound)
+                {
+                    var match = Regex.Match(error, "^network (.*) not found$");
+                    if (match.Success)
+                        throw new NetworkNotFoundException($"No network with name or ID \"{match.Groups[1].Value}\" exists.");
+
+                    throw CreateResourceNotFoundException(error);
+                }
+
+                // Use DockerDaemonException for unhandled 500s.
+                if (status == HttpStatusCode.InternalServerError)
+                    throw new DockerDaemonException($"The Docker daemon reported an internal error: {error}");
+
+                // Use a general exception for everything else.
+                throw new DockerException($"The request received unexpected response code {(int)response.StatusCode}: {error}");
+            }
+            catch (Exception ex)
+            {
+                // Augment the exception.
+                ex.Data["Http.Method"] = method;
+                ex.Data["Http.Path"] = path;
+                ex.Data["Http.Status"] = response.StatusCode;
+                throw;
+            }
         }
     }
 }

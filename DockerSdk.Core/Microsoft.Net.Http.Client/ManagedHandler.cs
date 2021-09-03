@@ -419,7 +419,7 @@ namespace Microsoft.Net.Http.Client
 		internal static HttpMessageHandler Create(CommOptions configuration, out Uri uri)
 		{
 			var innerHandler = CreateCore(configuration, out uri);
-			return configuration.Credentials.GetHandler(innerHandler);
+			return configuration.Credentials!.GetHandler(innerHandler);
 		}
 
 		internal static ManagedHandler CreateCore(CommOptions configuration, out Uri uri)
@@ -437,7 +437,7 @@ namespace Microsoft.Net.Http.Client
 				case "http":
 					var builder = new UriBuilder(uri)
 					{
-						Scheme = configuration.Credentials.IsTlsCredentials() ? "https" : "http"
+						Scheme = configuration.Credentials!.IsTlsCredentials() ? "https" : "http"
 					};
 					uri = builder.Uri;
 					return new ManagedHandler();
@@ -468,7 +468,7 @@ namespace Microsoft.Net.Http.Client
 		[SupportedOSPlatform("windows")]
 		private static ManagedHandler CreateNamedPipeHandler(CommOptions configuration, ref Uri uri)
 		{
-			if (configuration.Credentials.IsTlsCredentials())
+			if (configuration.Credentials!.IsTlsCredentials())
 			{
 				throw new Exception("TLS not supported over npipe");
 			}

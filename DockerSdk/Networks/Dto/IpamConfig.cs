@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace DockerSdk.Networks
+namespace DockerSdk.Networks.Dto
 {
-    public class IpamConfig
+    internal class IpamConfig
     {
-        public IDictionary<string, string>? AuxiliaryAddresses { get; set; }
+        public Dictionary<string, string>? AuxiliaryAddresses { get; set; }
         public string? Gateway { get; set; }
         public string? IPRange { get; set; }
         public string? Subnet { get; set; }

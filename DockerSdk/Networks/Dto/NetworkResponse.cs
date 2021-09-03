@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using DockerSdk.JsonConverters;
 
-namespace DockerSdk.Networks
+namespace DockerSdk.Networks.Dto
 {
     internal class NetworkResponse
     {

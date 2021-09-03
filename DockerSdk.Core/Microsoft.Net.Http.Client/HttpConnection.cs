@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Suppress this warning for now. TODO: revisit
+#pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
+
 namespace Microsoft.Net.Http.Client
 {
     internal class HttpConnection : IDisposable
@@ -137,7 +140,7 @@ namespace Microsoft.Net.Http.Client
                     throw new HttpRequestException("The given header line format is invalid: " + rawHeader);
                 }
                 string headerName = rawHeader.Substring(0, colonOffset);
-                string headerValue = rawHeader.Substring(colonOffset + 2);
+                string headerValue = rawHeader[(colonOffset + 2)..];
                 if (!response.Headers.TryAddWithoutValidation(headerName, headerValue))
                 {
                     bool success = response.Content.Headers.TryAddWithoutValidation(headerName, headerValue);

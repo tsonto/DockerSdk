@@ -92,7 +92,9 @@ namespace Microsoft.Net.Http.Client
 
         public static T? GetProperty<T>(this HttpRequestMessage request, string key)
         {
+#pragma warning disable CS0618 // Type or member is obsolete // TODO: make tests for this and then change it
             if (request.Properties.TryGetValue(key, out var obj))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return (T?)obj;
             }
@@ -101,7 +103,9 @@ namespace Microsoft.Net.Http.Client
 
         public static void SetProperty<T>(this HttpRequestMessage request, string key, T? value)
         {
+#pragma warning disable CS0618 // Type or member is obsolete // TODO: make tests for this and then change it
             request.Properties[key] = value;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

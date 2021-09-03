@@ -16,7 +16,7 @@ namespace DockerSdk.Images
         /// <summary>
         /// Creates an instance of the <see cref="Image"/> class.
         /// </summary>
-        /// <param name="client">The <see cref="Docker"/> instance to use.</param>
+        /// <param name="client">The <see cref="DockerClient"/> instance to use.</param>
         /// <param name="id">The image's full ID. If the hash function is not specified, SHA-256 is assumed.S</param>
         internal Image(DockerClient client, ImageFullId id)
         {

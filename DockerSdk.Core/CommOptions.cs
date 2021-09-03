@@ -22,7 +22,7 @@ namespace DockerSdk.Core
         /// <summary>
         /// Gets or sets the credentials to use for connecting to the Docker daemon.
         /// </summary>
-        public Credentials Credentials { get; set; } = new AnonymousCredentials();
+        public Credentials? Credentials { get; set; } = new AnonymousCredentials();
 
         /// <summary>
         /// Gets or sets how long the SDK should wait for responses to messages it sends to the Docker daemon.
@@ -51,7 +51,7 @@ namespace DockerSdk.Core
             {
                 if (disposing)
                 {
-                    Credentials.Dispose();
+                    Credentials?.Dispose();
                 }
 
                 disposedValue = true;

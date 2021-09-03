@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using DockerSdk.Core;
 using System.Buffers;
 
+// Suppress this warning for now. TODO: revisit
+#pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
+
 namespace Microsoft.Net.Http.Client
 {
     internal class BufferedReadStream : WriteClosableStream, IPeekableStream

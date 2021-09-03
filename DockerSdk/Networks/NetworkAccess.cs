@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Networks.Events;
 using System.Net.Http;
+using DockerSdk.Networks.Dto;
 
 namespace DockerSdk.Networks
 {

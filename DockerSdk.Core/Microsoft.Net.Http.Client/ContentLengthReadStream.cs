@@ -3,6 +3,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Suppress this warning for now. TODO: revisit
+#pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
+
 namespace Microsoft.Net.Http.Client
 {
     internal class ContentLengthReadStream : Stream

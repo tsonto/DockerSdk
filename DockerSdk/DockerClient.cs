@@ -147,9 +147,9 @@ namespace DockerSdk
             VersionResponse? versionInfo;
             try
             {
-                var response = await comm.SendAsync(HttpMethod.Get, "version", ct: ct).ConfigureAwait(false);
-                await response.ThrowIfNotStatusAsync(HttpStatusCode.OK).ConfigureAwait(false);
-                versionInfo = await response.DeserializeAsync<VersionResponse>(ct).ConfigureAwait(false);
+                versionInfo = await comm.Build(HttpMethod.Get, "version")
+                    .SendAsync<VersionResponse>(ct)
+                    .ConfigureAwait(false);
             }
             catch (TimeoutException ex)
             {
@@ -255,6 +255,11 @@ namespace DockerSdk
 
         #endregion IDisposable
 
+        /// <summary>
+        /// Subscribes an observer to receive Docker event notifications from the Docker daemon.
+        /// </summary>
+        /// <param name="observer">The object to receive the events.</param>
+        /// <returns>An object that, when disposed, ends the subscription.</returns>
         public IDisposable Subscribe(IObserver<Event> observer)
             => EventListener.Subscribe(observer);
     }

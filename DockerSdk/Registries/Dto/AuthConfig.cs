@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member // Suppress until we decide whether this class should remain public
+
 namespace DockerSdk.Registries.Dto
 {
     // TODO: don't expose this directly to the public?
