@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace DockerSdk.Core
+namespace DockerSdk
 {
     public class QueryStringBuilder
     {
         private readonly List<string> parameters = new();
+
+        public string Build() => string.Join('&', parameters);
 
         public void Set(string key, string? value, string? defaultValue = null)
         {
@@ -68,11 +68,16 @@ namespace DockerSdk.Core
             parameters.Add($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value)}");
         }
 
-        public string Build() => string.Join('&', parameters);
-
         public class StringStringBool
         {
             private readonly Dictionary<string, Dictionary<string, bool>> structure = new();
+
+            public string? Build()
+            {
+                if (!structure.Any())
+                    return null;
+                return JsonSerializer.Serialize(structure);
+            }
 
             public void Set(string key, string? value)
             {
@@ -93,14 +98,7 @@ namespace DockerSdk.Core
                 if (values == null || !values.Any())
                     return;
 
-                structure.Add(key, values.ToDictionary(v => v, v=> true));
-            }
-
-            public string? Build()
-            {
-                if (!structure.Any())
-                    return null;
-                return JsonSerializer.Serialize(structure);
+                structure.Add(key, values.ToDictionary(v => v, v => true));
             }
         }
     }

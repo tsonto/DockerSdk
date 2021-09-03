@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Core;
+using DockerSdk.Daemon;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
 using DockerSdk.Registries.Dto;

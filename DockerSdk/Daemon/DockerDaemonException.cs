@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace DockerSdk
+namespace DockerSdk.Daemon
 {
     [Serializable]
     internal class DockerDaemonException : Exception

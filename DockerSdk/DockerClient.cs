@@ -86,7 +86,8 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -103,7 +104,8 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -122,12 +124,12 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="DaemonNotFoundException">There is no running Docker daemon at the specified URL.</exception>
         public static async Task<DockerClient> StartAsync(ClientOptions options, CancellationToken ct = default)
         {
             if (options is null)

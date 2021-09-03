@@ -1,30 +1,35 @@
-﻿using Microsoft.Net.Http.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Client;
 
 namespace DockerSdk.Core
 {
     public sealed class Comm : IDisposable
     {
-        private const string UserAgent = "Docker.DotNet";
-        private readonly Uri _endpointBaseUri;
-        private readonly HttpClient _client;
-        private readonly Version? _requestedApiVersion;
-        private readonly TimeSpan _defaultTimeout;
-
-        public Comm(DockerClientConfiguration configuration, Version? requestedApiVersion)
+        public Comm(DockerClientConfiguration configuration, Version? apiVersion)
         {
             HttpMessageHandler handler = ManagedHandler.Create(configuration, out Uri uri);
-            _endpointBaseUri = uri;
-            _client = new HttpClient(handler, true)
+            endpointBaseUri = uri;
+            client = new HttpClient(handler, true)
             {
                 Timeout = Timeout.InfiniteTimeSpan,
             };
-            _requestedApiVersion = requestedApiVersion;
-            _defaultTimeout = configuration.DefaultTimeout;
+            this.apiVersion = apiVersion;
+            defaultTimeout = configuration.DefaultTimeout;
+        }
+
+        private const string UserAgent = "DockerSdk";
+        private readonly HttpClient client;
+        private readonly TimeSpan defaultTimeout;
+        private readonly Uri endpointBaseUri;
+        private readonly Version? apiVersion;
+
+        public void Dispose()
+        {
+            client.Dispose();
         }
 
         public Task<HttpResponseMessage> SendAsync(
@@ -41,30 +46,20 @@ namespace DockerSdk.Core
             return PrivateMakeRequestAsync(timeout, completionOption, request, ct);
         }
 
-        private async Task<HttpResponseMessage> PrivateMakeRequestAsync(
-            TimeSpan? timeout,
-            HttpCompletionOption completionOption,
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        private Uri BuildUri(string path, string? query)
         {
-            timeout ??= _defaultTimeout;
+            var builder = new UriBuilder(endpointBaseUri);
 
-            if (timeout == Timeout.InfiniteTimeSpan)
-            {
-                var tcs = new TaskCompletionSource<HttpResponseMessage>();
-                using (cancellationToken.Register(() => tcs.SetCanceled()))
-                {
-                    return await await Task.WhenAny(tcs.Task, _client.SendAsync(request, completionOption, cancellationToken)).ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                using (var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-                {
-                    timeoutTokenSource.CancelAfter(timeout.Value);
-                    return await _client.SendAsync(request, completionOption, timeoutTokenSource.Token).ConfigureAwait(false);
-                }
-            }
+            if (apiVersion != null)
+                builder.Path += $"v{apiVersion}/";
+
+            if (!string.IsNullOrEmpty(path))
+                builder.Path += path;
+
+            if (!string.IsNullOrEmpty(query))
+                builder.Query = query;
+
+            return builder.Uri;
         }
 
         private HttpRequestMessage PrepareRequest(HttpMethod method, string path, string? query, IDictionary<string, string>? headers, HttpContent? content)
@@ -87,25 +82,30 @@ namespace DockerSdk.Core
             return request;
         }
 
-        private Uri BuildUri(string path, string? query)
+        private async Task<HttpResponseMessage> PrivateMakeRequestAsync(
+                            TimeSpan? timeout,
+            HttpCompletionOption completionOption,
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
-            var builder = new UriBuilder(_endpointBaseUri);
+            timeout ??= defaultTimeout;
 
-            if (this._requestedApiVersion != null)
-                builder.Path += $"v{this._requestedApiVersion}/";
-
-            if (!string.IsNullOrEmpty(path))
-                builder.Path += path;
-
-            if (!string.IsNullOrEmpty(query))
-                builder.Query = query;
-
-            return builder.Uri;
-        }
-
-        public void Dispose()
-        {
-            _client.Dispose();
+            if (timeout == Timeout.InfiniteTimeSpan)
+            {
+                var tcs = new TaskCompletionSource<HttpResponseMessage>();
+                using (cancellationToken.Register(() => tcs.SetCanceled()))
+                {
+                    return await await Task.WhenAny(tcs.Task, client.SendAsync(request, completionOption, cancellationToken)).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                using (var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                {
+                    timeoutTokenSource.CancelAfter(timeout.Value);
+                    return await client.SendAsync(request, completionOption, timeoutTokenSource.Token).ConfigureAwait(false);
+                }
+            }
         }
     }
 }
