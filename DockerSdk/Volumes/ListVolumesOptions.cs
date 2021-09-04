@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace DockerSdk.Volumes
 {
+    /// <summary>
+    /// Specifies how to list volumes.
+    /// </summary>
     public class ListVolumesOptions
     {
         /// <summary>
