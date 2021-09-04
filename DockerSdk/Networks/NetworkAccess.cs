@@ -5,8 +5,8 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Networks.Events;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using System.Net.Http;
+using DockerSdk.Networks.Dto;
 
 namespace DockerSdk.Networks
 {
@@ -140,100 +140,16 @@ namespace DockerSdk.Networks
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            // Construct the API request.
-            var request = new CoreModels.NetworksListParameters
-            {
-                Filters = MakeListFilters(options, out bool none),
-            };
-            if (none)
-                return Array.Empty<INetwork>();
-
             // Send the API request.
-            IList<CoreModels.NetworkResponse> response;
-            try
-            {
-                response = await client.Core.Networks.ListNetworksAsync(request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
+            var response = await client.BuildRequest(HttpMethod.Get, "networks")
+                .WithParameters(options.ToQueryString())
+                .SendAsync<NetworkResponse[]>(ct)
+                .ConfigureAwait(false);
 
             // Convert the response into network objects.
             return response
-                .Select(net => new Network(client, new NetworkFullId(net.ID)))
+                .Select(net => new Network(client, new NetworkFullId(net.Id)))
                 .ToArray();
-        }
-
-        private static IDictionary<string, IDictionary<string, bool>>? MakeListFilters(ListNetworksOptions options, out bool none)
-        {
-            var output = new Dictionary<string, IDictionary<string, bool>>();
-            none = false;
-
-            if (options.DanglingNetworksFilter == true)
-                output.Add("dangling", new Dictionary<string, bool> { ["true"] = true });
-            else if (options.DanglingNetworksFilter == false)
-                output.Add("dangling", new Dictionary<string, bool> { ["false"] = true });
-
-            if (options.BuiltInNetworksFilter == true)
-                output.Add("type", new Dictionary<string, bool> { ["builtin"] = true });
-            else if (options.BuiltInNetworksFilter == false)
-                output.Add("type", new Dictionary<string, bool> { ["custom"] = true });
-
-            if (options.ScopeFilter is not null)
-            {
-                if (options.ScopeFilter == NetworkScope.Local)
-                    output.Add("scope", new Dictionary<string, bool> { ["local"] = true });
-                else if (options.ScopeFilter == NetworkScope.Swarm)
-                    output.Add("scope", new Dictionary<string, bool> { ["swarm"] = true });
-                else
-                    throw new NotImplementedException($"Scope type {options.ScopeFilter} is not supported for filtering networks.");
-            }
-
-            var labelsDictionary = new Dictionary<string, bool>();
-            foreach (var label in options.LabelExistsFilters)
-                labelsDictionary.Add(label, true);
-            foreach (var (label, value) in options.LabelValueFilters)
-                labelsDictionary.Add($"{label}={value}", true);
-            if (labelsDictionary.Any())
-                output.Add("label", labelsDictionary);
-
-            if (options.DriverFilter is not null)
-            {
-                var driversDict = new Dictionary<string, bool>();
-                foreach (var driverName in options.DriverFilter)
-                    driversDict.Add(driverName, true);
-                if (driversDict.Any())
-                    output.Add("driver", driversDict);
-                else
-                    none = true;
-            }
-
-            if (options.IdFilter is not null)
-            {
-                var idsDict = new Dictionary<string, bool>();
-                foreach (var id in options.IdFilter)
-                    idsDict.Add(id, true);
-                if (idsDict.Any())
-                    output.Add("id", idsDict);
-                else
-                    none = true;
-            }
-
-            if (options.NameFilter is not null)
-            {
-                var idsDict = new Dictionary<string, bool>();
-                foreach (var name in options.NameFilter)
-                    idsDict.Add(name, true);
-                if (idsDict.Any())
-                    output.Add("name", idsDict);
-                else
-                    none = true;
-            }
-
-            if (!output.Any())
-                return null;
-            return output;
         }
     }
 }

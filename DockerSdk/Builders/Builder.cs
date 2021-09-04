@@ -8,8 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
 
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using System.Net.Http;
+using System.Text.Json.Serialization;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
 
 namespace DockerSdk.Builders
 {
@@ -44,50 +47,104 @@ namespace DockerSdk.Builders
         /// The request failed due to an underlying issue such as loss of network connectivity.
         /// </exception>
         /// <exception cref="DockerImageBuildException">The build failed.</exception>
-        public async Task<IImage> BuildAsync(IBundle bundle, BuildOptions options, CancellationToken ct = default)
-        {
-            // Create the request object.
-            var request = new CoreModels.ImageBuildParameters
-            {
-                Dockerfile = bundle.DockerfilePath,
-                Labels = options.Labels,
-                NoCache = !options.UseBuildCache,
-                Tags = options.Tags.Select(name => name.ToString()).ToList(),
-                Target = options.TargetBuildStage,
-            };
+        public Task<IImage> BuildAsync(IBundle bundle, BuildOptions options, CancellationToken ct = default)
+            => BuildAsync(bundle, options, null, ct);
 
+        /// <summary>
+        /// Creates a new image from a Dockerfile.
+        /// </summary>
+        /// <param name="bundle">
+        /// A package of the Dockerfile with any other files that need to be available to the build process.
+        /// </param>
+        /// <param name="options">Specifies how to create the image.</param>
+        /// <param name="onProgress">Receives messages about the build process. These match what would display when building from 
+        /// the command line. Note that messages may include ANSI escape sequences for color formatting.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>
+        /// A <see cref="Task{Result}"/> that resolves when the image has been built and is available locally.
+        /// </returns>
+        /// <exception cref="System.Net.Http.HttpRequestException">
+        /// The request failed due to an underlying issue such as loss of network connectivity.
+        /// </exception>
+        /// <exception cref="DockerImageBuildException">The build failed.</exception>
+        public async Task<IImage> BuildAsync(IBundle bundle, BuildOptions options, Action<string>? onProgress, CancellationToken ct = default)
+        {
             // Get a stream for reading the TAR archive.
             using Stream bundleReader = await bundle.OpenTarForReadAsync().ConfigureAwait(false);
 
-            // Send the request to the daemon.
-            using var imageStream = await RunAsync(request, bundleReader, ct).ConfigureAwait(false);
-
-            // Read the messages.
-            ImageFullId? id = null;
-            foreach (var message in ReadMessages(imageStream))
+            var queryParameters = options.ToQueryParameters(bundle.DockerfilePath);
+            var contentHeaders = new Dictionary<string, string>
             {
-                // Is it an error message?
-                if (message.TryGetProperty("errorDetail", out JsonElement errorDetail))
+                ["Content-Type"] = "application/x-tar",
+                // TODO: X-Registry-Config
+            };
+
+            // Send the request to the daemon.
+            var observable = await client.BuildRequest(HttpMethod.Post, "build")
+                .WithParameters(queryParameters)
+                .WithBody(bundleReader, contentHeaders)
+                .RejectStatus(HttpStatusCode.BadRequest, "dockerfile parse error", err => new DockerImageBuildException($"The build failed: {err}"))
+                .SendAndStreamResults<ImageBuildMessage>(ct).ConfigureAwait(false);
+
+            var tcs = new TaskCompletionSource<IImage>();
+            //using var ctRegistration = ct.Register(() => tcs.TrySetCanceled()); // TODO: put this back
+
+            using var subscription = observable
+                .ObserveOn(ThreadPoolScheduler.Instance)  // avoid race condition when completing the TCS
+                .Subscribe(
+                item =>
                 {
-                    var errorText = errorDetail.GetProperty("message").GetString()!;
-                    throw new DockerImageBuildException("The build failed: " + errorText);
-                }
+                    // If we have a progress message, emit it.
+                    var message = item.Stream;
+                    if (message != null)
+                        onProgress?.Invoke(message);
 
-                // Is the message providing the image ID?
-                if (message.TryGetProperty("aux", out JsonElement aux) && aux.TryGetProperty("ID", out JsonElement idElement))
-                {
-                    id = ImageFullId.Parse(idElement.GetString()!);
-                }
+                    // Check for an image ID. If we get it, the image must have finished building successfully,
+                    // so resolve the task.
+                    var id = item.Aux?.ImageId;
+                    if (id != null)
+                    {
+                        var image = new Image(client, new ImageFullId(id));
+                        tcs.TrySetResult(image);
+                        return;
+                    }
 
-                // Ignore all other messages.
-            }
+                    // Check for an error message. If we get one, the build failed, so throw a build exception.
+                    var error = item.Error;
+                    if (error != null)
+                        tcs.TrySetException(new DockerImageBuildException(error));
+                },
+                ex => tcs.TrySetException(ex),
+                () => tcs.TrySetException(new DockerException("The build stream did not provide an image ID.")));
 
-            // Sanity check: we should have an image ID.
-            if (id is null)
-                throw new DockerException("The build output did not provide an image ID.");
+            return await tcs.Task.ConfigureAwait(false);
+        }
 
-            // Return the image object.
-            return new Image(client, id);
+        private class ImageBuildMessage
+        {
+            [JsonPropertyName("aux")]
+            public ImageBuildMessageAux? Aux { get; set; }
+
+            [JsonPropertyName("stream")]
+            public string? Stream { get; set; }
+
+            [JsonPropertyName("errorDetail")]
+            public ImageBuildMessageErrorDetail? ErrorDetail { get; set; }
+
+            [JsonPropertyName("error")]
+            public string? Error { get; set; }
+        }
+
+        private class ImageBuildMessageAux
+        {
+            [JsonPropertyName("ID")]
+            public string? ImageId { get; set; }
+        }
+
+        private class ImageBuildMessageErrorDetail
+        {
+            [JsonPropertyName("message")]
+            public string? Message { get; set; }
         }
 
         /// <summary>
@@ -166,31 +223,6 @@ namespace DockerSdk.Builders
         {
             var bundle = await Bundle.FromFilesAsync(contextPath, dockerfilePath, filePaths, ct).ConfigureAwait(false);
             return await BuildAsync(bundle, options, ct).ConfigureAwait(false);
-        }
-
-        private static JsonElement[] ReadMessages(Stream imageStream)
-        {
-            using var progressReader = new StreamReader(imageStream);
-            var lines = progressReader.ReadToEnd();
-            return lines.Split('\n')
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(line => JsonSerializer.Deserialize<JsonElement>(line))
-                .ToArray(); // must force the enumerable to resolve before progressReader is disposed
-        }
-
-        private async Task<Stream> RunAsync(CoreModels.ImageBuildParameters request, Stream bundleReader, CancellationToken ct)
-        {
-            try
-            {
-                return await client.Core.Images.BuildImageFromDockerfileAsync(bundleReader, request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ex.StatusCode == HttpStatusCode.BadRequest && ex.Message.Contains("dockerfile parse error"))
-                    throw new DockerImageBuildException("The build failed: " + ex.ReadJsonMessage(), ex);
-
-                throw DockerException.Wrap(ex);
-            }
         }
     }
 }

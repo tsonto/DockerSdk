@@ -1,8 +1,7 @@
 ﻿using DockerSdk.Registries;
+using DockerSdk.Registries.Dto;
 using FluentAssertions;
 using Xunit;
-
-using CoreModels = Docker.DotNet.Models;
 
 namespace DockerSdk.Tests
 {
@@ -16,8 +15,8 @@ namespace DockerSdk.Tests
 
             access.AddAnonymous("abc");
 
-            access.TryGetAuthObject("abc", out CoreModels.AuthConfig? actual).Should().BeTrue(); ;
-            actual.Should().BeEquivalentTo(new CoreModels.AuthConfig { ServerAddress = "abc" });
+            access.TryGetAuthObject("abc", out AuthConfig? actual).Should().BeTrue(); ;
+            actual.Should().BeEquivalentTo(new AuthConfig { ServerAddress = "abc" });
         }
 
         [Fact]
@@ -27,8 +26,8 @@ namespace DockerSdk.Tests
 
             access.AddBasicAuth("abc", "donald", "duck");
 
-            access.TryGetAuthObject("abc", out CoreModels.AuthConfig? actual).Should().BeTrue(); ;
-            actual.Should().BeEquivalentTo(new CoreModels.AuthConfig { ServerAddress = "abc", Username = "donald", Password = "duck" });
+            access.TryGetAuthObject("abc", out AuthConfig? actual).Should().BeTrue(); ;
+            actual.Should().BeEquivalentTo(new AuthConfig { ServerAddress = "abc", Username = "donald", Password = "duck" });
         }
 
         [Fact]
@@ -38,8 +37,8 @@ namespace DockerSdk.Tests
 
             access.AddBasicAuth("docker.io", "donald", "duck");
 
-            access.TryGetAuthObject("docker.io", out CoreModels.AuthConfig? actual).Should().BeTrue(); ;
-            actual.Should().BeEquivalentTo(new CoreModels.AuthConfig { ServerAddress = "docker.io", Username = "donald", Password = "duck" });
+            access.TryGetAuthObject("docker.io", out AuthConfig? actual).Should().BeTrue(); ;
+            actual.Should().BeEquivalentTo(new AuthConfig { ServerAddress = "docker.io", Username = "donald", Password = "duck" });
         }
 
         [Fact]
@@ -49,8 +48,8 @@ namespace DockerSdk.Tests
 
             access.AddIdentityToken("abc", "123-456-789");
 
-            access.TryGetAuthObject("abc", out CoreModels.AuthConfig? actual).Should().BeTrue(); ;
-            actual.Should().BeEquivalentTo(new CoreModels.AuthConfig { ServerAddress = "abc", IdentityToken = "123-456-789" });
+            access.TryGetAuthObject("abc", out AuthConfig? actual).Should().BeTrue(); ;
+            actual.Should().BeEquivalentTo(new AuthConfig { ServerAddress = "abc", IdentityToken = "123-456-789" });
         }
 
         [Fact]

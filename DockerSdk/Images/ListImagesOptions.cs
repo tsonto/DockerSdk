@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DockerSdk.Core;
 
 namespace DockerSdk.Images
 {
@@ -74,6 +77,28 @@ namespace DockerSdk.Images
         /// </para>
         /// </remarks>
         public List<string> ReferencePatternFilters { get; } = new();
+
+        internal string ToQueryString()
+        {
+            var dangling = DanglingImagesFilter switch
+            {
+                true => "true",
+                false => "false",
+                null => null
+            };
+
+            var labels = LabelValueFilters.Select(kvp => $"{kvp.Key}={kvp.Value}").Concat(LabelExistsFilters);
+
+            var filters = new QueryStringBuilder.StringStringBool();
+            filters.Set("dangling", dangling);
+            filters.Set("label", labels);
+            filters.Set("reference", ReferencePatternFilters);
+
+            var builder = new QueryStringBuilder();
+            builder.Set("all", !HideIntermediateImages, false);
+            builder.Set("filters", filters);
+            return builder.Build();
+        }
 
         // TODO: SinceImageFilter, if there's sufficient need for it
     }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
 using DockerSdk.Networks.Events;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using System.Net.Http;
+using System.Net;
 
 namespace DockerSdk.Networks
 {
@@ -87,40 +86,16 @@ namespace DockerSdk.Networks
                 .Where(ev => ev.NetworkId == nfid && ev.ContainerId == cfid)
                 .Subscribe(ev => found.SetResult(ev));
 
-            var request = new CoreModels.NetworkConnectParameters
-            {
-                Container = container,
-                EndpointConfig = new CoreModels.EndpointSettings()
-                {
-                    Aliases = options.ContainerAliases.ToArray(),
-                    DriverOpts = options.DriverOptions,
-                    IPAddress = options.IPv4Address?.ToString(),
-                    GlobalIPv6Address = options.IPv6Address?.ToString(),
-                },
-            };
+            await client.BuildRequest(HttpMethod.Post, $"networks/{nfid}/connect")
+                .WithJsonBody(options.ToBodyObject(container))
+                .AcceptStatus(HttpStatusCode.OK)
+                .RejectStatus(HttpStatusCode.NotFound, $"No such container: {container}", _ => new ContainerNotFoundException($"Container \"{container}\" does not exist."))
+                // TODO: NetworkNotFoundException
+                .SendAsync(ct)
+                .ConfigureAwait(false);
 
-            try
-            {
-                await client.Core.Networks.ConnectNetworkAsync(network, request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                // A bug in Docker.DotNet (https://github.com/dotnet/Docker.DotNet/issues/520) causes a
-                // NetworkNotFoundException exception when it should really be a container-not-found exception. Attempt
-                // to detect this and return the correct exception. When the bug is fixed we can remove this code.
-                if (ex.ResponseBody.Contains($"No such container: {container}"))
-                    throw new ContainerNotFoundException($"Container \"{container}\" does not exist.");
-
-                if (ContainerNotFoundException.TryWrap(ex, container, out var cex))
-                    throw cex;
-                if (NetworkNotFoundException.TryWrap(ex, network, out var nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
-
-            // Wait until we receive the confirmation message *and* all direct subscribers have been notified.
-            var completionEvent = await found.Task.ConfigureAwait(false);
-            await completionEvent.Delivered.ConfigureAwait(false);
+            // Wait until we receive the confirmation message.
+            await found.Task.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

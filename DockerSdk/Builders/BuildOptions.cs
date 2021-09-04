@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DockerSdk.Core;
 using DockerSdk.Images;
 
 namespace DockerSdk.Builders
@@ -33,6 +34,19 @@ namespace DockerSdk.Builders
         /// Gets a collection of the labels to apply to the image.
         /// </summary>
         public Dictionary<string, string> Labels = new();
+
+        internal string ToQueryParameters(string dockerfilePath)
+        {
+            var builder = new QueryStringBuilder();
+            builder.Set("dockerfile", dockerfilePath);
+            builder.Set("labels", Labels);
+            builder.Set("nocache", !UseBuildCache, false);
+            foreach (var tag in Tags)
+                builder.Set("t", tag);
+            builder.Set("target", TargetBuildStage);
+            return builder.Build();
+
+        }
 
         /*  // TODO: restore this when https://github.com/dotnet/Docker.DotNet/issues/522 is fixed
         /// <summary>

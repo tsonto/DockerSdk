@@ -1,6 +1,6 @@
 ﻿using DockerSdk.Events;
+using DockerSdk.Events.Dto;
 using DockerSdk.Images;
-using Message = Docker.DotNet.Models.Message;
 
 namespace DockerSdk.Containers.Events
 {
@@ -13,9 +13,9 @@ namespace DockerSdk.Containers.Events
             : base(message, EventSubjectType.Container)
         {
             EventType = eventType;
-            ContainerId = new ContainerFullId(message.Actor.ID);
+            ContainerId = new ContainerFullId(message.Actor!.Id);
 
-            if (message.Actor.Attributes.TryGetValue("name", out var nameString))
+            if (message.Actor!.Attributes!.TryGetValue("name", out var nameString))
                 if (ContainerName.TryParse(nameString, out var name))
                     ContainerName = name;
 

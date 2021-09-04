@@ -1,4 +1,4 @@
-﻿using Message = Docker.DotNet.Models.Message;
+﻿using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Containers.Events
 {
@@ -11,7 +11,7 @@ namespace DockerSdk.Containers.Events
     {
         internal ContainerSignalledEvent(Message message) : base(message, ContainerEventType.Signalled)
         {
-            if (message.Actor.Attributes.TryGetValue("signal", out string? signalString))
+            if (message.Actor!.Attributes.TryGetValue("signal", out string? signalString))
                 if (int.TryParse(signalString, out int signalNumber))
                     SignalNumber = signalNumber;
         }

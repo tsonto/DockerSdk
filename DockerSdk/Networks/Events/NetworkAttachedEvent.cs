@@ -1,5 +1,5 @@
-﻿using Docker.DotNet.Models;
-using DockerSdk.Containers;
+﻿using DockerSdk.Containers;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Networks.Events
 {

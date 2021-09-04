@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Images.Dto;
 
 namespace DockerSdk.Images
 {
@@ -18,7 +18,7 @@ namespace DockerSdk.Images
 
             var raw = await LoadCoreAsync(client, image, ct).ConfigureAwait(false);
 
-            var id = new ImageFullId(raw.ID);
+            var id = new ImageFullId(raw.Id);
             return new Image(client, id);
         }
 
@@ -40,8 +40,8 @@ namespace DockerSdk.Images
 
             var raw = await LoadCoreAsync(client, image, ct).ConfigureAwait(false);
 
-            var id = new ImageFullId(raw.ID);
-            var osType = Enum.Parse<GuestOsType>(raw.Os, true);
+            var id = new ImageFullId(raw.Id);
+            var osType = Enum.Parse<GuestOsType>(raw.OS, true);
             var parent = string.IsNullOrEmpty(raw.Parent)
                 ? null
                 : new Image(client, new ImageFullId(raw.Parent));
@@ -72,18 +72,10 @@ namespace DockerSdk.Images
                 _ => "/"
             };
 
-        private static async Task<CoreModels.ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct)
-        {
-            try
-            {
-                return await client.Core.Images.InspectImageAsync(image, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ImageNotFoundLocallyException.TryWrap(ex, image, out var wrapped))
-                    throw wrapped;
-                throw DockerException.Wrap(ex);
-            }
-        }
+        private static Task<ImageInspectResponse> LoadCoreAsync(DockerClient client, ImageReference image, CancellationToken ct)
+            => client.BuildRequest(HttpMethod.Get, $"images/{image}/json")
+                .RejectStatus(HttpStatusCode.NotFound, _ => new ImageNotFoundLocallyException($"Image {image} does not exist locally."))
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAsync<ImageInspectResponse>(ct);
     }
 }

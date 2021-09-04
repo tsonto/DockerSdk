@@ -1,6 +1,6 @@
 ﻿using DockerSdk.Events;
 using DockerSdk.Images;
-using Message = Docker.DotNet.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Images.Events
 {
@@ -13,7 +13,7 @@ namespace DockerSdk.Images.Events
             : base(message, EventSubjectType.Container)
         {
             EventType = eventType;
-            ImageReference = ImageReference.Parse(message.Actor.ID);
+            ImageReference = ImageReference.Parse(message.Actor.Id);
         }
 
         /// <summary>

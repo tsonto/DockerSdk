@@ -6,8 +6,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Images;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using System.Net.Http;
+using DockerSdk.Registries.Dto;
 
 namespace DockerSdk.Registries
 {
@@ -56,7 +56,7 @@ namespace DockerSdk.Registries
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
                 entry = _entriesByServer[registry] = new RegistryEntry(registry);
 
-            entry.AuthObject = new CoreModels.AuthConfig { ServerAddress = registry };
+            entry.AuthObject = new AuthConfig { ServerAddress = registry };
             entry.IsAnonymous = true;
         }
 
@@ -96,7 +96,7 @@ namespace DockerSdk.Registries
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
                 entry = _entriesByServer[registry] = new RegistryEntry(registry);
 
-            entry.AuthObject = new CoreModels.AuthConfig { ServerAddress = registry, Username = username, Password = password };
+            entry.AuthObject = new AuthConfig { ServerAddress = registry, Username = username, Password = password };
             entry.IsAnonymous = false;
         }
 
@@ -130,7 +130,7 @@ namespace DockerSdk.Registries
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
                 entry = _entriesByServer[registry] = new RegistryEntry(registry);
 
-            entry.AuthObject = new CoreModels.AuthConfig { ServerAddress = registry, IdentityToken = identityToken };
+            entry.AuthObject = new AuthConfig { ServerAddress = registry, IdentityToken = identityToken };
             entry.IsAnonymous = false;
         }
 
@@ -178,30 +178,29 @@ namespace DockerSdk.Registries
 
             // If we have an entry for that registry, get the auth object. Otherwise create a new auth object, and set a
             // flag indicating that the registry isn't already known.
-            bool isInCache = TryGetAuthObject(registry, out CoreModels.AuthConfig? authObject);
+            bool isInCache = TryGetAuthObject(registry, out AuthConfig? authObject);
             if (!isInCache)
-                authObject = new CoreModels.AuthConfig { ServerAddress = registry };
+                authObject = new AuthConfig { ServerAddress = registry };
 
-            try
+            AuthResponse response;
+            try // TODO: ideally we shouldn't use a try/catch for this
             {
-                // Try to authenticate.
-                await _client.Core.System.AuthenticateAsync(authObject, ct).ConfigureAwait(false);
+                response = await _client.BuildRequest(HttpMethod.Post, "auth")
+                    .WithJsonBody(authObject!)
+                    .AcceptStatus(HttpStatusCode.NoContent) // 200 means that it generated an identity token; 204 means that it didn't
+                    .SendAsync<AuthResponse>(ct)
+                    .ConfigureAwait(false);
             }
-            catch (Core.DockerApiException ex)
+            catch(RegistryAuthException)
             {
-                // If the exception represents a registry auth failure, return false instead.
-                if (RegistryAuthException.TryWrap(ex, registry, out _))
-                    return false;
-
-                // For any other kind of error, throw.
-                throw DockerException.Wrap(ex);
+                return false;
             }
 
-            // TODO after https://github.com/dotnet/Docker.DotNet/issues/493 is resolved: if we're given an auth token,
-            // clear username/pass and start using that instead
-
-            // If it wasn't in cache but it accepted anonymous access, cache it now.
-            if (!isInCache)
+            // If we're given an auth token, clear username/pass and start using that instead.
+            if (!string.IsNullOrEmpty(response.IdentityToken))
+                AddIdentityToken(registry, response.IdentityToken);
+            // Otherwise, if it wasn't in cache but it accepted anonymous access, cache it now.
+            else if (!isInCache)
                 AddAnonymous(registry);
 
             return true;
@@ -288,9 +287,9 @@ namespace DockerSdk.Registries
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        internal async Task<CoreModels.AuthConfig> GetAuthObjectAsync(string registry, CancellationToken ct = default)
+        internal async Task<AuthConfig> GetAuthObjectAsync(string registry, CancellationToken ct = default)
         {
-            if (TryGetAuthObject(registry, out CoreModels.AuthConfig? auth))
+            if (TryGetAuthObject(registry, out AuthConfig? auth))
                 return auth;
 
             if (!await CheckAuthenticationAsync(registry, ct).ConfigureAwait(false))
@@ -307,7 +306,7 @@ namespace DockerSdk.Registries
         /// </summary>
         /// <param name="registry">The name of the registry to retrieve information about.</param>
         /// <param name="authObject"></param>
-        internal bool TryGetAuthObject(string registry, [NotNullWhen(returnValue: true)] out CoreModels.AuthConfig? authObject)
+        internal bool TryGetAuthObject(string registry, [NotNullWhen(returnValue: true)] out AuthConfig? authObject)
         {
             if (!_entriesByServer.TryGetValue(registry, out RegistryEntry? entry))
             {

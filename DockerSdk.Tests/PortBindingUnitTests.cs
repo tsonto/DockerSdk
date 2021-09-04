@@ -3,7 +3,7 @@ using System.Net;
 using DockerSdk.Containers;
 using FluentAssertions;
 using Xunit;
-using CoreBinding = Docker.DotNet.Models.PortBinding;
+using CoreBinding = DockerSdk.Networks.Dto.PortBinding;
 
 namespace DockerSdk.Tests
 {
@@ -20,7 +20,7 @@ namespace DockerSdk.Tests
                 new(443, TransportType.All, IPAddress.Parse("1.2.3.0"), 443),
             };
 
-            var actual = ContainerAccess.MakePortBindings(input);
+            var actual = CreateContainerOptions.MakePortBindings(input);
 
             var expected = new Dictionary<string, IList<CoreBinding>>
             {

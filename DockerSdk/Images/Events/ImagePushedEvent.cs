@@ -1,5 +1,5 @@
 ﻿using DockerSdk.Registries;
-using Message = Docker.DotNet.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Images.Events
 {

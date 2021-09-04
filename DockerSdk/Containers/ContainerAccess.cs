@@ -12,8 +12,9 @@ using DockerSdk.Containers.Events;
 using DockerSdk.Images;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using System.Net.Http;
+using DockerSdk.Containers.Dto;
 
 namespace DockerSdk.Containers
 {
@@ -301,40 +302,12 @@ namespace DockerSdk.Containers
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
+            // Throw an exception if the given name is invalid.
             if (options.Name is not null)
                 _ = ContainerName.Parse(options.Name);
 
             // Optionally pull the image.
             await PullConditionallyAsync(options.PullCondition, image, ct).ConfigureAwait(false);
-
-            // Build the creation request's parameters.
-            var request = new CoreModels.CreateContainerParameters
-            {
-                Image = image,
-                Name = options.Name,
-                Hostname = options.Hostname,
-                Domainname = options.DomainName,
-                User = options.User,
-                HostConfig = new CoreModels.HostConfig
-                {
-                    PortBindings = MakePortBindings(options.PortBindings),
-                    Isolation = options.IsolationTech,
-                    AutoRemove = options.ExitAction == ContainerExitAction.Remove,
-                    RestartPolicy = options.ExitAction switch
-                    {
-                        ContainerExitAction.Restart => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.Always },
-                        ContainerExitAction.RestartUnlessStopped => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.UnlessStopped },
-                        ContainerExitAction.RestartOnFailure => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.OnFailure, MaximumRetryCount = options.MaximumRetriesCount ?? 3 },
-                        _ => new CoreModels.RestartPolicy { Name = CoreModels.RestartPolicyKind.No }
-                    },
-                },
-                Entrypoint = options.Entrypoint,
-                Cmd = options.Command,
-                Env = MakeEnvironmentVariables(options.EnvironmentVariables),
-                NetworkDisabled = options.DisableNetworking,
-                Labels = options.Labels,
-                NetworkingConfig = MakeNetworkConfigs(options.Networks),
-            };
 
             // Start capturing creation events. We want to find the event about the new container, but we don't have the
             // container's ID yet. So we store up events behind a "dam" and will release them once we have the ID.
@@ -347,28 +320,22 @@ namespace DockerSdk.Containers
                 .Subscribe(ev => found.SetResult(ev));
 
             // Call the API endpoint.
-            CoreModels.CreateContainerResponse response;
-            try
-            {
-                response = await _docker.Core.Containers.CreateContainerAsync(request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ImageNotFoundLocallyException.TryWrap(ex, image, out DockerException? wrapped))
-                    throw wrapped;
-                throw DockerException.Wrap(ex);
-            }
+            var response = await _docker.BuildRequest(HttpMethod.Post, "containers/create")
+                .WithParameters(options.ToQueryString())
+                .WithJsonBody(options.ToBodyObject(image))
+                .AcceptStatus(HttpStatusCode.Created)
+                .RejectStatus(HttpStatusCode.NotFound, _ => new ImageNotFoundLocallyException($"Image {image} does not exist locally."))
+                .SendAsync<CreateContainerResponse>(ct)
+                .ConfigureAwait(false);
 
             // Now that we have the ID, start processing events to look for it.
-            id = response.ID;
+            id = response.Id;
             open();
 
-            var output = new Container(_docker, new ContainerFullId(response.ID));
+            var output = new Container(_docker, new ContainerFullId(response.Id));
 
-            // Don't leave the method until we have acknowledgement that the operation has completed *and* all direct
-            // observers have been notified.
-            ContainerEvent completionEvent = await found.Task.ConfigureAwait(false);
-            await completionEvent.Delivered.ConfigureAwait(false);
+            // Don't leave the method until we have acknowledgement that the operation has completed.
+            await found.Task.ConfigureAwait(false);
 
             return output;
         }
@@ -492,26 +459,15 @@ namespace DockerSdk.Containers
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var request = new CoreModels.ContainersListParameters
-            {
-                All = !options.OnlyRunningContainers,
-                Filters = MakeFilters(options),
-                Limit = options.MaxResults,
-                Size = false,
-            };
+            var qp = options.ToQueryParameters();
 
-            IList<CoreModels.ContainerListResponse> response;
-            try
-            {
-                response = await _docker.Core.Containers.ListContainersAsync(request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
+            var response = await _docker.BuildRequest(HttpMethod.Get, "containers/json")
+                .WithParameters(qp)
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAsync<ContainerListResponse[]>(ct);
 
             return response
-                .Select(r => new Container(_docker, new(r.ID)))
+                .Select(r => new Container(_docker, new(r.Id)))
                 .ToImmutableArray();
         }
 
@@ -584,37 +540,19 @@ namespace DockerSdk.Containers
                 .Where(ev => ev.ContainerId == cfid)
                 .Subscribe(ev => found.SetResult(ev));
 
-            // Send the request to the API.
-            bool alreadyRunning;
-            try
-            {
-                alreadyRunning = !await _docker.Core.Containers.StartContainerAsync(container, new(), ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                // A bug in Docker.DotNet (https://github.com/dotnet/Docker.DotNet/issues/519) causes a
-                // ContainerNotFoundException exception when it should really be a network-not-found exception. Attempt
-                // to detect this and return the correct exception. When the bug is fixed, we can change this code to
-                // detect network-not-found more properly.
-                var match = Regex.Match(ex.ResponseBody, "\"message\":\"network (.*) not found\"");
-                if (match.Success)
-                {
-                    var network = match.Groups[0].Value;
-                    throw new NetworkNotFoundException($"No network \"{network}\" exists.");
-                }
-
-                if (ContainerNotFoundException.TryWrap(ex, container, out var wrapper))
-                    throw wrapper;
-                throw DockerException.Wrap(ex);
-            }
+            var response = await _docker.BuildRequest(HttpMethod.Post, $"containers/{cfid}/start")
+                .AcceptStatus(HttpStatusCode.NoContent) // not already running
+                .AcceptStatus(HttpStatusCode.NotModified) // already running
+                .SendAsync(ct)
+                .ConfigureAwait(false);
 
             // If the container was already running, don't wait for a message about it. (There won't be one.)
+            var alreadyRunning = response.StatusCode == HttpStatusCode.NotModified;
             if (alreadyRunning)
                 return;
 
-            // Wait until we receive the confirmation message *and* all direct subscribers have been notified.
-            var completionEvent = await found.Task.ConfigureAwait(false);
-            await completionEvent.Delivered.ConfigureAwait(false);
+            // Wait until we receive the confirmation message.
+            await found.Task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -627,110 +565,6 @@ namespace DockerSdk.Containers
         /// </returns>
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
             => _docker.OfType<ContainerEvent>().Subscribe(observer);
-
-        internal static IDictionary<string, IList<CoreModels.PortBinding>> MakePortBindings(IEnumerable<PortBinding> portBindings)
-        {
-            return (from binding in portBindings
-                    let key = GetKey(binding)
-                    group binding.HostEndpoint by key into g
-                    let hostParts = FormatEndpoints(g)
-                    select new KeyValuePair<string, IList<CoreModels.PortBinding>>(g.Key, hostParts))
-                   .ToDictionary();
-
-            string GetKey(PortBinding binding)
-                => binding.ContainerPort.ToStringI()
-                + binding.Transport switch
-                {
-                    TransportType.Udp => "/udp",
-                    TransportType.Tcp => "/tcp",
-                    _ => ""
-                };
-
-            CoreModels.PortBinding[] FormatEndpoints(IEnumerable<IPEndPoint> endpoints)
-                => endpoints.Select(FormatEndpoint).ToArray();
-
-            CoreModels.PortBinding FormatEndpoint(IPEndPoint endpoint)
-                => new()
-                {
-                    HostIP = endpoint.Address.ToString(),
-                    HostPort = endpoint.Port.ToStringI(),
-                };
-        }
-
-        private IList<string> MakeEnvironmentVariables(Dictionary<string, string?> environmentVariables)
-        {
-            if (environmentVariables.Keys.Any(k => k.Contains('=')))
-                throw new ArgumentException("Environment variable names must not contain equal signs.");
-
-            return environmentVariables
-                   .Select(Convert)
-                   .ToArray();
-
-            static string Convert(KeyValuePair<string, string?> kvp) => kvp.Value is null ? kvp.Key : $"{kvp.Key}={kvp.Value}";
-        }
-
-        private IDictionary<string, IDictionary<string, bool>>? MakeFilters(ListContainersOptions options)
-        {
-            var output = new Dictionary<string, IDictionary<string, bool>>();
-
-            // Build the "ancestor" filter.
-            if (!string.IsNullOrEmpty(options.AncestorFilter))
-            {
-                _ = ImageReference.Parse(options.AncestorFilter);
-                var subdict = new Dictionary<string, bool>() { [options.AncestorFilter] = true };
-                output.Add("ancestor", subdict);
-            }
-
-            // Build the "exited" filter.
-            if (options.ExitCodeFilter.HasValue)
-            {
-                var exitCodeString = options.ExitCodeFilter.Value.ToString(CultureInfo.InvariantCulture);
-                var subdict = new Dictionary<string, bool>() { [exitCodeString] = true };
-                output.Add("exited", subdict);
-            }
-
-            // Build the "label" filter. This comes from two settings, LabelExistsFilters and LabelValueFilters.
-            var labelsDictionary = new Dictionary<string, bool>();
-            foreach (var label in options.LabelExistsFilters)
-                labelsDictionary.Add(label, true);
-            foreach (var (label, value) in options.LabelValueFilters)
-                labelsDictionary.Add($"{label}={value}", true);
-            if (labelsDictionary.Any())
-                output.Add("label", labelsDictionary);
-
-            // Build the "name" filter. This is a glob pattern.
-            if (!string.IsNullOrEmpty(options.NameFilter))
-            {
-                var subdict = new Dictionary<string, bool>() { [options.NameFilter] = true };
-                output.Add("name", subdict);
-            }
-
-            // Build the "status" filter.
-            if (options.StatusFilter.HasValue)
-            {
-                var statusString = options.StatusFilter.Value.ToString().ToLowerInvariant();
-                var subdict = new Dictionary<string, bool>() { [statusString] = true };
-                output.Add("status", subdict);
-            }
-
-            // Note: This is not all available filters. As of 4/2021, these other filters exist but are not implemented
-            // here: before, expose, health, id, isolation, is-task, network, publish, since, volume.
-
-            if (!output.Any())
-                return null;
-            return output;
-        }
-
-        private CoreModels.NetworkingConfig? MakeNetworkConfigs(IEnumerable<NetworkReference> networks)
-        {
-            if (!networks.Any())
-                return null;
-            var x = networks.ToDictionary(net => net.ToString(), net => new CoreModels.EndpointSettings());
-            return new CoreModels.NetworkingConfig
-            {
-                EndpointsConfig = x,
-            };
-        }
 
         private async Task PullConditionallyAsync(PullImageCondition pullCondition, ImageReference image, CancellationToken ct)
         {

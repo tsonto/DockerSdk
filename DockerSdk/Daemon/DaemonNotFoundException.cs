@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DockerSdk
+namespace DockerSdk.Daemon
 {
     /// <summary>
     /// Indicates that the Docker daemon is not present or not running.

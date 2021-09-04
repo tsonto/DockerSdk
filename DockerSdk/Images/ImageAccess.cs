@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using DockerSdk.Builders;
 using DockerSdk.Images.Events;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using DockerSdk.Core;
+using System.Net.Http;
+using System.Net;
+using DockerSdk.Images.Dto;
 
 namespace DockerSdk.Images
 {
@@ -131,23 +133,13 @@ namespace DockerSdk.Images
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var request = new CoreModels.ImagesListParameters
-            {
-                All = !options.HideIntermediateImages,
-                Filters = MakeListFilters(options),
-            };
+            var response = await _docker.BuildRequest(HttpMethod.Get, "images/json")
+                .WithParameters(options.ToQueryString())
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAsync<ImagesListResponse[]>(ct)
+                .ConfigureAwait(false);
 
-            IList<CoreModels.ImagesListResponse> response;
-            try
-            {
-                response = await _docker.Core.Images.ListImagesAsync(request, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
-
-            return response.Select(raw => new Image(_docker, new ImageFullId(raw.ID))).ToArray();
+            return response.Select(raw => new Image(_docker, new ImageFullId(raw.Id))).ToArray();
         }
 
         /// <summary>
@@ -208,55 +200,30 @@ namespace DockerSdk.Images
             var registryName = _docker.Registries.GetRegistryName(image);
             var auth = await _docker.Registries.GetAuthObjectAsync(registryName, ct).ConfigureAwait(false);
 
-            // Perform the pull request.
-            var request = new CoreModels.ImagesCreateParameters
-            {
-                FromImage = image,
-            };
-            try
-            {
-                await _docker.Core.Images.CreateImageAsync(request, auth, new NoOpProgress(), ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (ImageNotFoundException.TryWrap(ex, image, out var nex))
-                    throw nex;
-                if (RegistryAuthException.TryWrap(ex, registryName, out nex))
-                    throw nex;
-                throw DockerException.Wrap(ex);
-            }
+            var qsb = new QueryStringBuilder();
+            qsb.Set("fromImage", image);
+            var qs = qsb.Build();
+
+            // Perform the pull request. We ignore all the progress messages.
+            await _docker.BuildRequest(HttpMethod.Post, "images/create")
+                .WithParameters(qs)
+                .WithAuthHeader(auth)
+                .RejectStatus(HttpStatusCode.NotFound, "manifest unknown", _ => new ImageNotFoundRemotelyException($"Image {image} does not exist."))
+                .RejectStatus(HttpStatusCode.NotFound, "No such image:", _ => new ImageNotFoundLocallyException($"Image {image} does not exist locally, and auto-pull is disabled."))
+                .RejectStatus(HttpStatusCode.NotFound, "access to the resource is denied", _ => new RegistryAuthException($"Authorization to registry {registryName} failed: denied.")) // This happens when we attempt to access an image on a private registry without the credentials.
+                .RejectStatus(HttpStatusCode.NotFound, err => new ResourceNotFoundException(err))
+                .RejectStatus(HttpStatusCode.Unauthorized, _ => new RegistryAuthException($"Authorization to registry {registryName} failed: unauthorized."))
+                .RejectStatus(HttpStatusCode.InternalServerError, "401 Unauthorized", _ => new RegistryAuthException($"Authorization to registry {registryName} failed: unauthorized."))
+                .RejectStatus(HttpStatusCode.InternalServerError, "no basic auth credentials", _ => new RegistryAuthException($"Authorization to registry {registryName} failed: expected basic auth credentials.")) // This happens when we attempt to access an image on a private registry that expects basic auth, but we gave it either no credentials or an identity token.
+                .AcceptStatus(HttpStatusCode.OK)
+                .SendAsync(ct)
+                .ConfigureAwait(false);
 
             // Return an object representing the new image.
             return await GetAsync(image, ct).ConfigureAwait(false);
         }
 
-        private static IDictionary<string, IDictionary<string, bool>>? MakeListFilters(ListImagesOptions options)
-        {
-            var output = new Dictionary<string, IDictionary<string, bool>>();
 
-            if (options.DanglingImagesFilter == true)
-                output.Add("dangling", new Dictionary<string, bool> { ["true"] = true });
-            else if (options.DanglingImagesFilter == false)
-                output.Add("dangling", new Dictionary<string, bool> { ["false"] = true });
-
-            var labelsDictionary = new Dictionary<string, bool>();
-            foreach (var label in options.LabelExistsFilters)
-                labelsDictionary.Add(label, true);
-            foreach (var (label, value) in options.LabelValueFilters)
-                labelsDictionary.Add($"{label}={value}", true);
-            if (labelsDictionary.Any())
-                output.Add("label", labelsDictionary);
-
-            var globsDictionary = new Dictionary<string, bool>();
-            foreach (var glob in options.ReferencePatternFilters)
-                globsDictionary.Add(glob, true);
-            if (globsDictionary.Any())
-                output.Add("reference", globsDictionary);
-
-            if (!output.Any())
-                return null;
-            return output;
-        }
 
         /// <summary>
         /// Subscribes to events about images.
@@ -268,13 +235,6 @@ namespace DockerSdk.Images
         /// </returns>
         public IDisposable Subscribe(IObserver<ImageEvent> observer)
             => _docker.OfType<ImageEvent>().Subscribe(observer);
-
-        private class NoOpProgress : IProgress<CoreModels.JSONMessage>
-        {
-            public void Report(CoreModels.JSONMessage value)
-            {
-            }
-        }
 
         // TODO: PushAsync
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DockerSdk.Containers.Events;
 using DockerSdk.Images.Events;
 using DockerSdk.Networks.Events;
-using Message = Docker.DotNet.Models.Message;
+using DockerSdk.Events.Dto;
 
 namespace DockerSdk.Events
 {
@@ -19,7 +19,6 @@ namespace DockerSdk.Events
             SubjectType = type;
             Timestamp = MakeTimestamp(message.Time, message.TimeNano);
             raw = message;
-            delivery = new TaskCompletionSource();
         }
 
         /// <summary>
@@ -31,7 +30,7 @@ namespace DockerSdk.Events
         IReadOnlyDictionary<string, string> IEventLowLevel.ActorDetails => raw.Actor.Attributes.ToImmutableDictionary();
 
         /// <inheritdoc/>
-        string IEventLowLevel.ActorId => raw.Actor.ID;
+        string IEventLowLevel.ActorId => raw.Actor.Id;
 
         /// <inheritdoc/>
         public EventSubjectType SubjectType { get; }
@@ -48,8 +47,8 @@ namespace DockerSdk.Events
         /// </remarks>
         public DateTimeOffset Timestamp { get; }
 
-        internal Task Delivered => delivery.Task;
-        private readonly TaskCompletionSource delivery;
+        // internal Task Delivered => delivery.Task;
+
         private readonly Message raw;
 
         /// <summary>
@@ -65,8 +64,6 @@ namespace DockerSdk.Events
                 "image" => ImageEvent.Wrap(message),
                 _ => null
             };
-
-        internal void MarkDelivered() => delivery.TrySetResult();
 
         private static DateTimeOffset MakeTimestamp(long seconds, long nanoseconds)
             => DateTimeOffset.FromUnixTimeSeconds(seconds).AddSeconds(nanoseconds / 1e9);

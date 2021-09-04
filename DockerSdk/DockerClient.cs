@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DockerSdk.Containers;
+using DockerSdk.Core;
+using DockerSdk.Daemon;
 using DockerSdk.Events;
 using DockerSdk.Images;
-using DockerSdk.Networks;
 using DockerSdk.Registries;
-using Core = Docker.DotNet;
-using CoreModels = Docker.DotNet.Models;
+using NetworkAccess = DockerSdk.Networks.NetworkAccess;
+using Version = System.Version;
 
 namespace DockerSdk
 {
@@ -16,12 +19,11 @@ namespace DockerSdk
     /// </summary>
     public class DockerClient : IDisposable, IObservable<Event>
     {
-        private DockerClient(Core.DockerClient core, ClientOptions options, Version negotiatedApiVersion)
+        private DockerClient(Comm core, ClientOptions options, Version negotiatedApiVersion, EventListener listener)
         {
-            // Start listening to events.
-            EventListener = new EventListener(this);
+            EventListener = listener;
 
-            Core = core;
+            Comm = core;
             Options = options;
             ApiVersion = negotiatedApiVersion;
             Containers = new ContainerAccess(this);
@@ -59,7 +61,7 @@ namespace DockerSdk
         /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.
         /// </summary>
-        internal Core.IDockerClient Core { get; }
+        internal Comm Comm { get; }
 
         internal ClientOptions Options { get; }
         internal readonly EventListener EventListener;
@@ -84,7 +86,8 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
@@ -101,14 +104,15 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
         /// <exception cref="ArgumentException">The URL is <see langword="null"/>.</exception>
         public static Task<DockerClient> StartAsync(Uri daemonUrl, CancellationToken ct = default)
-            => StartAsync(new ClientOptions { DaemonUri = daemonUrl }, ct);
+            => StartAsync(new ClientOptions { DaemonUrl = daemonUrl }, ct);
 
         /// <summary>
         /// Creates a new Docker client and connects it to a Docker daemon.
@@ -120,54 +124,52 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// The API versions that the SDK supports don't overlap with the API versions that the daemon supports.
         /// </exception>
-        /// <exception cref="Core.DockerApiException">An internal error occurred within the daemon.</exception>
+        /// <exception cref="DaemonNotFoundException">No Docker daemon was found at the expected path.</exception>
+        /// <exception cref="DockerDaemonException">An internal error occurred within the daemon.</exception>
         /// <exception cref="System.Net.Http.HttpRequestException">
         /// The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate
         /// validation, or timeout.
         /// </exception>
-        /// <exception cref="DaemonNotFoundException">There is no running Docker daemon at the specified URL.</exception>
         public static async Task<DockerClient> StartAsync(ClientOptions options, CancellationToken ct = default)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            if (options.DaemonUri is null)
+            if (options.DaemonUrl is null)
                 throw new ArgumentException("The daemon URL is required.", nameof(options));
 
+            // Make a defensive copy of the options.
+            options = options with { };
+
             // First, establish a connection with the daemon.
-            Core.DockerClient core = options.ToCore().CreateClient();
+            Comm comm = new Comm(options, null);
 
             // Now figure out which API version to use. This will be the max API version that both sides support.
-            CoreModels.VersionResponse versionInfo;
+            VersionResponse? versionInfo;
             try
             {
-                versionInfo = await core.System.GetVersionAsync(ct).ConfigureAwait(false);
+                versionInfo = await comm.Build(HttpMethod.Get, "version")
+                    .SendAsync<VersionResponse>(ct)
+                    .ConfigureAwait(false);
             }
             catch (TimeoutException ex)
             {
-                throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUri}. This typically means that the daemon is not running.", ex);
+                throw new DaemonNotFoundException($"No Docker daemon responded at {options.DaemonUrl}. This typically means that the daemon is not running.", ex);
             }
-            var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo, _libraryMaxApiVersion);
+            var negotiatedApiVersion = DetermineVersionToUse(_libraryMinApiVersion, versionInfo!, _libraryMaxApiVersion);
 
             // Replace the non-versioned core instance with a versioned instance.
-            core.Dispose();
-            core = options.ToCore().CreateClient(negotiatedApiVersion);
+            comm.Dispose();
+            comm = new Comm(options, negotiatedApiVersion);
 
             // Now remove the reference to the credentials so they can drop out of memory as soon as possible.
             options.Credentials = null;
 
-            return new DockerClient(core, options, negotiatedApiVersion);
-        }
+            // Listen for events.
+            var listener = new EventListener(comm);
+            await listener.StartAsync(ct).ConfigureAwait(false);
 
-        /// <summary>
-        /// Subscribes to events from the Docker daemon.
-        /// </summary>
-        /// <param name="observer">An object to observe the events.</param>
-        /// <returns>
-        /// An <see cref="IDisposable"/> representing the subscription. Disposing this unsubscribes and releases
-        /// resources.
-        /// </returns>
-        public IDisposable Subscribe(IObserver<Event> observer)
-            => EventListener.Subscribe(observer);
+            return new DockerClient(comm, options, negotiatedApiVersion, listener);
+        }
 
         /// <summary>
         /// Determines which API version to use for communications between the SDK and the Docker daemon, or throws an
@@ -180,19 +182,19 @@ namespace DockerSdk
         /// <exception cref="DockerVersionException">
         /// There's no overlap between what the two sides can accept.
         /// </exception>
-        internal static Version DetermineVersionToUse(Version libraryMin, CoreModels.VersionResponse daemonInfo, Version libraryMax)
+        internal static Version DetermineVersionToUse(Version libraryMin, VersionResponse daemonInfo, Version libraryMax)
         {
             // Watch out for daemons that are so old that they don't even report APIVersion.
-            if (string.IsNullOrEmpty(daemonInfo.APIVersion))
+            if (string.IsNullOrEmpty(daemonInfo.ApiVersion))
                 throw new DockerVersionException($"The daemon did not report its supported API version, which likely means that it is extremely old. The SDK only supports API versions down to v{libraryMin.ToString(2)}.");
 
             // Check that we support the daemon's max API version.
-            var daemonMaxVersion = new Version(daemonInfo.APIVersion);
+            var daemonMaxVersion = new Version(daemonInfo.ApiVersion);
             if (daemonMaxVersion < libraryMin)
                 throw new DockerVersionException($"Version mismatch: The Docker daemon only supports API versions up to v{daemonMaxVersion.ToString(2)}, and the Docker SDK library only supports API versions down to v{libraryMin.ToString(2)}.");
 
             // Check the daemon's min API version.
-            var daemonMinVersion = new Version(daemonInfo.MinAPIVersion);
+            var daemonMinVersion = new Version(daemonInfo.MinimumApiVersion);
             if (daemonMinVersion > libraryMax)
                 throw new DockerVersionException($"Version mismatch: The Docker daemon supports API versions v{daemonMinVersion.ToString(2)} through v{daemonMaxVersion.ToString(2)}, and the Docker SDK library supports API versions v{libraryMin.ToString(2)} through v{libraryMax.ToString(2)}.");
 
@@ -222,6 +224,8 @@ namespace DockerSdk
                 throw new NotSupportedException($"This feature has not been available since API version v{maxVersion}. You are currently using API version v{version.ToString(2)}.");
         }
 
+        internal RequestBuilder BuildRequest(HttpMethod method, string path) => new RequestBuilder(Comm, method, path);
+
         #region IDisposable
 
         /// <inheritdoc/>
@@ -242,7 +246,7 @@ namespace DockerSdk
                 if (disposing)
                 {
                     EventListener.Dispose();
-                    Core?.Dispose();
+                    Comm?.Dispose();
                 }
 
                 _isDisposed = true;
@@ -250,5 +254,13 @@ namespace DockerSdk
         }
 
         #endregion IDisposable
+
+        /// <summary>
+        /// Subscribes an observer to receive Docker event notifications from the Docker daemon.
+        /// </summary>
+        /// <param name="observer">The object to receive the events.</param>
+        /// <returns>An object that, when disposed, ends the subscription.</returns>
+        public IDisposable Subscribe(IObserver<Event> observer)
+            => EventListener.Subscribe(observer);
     }
 }
