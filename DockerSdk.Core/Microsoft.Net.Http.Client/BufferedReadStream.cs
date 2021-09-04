@@ -197,6 +197,10 @@ namespace Microsoft.Net.Http.Client
                         _bufferCount = await _inner.ReadAsync(_buffer, _bufferOffset, _buffer.Length, cancel).ConfigureAwait(false);
                     }
                 }
+                catch (IOException ex) when (ex.Message.Contains("Operation canceled"))
+                {
+                    throw new OperationCanceledException("The operation has been cancelled.", ex);
+                }
                 finally
                 {
                     if ((Interlocked.Decrement(ref _bufferRefCount) == 0) && validBuffer)
