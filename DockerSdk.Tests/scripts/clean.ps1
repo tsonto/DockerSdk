@@ -25,6 +25,12 @@ foreach ($id in docker network ls --filter="name=ddnt" --quiet --no-trunc)
     docker network rm $id
 }
 
+# Remove volumes.
+foreach ($id in docker volume ls --filter="name=ddnt" --quiet)
+{
+    docker volume rm $id
+}
+
 # Remove images in reverse order of how they were created.
 $tags = $imageDefinitions.Name
 $tags = [System.Linq.Enumerable]::Reverse([string[]] $tags) 

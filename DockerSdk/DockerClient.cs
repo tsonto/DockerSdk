@@ -9,6 +9,7 @@ using DockerSdk.Daemon;
 using DockerSdk.Events;
 using DockerSdk.Images;
 using DockerSdk.Registries;
+using DockerSdk.Volumes;
 using NetworkAccess = DockerSdk.Networks.NetworkAccess;
 using Version = System.Version;
 
@@ -30,6 +31,7 @@ namespace DockerSdk
             Images = new ImageAccess(this);
             Networks = new NetworkAccess(this);
             Registries = new RegistryAccess(this);
+            Volumes = new VolumeAccess(this);
         }
 
         /// <summary>
@@ -57,6 +59,11 @@ namespace DockerSdk
         /// Provides access to functionality related to Docker registries.
         /// </summary>
         public RegistryAccess Registries { get; }
+
+        /// <summary>
+        /// Provides access to functionality related to Docker volumes.
+        /// </summary>
+        public VolumeAccess Volumes { get; }
 
         /// <summary>
         /// Gets the core client, which is what does all the heavy lifting for communicating with the Docker daemon.

@@ -39,6 +39,14 @@ $networkDefinitions = @(
     }
 )
 
+# Defines the volumes to build.
+$volumeDefinitions = @(
+    @{
+        name = 'general'
+        args = '--label ddnt1=alef --label ddnt2=beth'
+    }
+)
+
 # Defines the containers to start. If the image is not specified, it defaults to the name.
 # It's intentional that error-out immediately fails and that some other containers immediately run to completion.
 $containerDefinitions = @(

@@ -25,6 +25,14 @@ function VerifySetup()
         }
     }
 
+    foreach ($name in $volumeDefinitions.Name)
+    {
+        if (!(VerifyVolume $name))
+        {
+            return $false
+        }
+    }
+
     foreach ($name in $imageDefinitions.Name)
     {
         if (!(VerifyImage $name))
@@ -88,6 +96,18 @@ function VerifyNetwork($name)
     return $true
 }
 
+function VerifyVolume($name)
+{
+    $dockerId = docker volume ls --filter=name=ddnt-$name --quiet
+    if (!$dockerId)
+    {
+        # Setup hasn't been run, or someone has deleted the volume. Clean and rebuild.
+        return $false
+    }
+
+    return $true
+}
+
 function VerifyImage($name)
 {
     $path = "$name/image.id"
@@ -133,6 +153,14 @@ foreach ($entry in $imageDefinitions)
     Push-Location $name
     Invoke-Expression "docker build . --tag ddnt:$name --quiet $args > image.id"
     Pop-Location
+}
+
+# Create the volumes.
+foreach ($entry in $volumeDefinitions)
+{
+    $name = $entry.Name
+    $args = $entry['Args'] ?? ''
+    Invoke-Expression "docker volume create $args ddnt-$name"
 }
 
 # Create the networks.
