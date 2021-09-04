@@ -17,6 +17,7 @@ using DockerSdk.Daemon;
 using DockerSdk.Networks;
 using DockerSdk.Registries;
 using DockerSdk.Registries.Dto;
+using DockerSdk.Volumes;
 
 namespace DockerSdk
 {
@@ -390,6 +391,10 @@ namespace DockerSdk
                     var match = Regex.Match(error, "^network (.*) not found$");
                     if (match.Success)
                         throw new NetworkNotFoundException($"No network with name or ID \"{match.Groups[1].Value}\" exists.");
+
+                    match = Regex.Match(error, "^get (.*): no such volume$");
+                    if (match.Success)
+                        throw new VolumeNotFoundException($"No volume with name \"{match.Groups[1].Value}\" exists.");
 
                     throw CreateResourceNotFoundException(error);
                 }

@@ -14,6 +14,6 @@ namespace DockerSdk.Volumes
         public string Driver { get; init; } = null!;
         public IReadOnlyDictionary<string, string> Labels { get; init; } = ImmutableDictionary<string, string>.Empty;
         public string Mountpoint { get; init; } = null!;
-        public string Scope { get; init; } = null!;
+        public VolumeScope Scope { get; init; }
     }
 }

@@ -25,7 +25,7 @@ namespace DockerSdk.Volumes
 
         string Mountpoint { get; }
 
-        string Scope { get; }
+        VolumeScope Scope { get; }
 
         // TODO: Options
     }

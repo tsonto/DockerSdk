@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Volumes.Dto;
 
 namespace DockerSdk.Volumes
 {
@@ -86,17 +88,22 @@ namespace DockerSdk.Volumes
         /// <param name="ct">A token used to cancel the operation.</param>
         /// <returns>A <see cref="Task{TResult}"/> that resolves to the list of volumes.</returns>
         /// <remarks>The sequence of the results is undefined.</remarks>
-        public async Task<IReadOnlyList<IVolume>> ListAsync(CancellationToken ct = default)
+        public Task<IReadOnlyList<IVolume>> ListAsync(CancellationToken ct = default)
+            => ListAsync(new(), ct);
+
+        /// <summary>
+        /// Gets a list of Docker volumes known to the daemon.
+        /// </summary>
+        /// <param name="options">Filters for which volumes to return.</param>
+        /// <param name="ct">A token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task{TResult}"/> that resolves to the list of volumes.</returns>
+        /// <remarks>The sequence of the results is undefined.</remarks>
+        public async Task<IReadOnlyList<IVolume>> ListAsync(ListVolumesOptions options, CancellationToken ct = default)
         {
-            CoreModels.VolumesListResponse response;
-            try
-            {
-                response = await client.Core.Volumes.ListAsync(ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                throw DockerException.Wrap(ex);
-            }
+            ListResponse response = await client.BuildRequest(HttpMethod.Get, "volumes")
+                .WithParameters(options.ToQueryString())
+                .SendAsync<ListResponse>(ct)
+                .ConfigureAwait(false);
 
             return response.Volumes.Select(raw => new Volume(client, new VolumeName(raw.Name))).ToArray();
         }

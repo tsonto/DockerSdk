@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DockerSdk.Volumes.Dto;
 
 namespace DockerSdk.Volumes
 {
     internal static class VolumeFactory
     {
-        internal static Task<IVolume> LoadAsync(DockerClient client, VolumeName name, CancellationToken ct)
+        internal static Task<IVolume> LoadAsync(DockerClient client, VolumeName name, CancellationToken _)
         {
             if (name is null)
                 throw new ArgumentNullException(nameof(name));
@@ -25,7 +28,7 @@ namespace DockerSdk.Volumes
 
             return new VolumeInfo(client, name)
             {
-                CreationTime = DateTimeOffset.Parse(raw.CreatedAt),
+                CreationTime = raw.CreatedAt,
                 Driver = raw.Driver,
                 Labels = raw.Labels?.ToImmutableDictionary() ?? ImmutableDictionary.Create<string, string>(),
                 Mountpoint = raw.Mountpoint,
@@ -33,18 +36,11 @@ namespace DockerSdk.Volumes
             };
         }
 
-        private static async Task<CoreModels.VolumeResponse> LoadCoreAsync(DockerClient client, VolumeName name, CancellationToken ct)
+        private static Task<VolumeResponse> LoadCoreAsync(DockerClient client, VolumeName name, CancellationToken ct)
         {
-            try
-            {
-                return await client.Core.Volumes.InspectAsync(name, ct).ConfigureAwait(false);
-            }
-            catch (Core.DockerApiException ex)
-            {
-                if (VolumeNotFoundException.TryWrap(ex, name, out var wrapped))
-                    throw wrapped;
-                throw DockerException.Wrap(ex);
-            }
+            return client.BuildRequest(HttpMethod.Get, $"volumes/{name}")
+                .RejectStatus(HttpStatusCode.NotFound, _ => new VolumeNotFoundException($"No volume with name \"{name}\" exists."))
+                .SendAsync<VolumeResponse>(ct);
         }
     }
 }
