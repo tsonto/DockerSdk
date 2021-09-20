@@ -40,7 +40,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SharpCompress" Version="0.28.3" />
+        <PackageReference Include="SharpCompress" Version="0.29.0" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />
         <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     </ItemGroup>
